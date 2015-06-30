@@ -1,0 +1,35 @@
+
+
+
+
+
+
+
+
+
+
+
+/*
+   SECTION: PREVIEW
+ */
+
+.slider_track {
+  -fx-fill: gray
+}
+
+.slider_thumb {
+  -fx-fill: red
+}
+
+
+
+
+/*
+   SECTION: VISUALIZATION
+ */
+
+/* subsection: TextRoot */
+
+.textRoot_string {
+
+}
