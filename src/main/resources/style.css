@@ -14,11 +14,11 @@
  */
 
 .slider_track {
-  -fx-fill: gray
+  -fx-fill: gray;
 }
 
 .slider_thumb {
-  -fx-fill: red
+  -fx-fill: red;
 }
 
 

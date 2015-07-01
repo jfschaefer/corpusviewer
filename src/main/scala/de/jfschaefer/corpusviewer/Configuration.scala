@@ -3,14 +3,18 @@ package de.jfschaefer.corpusviewer
 import java.io.FileInputStream
 import java.util.Properties
 
+import de.jfschaefer.corpusviewer.preview.{PolynomialScalingFunction, AbstractPreviewScalingFunction, ConstantScalingFunction}
+
 object Configuration {
   val (
     // display settings
     displayScreen : Int,
     // layout settings
+    windowMargin: Int,
     sliderWidth: Int,
     sliderThumbHeight: Int,
-    windowMargin: Int,
+    previewMargin: Double,
+    previewScale: Double,
     // style settings
     stylesheet: String
   ) = try {
@@ -20,9 +24,11 @@ object Configuration {
       // display settings
       properties getProperty "display_screen" toInt,
       // layout settings
+      properties getProperty "window_margin" toInt,
       properties getProperty "slider_width" toInt,
       properties getProperty "slider_thumb_height" toInt,
-      properties getProperty "window_margin" toInt,
+      properties getProperty "preview_margin" toDouble,
+      properties getProperty "preview_scale" toDouble,
       //style settings
       properties getProperty "stylesheet"
       )
@@ -33,4 +39,5 @@ object Configuration {
   }
 
   val visualizationFactory : AbstractVisualizationFactory = new ConcreteVisualizationFactory
+  val previewScaling: AbstractPreviewScalingFunction = new PolynomialScalingFunction //new ConstantScalingFunction
 }
