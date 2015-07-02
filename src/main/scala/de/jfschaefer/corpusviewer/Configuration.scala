@@ -16,7 +16,9 @@ object Configuration {
     sliderThumbHeight: Int,
     previewMargin: Double,
     previewScale: Double,
+    initialScale: Double,
     preferredPreviewWidth: Double,
+    previewSectionWidth: Double,
 
     textrootIrWidth: Double,
     textrootIrGap: Double,
@@ -35,7 +37,9 @@ object Configuration {
       properties getProperty "slider_thumb_height" toInt,
       properties getProperty "preview_margin" toDouble,
       properties getProperty "preview_scale" toDouble,
+      properties getProperty "initial_scale" toDouble,
       properties getProperty "preferred_preview_width" toDouble,
+      properties getProperty "preview_section_width" toDouble,
       properties getProperty "textroot_ir_width" toDouble,
       properties getProperty "textroot_ir_gap" toDouble,
       //style settings

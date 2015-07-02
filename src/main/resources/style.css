@@ -21,6 +21,10 @@
   -fx-fill: red;
 }
 
+.previewGroup_bgRect {
+  -fx-fill: white;
+}
+
 
 
 

@@ -103,9 +103,20 @@ class Corpus(reader: Reader) extends Group {
       None
     }
     else if (instanceStartPositions(left) > pos) {
-      Some(left + 1)
+      Some(left)
     } else {
       Some(left)
+    }
+  }
+
+  //returns the index corresponding to the corpus offset pos
+  def getIndex(pos: Double): Option[Int] = {
+    getNextIndex(pos) match {
+      case Some(i) =>
+        if (instanceEndPositions(i) > pos && instanceStartPositions(i) < pos) {
+          Some(i)
+        } else None
+      case None => None
     }
   }
 }

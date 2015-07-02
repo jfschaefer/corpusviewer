@@ -8,7 +8,7 @@ import java.io.Reader
 
 import scalafx.application.JFXApp
 import scalafx.scene.Scene
-import scalafx.stage.{StageStyle, Stage, Screen}
+import scalafx.stage.{StageStyle, Screen}
 import scalafx.Includes._
 
 
@@ -51,6 +51,7 @@ object Main extends JFXApp {
     corpus = new Corpus(reader)
     corpusScene.root = corpus
     stage.scene = corpusScene
+    corpus.previewGroup.update()
   }
 
   def getCorpus:Corpus = corpus
