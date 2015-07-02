@@ -30,6 +30,10 @@
 
 /* subsection: TextRoot */
 
+.textRoot {
+  -fx-background-color: lightgray;
+}
+
 .textRoot_string {
 
 }

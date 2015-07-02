@@ -1,6 +1,6 @@
 package de.jfschaefer.corpusviewer.visualization
 
-import de.jfschaefer.corpusviewer.Main
+import de.jfschaefer.corpusviewer.{Main, Configuration}
 
 import de.up.ling.irtg.corpus.Instance
 import de.up.ling.irtg.algebra.StringAlgebra
@@ -13,11 +13,17 @@ import scalafx.scene.shape.{Circle, Rectangle}
 import scalafx.Includes._
 
 import scala.collection.JavaConversions._
+import scala.collection.mutable
 
 // Uses some kind of a String representation for preview
 // Since it is a root, it can be used to open the other interpretations
 class TextRoot(instance: Instance) extends Pane with Displayable {
+  styleClass.add("textRoot")
+
   val instanceMap = instance.getInputObjects
+
+  // FIND STRING REPRESENTATION
+
   var stringRepresentation: String = ""
   if (instanceMap.containsKey("string")) {
     val stringAlgebra = instanceMap.get("string")
@@ -34,17 +40,30 @@ class TextRoot(instance: Instance) extends Pane with Displayable {
     stringRepresentation = "[No string representation has been found]"
   }
 
-  //val textLabel = new Label(stringRepresentation) {
-  //  styleClass.clear()
-  //  styleClass.add("textRoot_string")
-  //  wrapText = true
-  //  maxWidth(100)
-  //}
 
-  //textLabel.setWrapText(true)
-  val text = new Text(stringRepresentation) {
-    wrappingWidth = 400
+  // GENERATE CHILDREN
+
+  val text = new Text("\n" + stringRepresentation) {   //leading \n fixes alignment
+    wrappingWidth = Configuration.preferredPreviewWidth
+  }
+
+  val keyset = instanceMap.keySet
+  val interpretationsMap = mutable.HashMap.empty[String, InterpretationRepresenter]
+  var irXPos = 0d
+  for (key <- keyset) {
+    val ir = new InterpretationRepresenter(key, instance)
+    interpretationsMap += (key -> ir)
+    ir.bgRect.width = Configuration.textrootIrWidth
+    children.add(ir)
+    ir.bgRect.layoutX = irXPos
+    ir.bgRect.layoutY = text.boundsInParent.value.getHeight + 15
+    irXPos += Configuration.textrootIrWidth + Configuration.textrootIrGap
   }
 
   children.add(text)
+
+
+  override def enableInteraction(): Unit = {
+
+  }
 }

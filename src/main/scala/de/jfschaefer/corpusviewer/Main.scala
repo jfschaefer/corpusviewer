@@ -2,8 +2,11 @@ package de.jfschaefer.corpusviewer
 
 import de.jfschaefer.corpusviewer.opendialog.OpenCorpusDialog
 
-import scalafx.application.JFXApp
+import de.up.ling.gesture.JavaFxAdapter
+
 import java.io.Reader
+
+import scalafx.application.JFXApp
 import scalafx.scene.Scene
 import scalafx.stage.{StageStyle, Stage, Screen}
 import scalafx.Includes._
@@ -29,6 +32,8 @@ object Main extends JFXApp {
     height = 600
     scene = openCorpusScene
   }
+
+  val adapter = JavaFxAdapter.start(stage.delegate, Configuration.gestureConfigProperties)
 
   val numberOfScreens = Screen.screens.size
   if (numberOfScreens > Configuration.displayScreen) {
