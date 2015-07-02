@@ -1,6 +1,6 @@
 package de.jfschaefer.corpusviewer.preview
 
-import de.jfschaefer.corpusviewer.visualization.Displayable
+import de.jfschaefer.corpusviewer.visualization.RootDisplayable
 import de.jfschaefer.corpusviewer.{Corpus, Configuration, Main}
 
 import scalafx.beans.property.ReadOnlyDoubleProperty
@@ -131,15 +131,15 @@ class PreviewGroup(corpus: Corpus) extends Group {
   var p_dragStart = (0d, 0d)
   var dragInitialScale = 0d
   var p_dragLast = (0d, 0d)
-  var draggedNode : Option[Displayable] = None
+  var draggedNode : Option[RootDisplayable] = None
   onMousePressed = { ev: MouseEvent =>
     p_dragStart = (ev.x, ev.y)
     p_dragLast = (ev.x, ev.y)
     val s_pos: Double = f_scaling.normalizedIntegralInverse(ev.y / p_totalHeight)
     val c_pos: Double = (1d + s_pos) * c_totalHeight * 0.5 + c_top
     corpus.getIndex(c_pos) match {
-      case Some(i) => {
-        val node = Configuration.visualizationFactory.getRootVisualization(corpus.instances(i))
+      case Some(i) =>
+        val node = Configuration.visualizationFactory.getRootVisualization(corpus.instances(i), i)
         node.scaleX = corpus.instancePreviews(i).getScaleX
         node.scaleY = corpus.instancePreviews(i).getScaleY
         dragInitialScale = node.scaleX.value
@@ -147,7 +147,6 @@ class PreviewGroup(corpus: Corpus) extends Group {
         node.layoutY = corpus.instancePreviews(i).boundsInParent.value.getMinY
         draggedNode = Some(node)
         children.add(node)
-      }
       case None => draggedNode = None
     }
     ev.consume()
@@ -170,7 +169,7 @@ class PreviewGroup(corpus: Corpus) extends Group {
           node.scaleX = scale
           node.scaleY = scale
         }
-      case None => {}
+      case None =>
     }
     p_dragLast = (ev.x, ev.y)
     ev.consume()
@@ -178,15 +177,15 @@ class PreviewGroup(corpus: Corpus) extends Group {
 
   onMouseReleased = { ev: MouseEvent =>
     draggedNode match {
-      case Some(node) => {
+      case Some(node) =>
         children.remove(node)
         if (ev.x > Configuration.previewSectionWidth) {
           Main.corpusScene.getChildren.add(node)
+          node.enableInteraction()
         }
         draggedNode = None
-      }
-      case None => {}
+      case None =>
     }
+    ev.consume()
   }
-
 }

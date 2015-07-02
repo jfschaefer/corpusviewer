@@ -1,13 +1,17 @@
 package de.jfschaefer.corpusviewer.visualization
 
+import de.jfschaefer.corpusviewer.Configuration
 import de.up.ling.irtg.corpus.Instance
 
 import scalafx.scene.Group
 import scalafx.scene.shape.Rectangle
 import scalafx.scene.control.Label
+import scalafx.scene.input.MouseEvent
+
+import scalafx.Includes._
 
 // Remark: Can be controlled by simply placing bgRect at the desired position
-class InterpretationRepresenter(algType : String, instance: Instance) extends Group {
+class InterpretationRepresenter(algType : String, instance: Instance, root: TextRoot) extends Group {
   val bgRect = new Rectangle {
     style = "-fx-fill: red"
     height = 25
@@ -31,4 +35,22 @@ class InterpretationRepresenter(algType : String, instance: Instance) extends Gr
 
   children.add(bgRect)
   children.add(label)
+
+  def enableInteraction(): Unit = {
+    onMousePressed = { ev: MouseEvent =>
+      root.draggedInterpretationNode = {
+        val node = Configuration.visualizationFactory.getVisualization(instance, algType, root)
+        node.scaleX = 0.05
+        node.scaleY = 0.05
+        node.layoutX = boundsInParent.value.getMinX + 0.5 * (boundsInParent.value.getWidth - node.boundsInLocal.value.getWidth)
+        node.layoutY = boundsInParent.value.getMinY + 0.5 * (boundsInParent.value.getHeight - node.boundsInLocal.value.getHeight)
+        root.children.add(node)
+        Some(node)
+      }
+      root.draggedInterpretationStartPos = (ev.x, ev.y)
+      root.draggedInterpretationLastPos = (ev.x, ev.y)
+      root.draggedInterpretationStartScale = 0.05     //let's start really small
+      ev.consume()
+    }
+  }
 }

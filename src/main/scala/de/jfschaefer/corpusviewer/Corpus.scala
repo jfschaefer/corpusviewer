@@ -4,7 +4,7 @@ import java.io.Reader
 import java.util
 
 import de.jfschaefer.corpusviewer.preview.{PreviewGroup, Slider}
-import de.jfschaefer.corpusviewer.visualization.Displayable
+import de.jfschaefer.corpusviewer.visualization.RootDisplayable
 
 import de.up.ling.irtg.algebra.graph.GraphAlgebra
 import de.up.ling.irtg.InterpretedTreeAutomaton
@@ -39,13 +39,13 @@ class Corpus(reader: Reader) extends Group {
   val instances: Array[Instance] = new Array(corpus.getNumberOfInstances)
   val instanceStartPositions: Array[Double] = new Array(corpus.getNumberOfInstances)
   val instanceEndPositions: Array[Double] = new Array(corpus.getNumberOfInstances)
-  val instancePreviews: Array[Displayable] = new Array(corpus.getNumberOfInstances)
+  val instancePreviews: Array[RootDisplayable] = new Array(corpus.getNumberOfInstances)
 
   var index = 0;
 
   for (instance <- corpus.iterator) {
     instances(index) = instance
-    instancePreviews(index) = Configuration.visualizationFactory.getRootVisualization(instance)
+    instancePreviews(index) = Configuration.visualizationFactory.getRootVisualization(instance, index)
     if (index == 0) {
       instanceStartPositions(index) = 0.5 * Configuration.previewMargin
     } else {

@@ -22,6 +22,7 @@ object Configuration {
 
     textrootIrWidth: Double,
     textrootIrGap: Double,
+    textrootInterpretationDragoutDistance: Double,
     // style settings
     stylesheet: String
   ) = try {
@@ -42,6 +43,7 @@ object Configuration {
       properties getProperty "preview_section_width" toDouble,
       properties getProperty "textroot_ir_width" toDouble,
       properties getProperty "textroot_ir_gap" toDouble,
+      properties getProperty "textroot_interpretation_dragout_distance" toDouble,
       //style settings
       properties getProperty "stylesheet"
       )
