@@ -10,19 +10,24 @@ object Configuration {
     // display settings
     displayScreen : Int,
     gestureConfigProperties: String,
+
     // layout settings
     windowMargin: Int,
+    initialScale: Double,
+
     sliderWidth: Int,
     sliderThumbHeight: Int,
     previewMargin: Double,
     previewScale: Double,
-    initialScale: Double,
     preferredPreviewWidth: Double,
     previewSectionWidth: Double,
 
     textrootIrWidth: Double,
-    textrootIrGap: Double,
+    textrootMargin: Double,
     textrootInterpretationDragoutDistance: Double,
+
+    stringvisualizationPadding: Double,
+    stringvisualizationWidth: Double,
     // style settings
     stylesheet: String
   ) = try {
@@ -34,16 +39,20 @@ object Configuration {
       properties getProperty "gesture_config_properties",
       // layout settings
       properties getProperty "window_margin" toInt,
+      properties getProperty "initial_scale" toDouble,
+
       properties getProperty "slider_width" toInt,
       properties getProperty "slider_thumb_height" toInt,
       properties getProperty "preview_margin" toDouble,
       properties getProperty "preview_scale" toDouble,
-      properties getProperty "initial_scale" toDouble,
       properties getProperty "preferred_preview_width" toDouble,
       properties getProperty "preview_section_width" toDouble,
       properties getProperty "textroot_ir_width" toDouble,
-      properties getProperty "textroot_ir_gap" toDouble,
+      properties getProperty "textroot_margin" toDouble,
       properties getProperty "textroot_interpretation_dragout_distance" toDouble,
+
+      properties getProperty "stringvisualization_padding" toDouble,
+      properties getProperty "stringvisualization_width" toDouble,
       //style settings
       properties getProperty "stylesheet"
       )

@@ -46,9 +46,6 @@ class InterpretationRepresenter(algType : String, instance: Instance, root: Text
         root.children.add(node)
         Some(node)
       }
-      //println("ORIGIN: " + ev.x + "  |  " + ev.y)
-      //root.draggedInterpretationStartPos = (ev.x * root.scale.value, ev.y * root.scale.value)
-      //root.draggedInterpretationLastPos = (ev.x * root.scale.value, ev.y * root.scale.value)
       root.draggedInterpretationStartPos = (ev.sceneX, ev.sceneY)
       root.draggedInterpretationLastPos = (ev.x, ev.y)
       root.draggedInterpretationStartScale = 0.05     //let's start really small

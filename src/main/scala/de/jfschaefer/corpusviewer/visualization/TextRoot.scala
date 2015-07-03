@@ -33,10 +33,9 @@ class TextRoot(instance: Instance, indeX: Int) extends Group with RootDisplayabl
   var stringRepresentation: String = ""
   if (instanceMap.containsKey("string")) {
     val stringAlgebra = instanceMap.get("string")
-    //if (stringAlgebra.isInstanceOf[StringAlgebra]) {
-     // stringRepresentation = Main.getCorpus.algebraMap.get("string").asInstanceOf[StringAlgebra].representAsString(stringAlgebra.asInstanceOf[java.util.List[String]])
-    stringRepresentation = (new StringAlgebra).representAsString(stringAlgebra.asInstanceOf[java.util.List[String]])
-    //} else if (stringAlgebra.isInstanceOf[java.util.ArrayList[java.lang.String]]) {
+    if (stringAlgebra.isInstanceOf[java.util.List[String]]) {
+      stringRepresentation = (new StringAlgebra).representAsString(stringAlgebra.asInstanceOf[java.util.List[String]])
+    }
   }
   // If no string algebra has been found, use the string representation of the instance instead
   if (stringRepresentation == "") {
@@ -46,26 +45,29 @@ class TextRoot(instance: Instance, indeX: Int) extends Group with RootDisplayabl
     stringRepresentation = "[No string representation has been found]"
   }
 
-
   // GENERATE CHILDREN
   val pane = new Pane {
-    styleClass.add("textRoot")
     scaleX <== scale
     scaleY <== scale
+    styleClass.clear()
+    styleClass.add("displayable")
+    styleClass.add("no_trash_alert")
+    styleClass.add("no_id_assigned")
+    minWidth = Configuration.preferredPreviewWidth
   }
 
   val text = new Text("\n" + stringRepresentation) {   //leading \n fixes alignment
-    wrappingWidth = Configuration.preferredPreviewWidth
+    wrappingWidth = Configuration.preferredPreviewWidth - 2 * Configuration.textrootMargin
   }
+
+  var draggedInterpretationStartPos = (0d, 0d)    //In sceneX|sceneY coordinates
+  var draggedInterpretationLastPos = (0d, 0d)     //In ev.x|ev.y coordinates
+  var draggedInterpretationStartScale = 0d
+  var draggedInterpretationNode: Option[Displayable] = None
 
   val keyset = instanceMap.keySet
   val interpretationsMap = mutable.HashMap.empty[String, InterpretationRepresenter]
-  var irXPos = 0d
-
-  var draggedInterpretationStartPos = (0d, 0d)
-  var draggedInterpretationLastPos = (0d, 0d)
-  var draggedInterpretationStartScale = 0d
-  var draggedInterpretationNode: Option[Displayable] = None
+  var irXPos = Configuration.textrootMargin
 
   for (key <- keyset) {
     val ir = new InterpretationRepresenter(key, instance, this)
@@ -73,11 +75,13 @@ class TextRoot(instance: Instance, indeX: Int) extends Group with RootDisplayabl
     ir.bgRect.width = Configuration.textrootIrWidth
     pane.children.add(ir)
     ir.bgRect.layoutX = irXPos
-    ir.bgRect.layoutY = text.boundsInParent.value.getHeight + 15
-    irXPos += Configuration.textrootIrWidth + Configuration.textrootIrGap
+    ir.bgRect.layoutY = text.boundsInParent.value.getHeight + Configuration.textrootMargin
+    irXPos += Configuration.textrootIrWidth + 2 * Configuration.textrootMargin
   }
 
   pane.children.add(text)
+  text.translateX = text.translateX.value + Configuration.textrootMargin
+  text.translateY = text.translateY.value + Configuration.textrootMargin
 
   children.add(pane)
 
@@ -87,7 +91,6 @@ class TextRoot(instance: Instance, indeX: Int) extends Group with RootDisplayabl
     onScroll = Util.handleScroll(this)
 
     onMouseDragged = { ev: MouseEvent =>
-      println("x y: " + ev.x + "  |  " + ev.y)
       draggedInterpretationNode match {
         case Some(d: Displayable) =>
           d.translateX = d.translateX.value + ev.x - draggedInterpretationLastPos._1
@@ -125,7 +128,7 @@ class TextRoot(instance: Instance, indeX: Int) extends Group with RootDisplayabl
             Main.corpusScene.getChildren.add(d)
             d.translateX = d.translateX.value + bounds.getMinX - d.boundsInParent.value.getMinX
             d.translateY = d.translateY.value + bounds.getMinY - d.boundsInParent.value.getMinY
-            println((bounds.getMinX, d.boundsInParent.value.getMinX, d.translateX.value))
+            d.enableInteraction()
           }
         case None =>
       }

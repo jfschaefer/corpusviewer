@@ -14,11 +14,13 @@
  */
 
 .slider_track {
-  -fx-fill: gray;
+  -fx-fill: lightgray;
+  -fx-stroke: gray;
+  -fx-stroke-width: 1px;
 }
 
 .slider_thumb {
-  -fx-fill: red;
+  -fx-fill: gray;
 }
 
 .previewGroup_bgRect {
@@ -26,18 +28,29 @@
 }
 
 
-
-
 /*
    SECTION: VISUALIZATION
  */
 
-/* subsection: TextRoot */
-
-.textRoot {
-  -fx-background-color: lightgray;
+.displayable {
+  -fx-arc-height: 14px;
+  -fx-arc-width: 14px;
 }
 
-.textRoot_string {
+.trash_alert {
+  -fx-effect: dropshadow(three-pass-box, rgba(255, 0, 0, 1.0), 8, 0.5, 0, 0);
+  -fx-stroke: red;
+  -fx-stroke-width: 4px;
+}
 
+.no_trash_alert {
+  -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 5, 0.0, 1, 2);
+  -fx-stroke: black;
+  -fx-stroke-width: 1px
+}
+
+/* ID COLORS */
+
+.no_id_assigned {
+  -fx-background-color: white;
 }
