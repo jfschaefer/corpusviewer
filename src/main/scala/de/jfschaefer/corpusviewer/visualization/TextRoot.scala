@@ -96,7 +96,7 @@ class TextRoot(iw: InstanceWrapper, indeX: Int) extends Group with RootDisplayab
 
 
   override def enableInteraction(): Unit = {
-    onZoom = Util.handleZoom(this, scale)
+    pane.onZoom = Util.handleZoom(pane, scale)
     onScroll = Util.handleScroll(this)
 
     onMouseDragged = { ev: MouseEvent =>

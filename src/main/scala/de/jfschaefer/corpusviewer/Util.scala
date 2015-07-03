@@ -21,6 +21,7 @@ object Util {
 
       node.translateX = node.translateX.value + shiftX
       node.translateY = node.translateY.value + shiftY
+      ev.consume()
     }
   }
 
