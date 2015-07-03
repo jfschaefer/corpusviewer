@@ -1,6 +1,6 @@
 package de.jfschaefer.corpusviewer.visualization
 
-import de.jfschaefer.corpusviewer.{Util, Configuration}
+import de.jfschaefer.corpusviewer.{InstanceWrapper, Util, Configuration}
 import de.up.ling.irtg.algebra.StringAlgebra
 import de.up.ling.irtg.corpus.Instance
 
@@ -9,9 +9,10 @@ import scalafx.scene.layout.Pane
 import scalafx.Includes._
 import scalafx.scene.text.Text
 
-class StringVisualization(instance: Instance, key: String, parentD: Displayable) extends Pane with Displayable {
+class StringVisualization(iw: InstanceWrapper, key: String, parentD: Displayable) extends Pane with Displayable {
   override val parentDisplayable = Some(parentD)
   override val scale = new DoubleProperty
+  override def getIw = iw
   scale.set(1d)
 
   styleClass.clear()
@@ -19,14 +20,24 @@ class StringVisualization(instance: Instance, key: String, parentD: Displayable)
   styleClass.add("no_trash_alert")
   styleClass.add("no_id_assigned")
 
+  var idstyleclass: String = iw.getStyleClass
+  styleClass.add(idstyleclass)
+
+  iw.id onChange {
+    styleClass.removeAll(idstyleclass)
+    idstyleclass = iw.getStyleClass
+    styleClass.add(idstyleclass)
+    val a = 0    //has to return Unit...
+  }
+
   scaleX <== scale
   scaleY <== scale
 
   minWidth = Configuration.stringvisualizationWidth + 2 * Configuration.stringvisualizationPadding
 
 
-  assert(instance.getInputObjects.containsKey(key))
-  val algObj = instance.getInputObjects.get(key)
+  assert(iw.instance.getInputObjects.containsKey(key))
+  val algObj = iw.instance.getInputObjects.get(key)
   assert(algObj.isInstanceOf[java.util.List[String]])
   val stringRepresentation = (new StringAlgebra).representAsString(algObj.asInstanceOf[java.util.List[String]])
 

@@ -38,6 +38,7 @@ object Util {
 
       node.translateX = node.translateX.value + shiftX
       node.translateY = node.translateY.value + shiftY
+      ev.consume()
     }
   }
 
@@ -45,6 +46,7 @@ object Util {
     ev: ScrollEvent => {
       node.translateX = node.translateX.value + ev.deltaX
       node.translateY = node.translateY.value + ev.deltaY
+      ev.consume()
     }
   }
 }

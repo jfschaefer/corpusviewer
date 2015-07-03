@@ -36,22 +36,23 @@ class Corpus(reader: Reader) extends Group {
 
   println("Generating preview visualizations")
 
-  val instances: Array[Instance] = new Array(corpus.getNumberOfInstances)
-  val instanceStartPositions: Array[Double] = new Array(corpus.getNumberOfInstances)
-  val instanceEndPositions: Array[Double] = new Array(corpus.getNumberOfInstances)
-  val instancePreviews: Array[RootDisplayable] = new Array(corpus.getNumberOfInstances)
+  val iws: Array[InstanceWrapper] = new Array(corpus.getNumberOfInstances)
+  // val instanceStartPositions: Array[Double] = new Array(corpus.getNumberOfInstances)
+  // val instanceEndPositions: Array[Double] = new Array(corpus.getNumberOfInstances)
+  // val instancePreviews: Array[RootDisplayable] = new Array(corpus.getNumberOfInstances)
 
-  var index = 0;
+  var index = 0
 
   for (instance <- corpus.iterator) {
-    instances(index) = instance
-    instancePreviews(index) = Configuration.visualizationFactory.getRootVisualization(instance, index)
+    val iw = new InstanceWrapper(instance)
+    iws(index) = iw
+    iw.preview = Configuration.visualizationFactory.getRootVisualization(iw, index)
     if (index == 0) {
-      instanceStartPositions(index) = 0.5 * Configuration.previewMargin
+      iw.corpusOffsetStart = 0.5 * Configuration.previewMargin
     } else {
-      instanceStartPositions(index) = instanceEndPositions(index - 1) + Configuration.previewMargin
+      iw.corpusOffsetStart = iws(index - 1).corpusOffsetEnd + Configuration.previewMargin
     }
-    instanceEndPositions(index) = instanceStartPositions(index) + instancePreviews(index).boundsInLocal.value.getHeight
+    iw.corpusOffsetEnd = iw.corpusOffsetStart + iw.preview.boundsInLocal.value.getHeight
     index += 1
   }
 
@@ -70,7 +71,7 @@ class Corpus(reader: Reader) extends Group {
     minHeight <== Main.stage.height - 2*Configuration.windowMargin
     maxHeight <== Main.stage.height - 2*Configuration.windowMargin
     rangeStart.set(0d)
-    rangeEnd.set(instanceEndPositions(lastIndex) + 0.5 * Configuration.previewMargin)
+    rangeEnd.set(iws(lastIndex).corpusOffsetEnd + 0.5 * Configuration.previewMargin)
   }
 
   children.add(slider)
@@ -88,8 +89,8 @@ class Corpus(reader: Reader) extends Group {
     var right = lastIndex
     while (left != right) {
       val mid : Int = (left + right) / 2
-      if (instanceStartPositions(mid) <= pos) {
-        if (instanceEndPositions(mid) >= pos) {
+      if (iws(mid).corpusOffsetStart <= pos) {
+        if (iws(mid).corpusOffsetEnd >= pos) {
           return Some(mid)  //Found it
         } else {
           left = mid + 1
@@ -98,11 +99,11 @@ class Corpus(reader: Reader) extends Group {
         right = mid
       }
     }
-    if (instanceEndPositions(left) < pos) {
+    if (iws(left).corpusOffsetEnd < pos) {
       assert(left == lastIndex)
       None
     }
-    else if (instanceStartPositions(left) > pos) {
+    else if (iws(left).corpusOffsetStart > pos) {
       Some(left)
     } else {
       Some(left)
@@ -113,7 +114,7 @@ class Corpus(reader: Reader) extends Group {
   def getIndex(pos: Double): Option[Int] = {
     getNextIndex(pos) match {
       case Some(i) =>
-        if (instanceEndPositions(i) > pos && instanceStartPositions(i) < pos) {
+        if (iws(i).corpusOffsetEnd > pos && iws(i).corpusOffsetStart < pos) {
           Some(i)
         } else None
       case None => None

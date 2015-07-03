@@ -1,5 +1,7 @@
 package de.jfschaefer.corpusviewer.visualization
 
+import de.jfschaefer.corpusviewer.InstanceWrapper
+
 import scalafx.beans.property.DoubleProperty
 import scalafx.scene.Node
 
@@ -8,6 +10,7 @@ trait Displayable extends Node {
   val parentDisplayable: Option[Displayable]
   val scale: DoubleProperty
   def enableInteraction():Unit
+  def getIw: InstanceWrapper
 }
 
 trait RootDisplayable extends Displayable {

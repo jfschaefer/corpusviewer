@@ -1,6 +1,6 @@
 package de.jfschaefer.corpusviewer.visualization
 
-import de.jfschaefer.corpusviewer.{Main, Configuration, Util}
+import de.jfschaefer.corpusviewer.{InstanceWrapper, Main, Configuration, Util}
 
 import de.up.ling.irtg.corpus.Instance
 import de.up.ling.irtg.algebra.StringAlgebra
@@ -19,17 +19,16 @@ import scala.collection.mutable
 
 // Uses some kind of a String representation for preview
 // Since it is a root, it can be used to open the other interpretations
-class TextRoot(instance: Instance, indeX: Int) extends Group with RootDisplayable {
+class TextRoot(iw: InstanceWrapper, indeX: Int) extends Group with RootDisplayable {
   override val parentDisplayable = None
   override val index = indeX
   override val scale = new DoubleProperty
+  override def getIw = iw
   scale.set(1d)
-
-  val instanceMap = instance.getInputObjects
-
 
   // FIND STRING REPRESENTATION
 
+  val instanceMap = iw.instance.getInputObjects
   var stringRepresentation: String = ""
   if (instanceMap.containsKey("string")) {
     val stringAlgebra = instanceMap.get("string")
@@ -39,7 +38,7 @@ class TextRoot(instance: Instance, indeX: Int) extends Group with RootDisplayabl
   }
   // If no string algebra has been found, use the string representation of the instance instead
   if (stringRepresentation == "") {
-    stringRepresentation = instance.toString
+    stringRepresentation = iw.instance.toString
   }
   if (stringRepresentation == "") {
     stringRepresentation = "[No string representation has been found]"
@@ -53,6 +52,16 @@ class TextRoot(instance: Instance, indeX: Int) extends Group with RootDisplayabl
     styleClass.add("displayable")
     styleClass.add("no_trash_alert")
     styleClass.add("no_id_assigned")
+
+    var idstyleclass: String = iw.getStyleClass
+    styleClass.add(idstyleclass)
+
+    iw.id onChange {
+      styleClass.remove(styleClass.indexOf(idstyleclass))
+      idstyleclass = iw.getStyleClass
+      styleClass.add(idstyleclass)
+      val a = 0    //has to return Unit...
+    }
     minWidth = Configuration.preferredPreviewWidth
   }
 
@@ -70,7 +79,7 @@ class TextRoot(instance: Instance, indeX: Int) extends Group with RootDisplayabl
   var irXPos = Configuration.textrootMargin
 
   for (key <- keyset) {
-    val ir = new InterpretationRepresenter(key, instance, this)
+    val ir = new InterpretationRepresenter(key, iw, this)
     interpretationsMap += (key -> ir)
     ir.bgRect.width = Configuration.textrootIrWidth
     pane.children.add(ir)

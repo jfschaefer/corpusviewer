@@ -54,3 +54,27 @@
 .no_id_assigned {
   -fx-background-color: white;
 }
+
+.id_0 {
+  -fx-background-color: #bbbbff;
+}
+
+.id_1 {
+  -fx-background-color: #bbffbb;
+}
+
+.id_2 {
+  -fx-background-color: #ffbbbb;
+}
+
+.id_3 {
+  -fx-background-color: #ffbbff;
+}
+
+.id_4 {
+  -fx-background-color: #bbffff;
+}
+
+.id_5 {
+  -fx-background-color: #ffffbb;
+}

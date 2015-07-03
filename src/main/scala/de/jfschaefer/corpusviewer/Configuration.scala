@@ -28,8 +28,10 @@ object Configuration {
 
     stringvisualizationPadding: Double,
     stringvisualizationWidth: Double,
+
     // style settings
-    stylesheet: String
+    stylesheet: String,
+    numberOfIds: Int
   ) = try {
     val properties = new Properties()
     properties.load(new FileInputStream("corpusviewer.properties"))
@@ -54,10 +56,12 @@ object Configuration {
       properties getProperty "stringvisualization_padding" toDouble,
       properties getProperty "stringvisualization_width" toDouble,
       //style settings
-      properties getProperty "stylesheet"
+      properties getProperty "stylesheet",
+      properties getProperty "number_of_ids" toInt
       )
   } catch {
     case exc: Exception =>
+      System.err.println("de.jfschaefer.corpusviewer.Configuration: Couldn't load corpusviewer.properties")
       exc.printStackTrace()
       sys.exit(1)
   }

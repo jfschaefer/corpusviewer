@@ -74,7 +74,7 @@ class PreviewGroup(corpus: Corpus) extends Group {
           System.err.println("de.jfschaefer.corpusviewer.preview.PreviewGroup: No instances loaded")
           return
         }
-        else if (c_top > corpus.instanceEndPositions(corpus.lastIndex)) i_top = corpus.lastIndex //let's keep it simple
+        else if (c_top > corpus.iws(corpus.lastIndex).corpusOffsetEnd) i_top = corpus.lastIndex //let's keep it simple
         else {
           System.err.println("de.jfschaefer.corpusviewer.preview.PreviewGroup: ...Corpus.getNextIndex returned None")
           return
@@ -85,10 +85,10 @@ class PreviewGroup(corpus: Corpus) extends Group {
 
     // iterate over all the nodes to be displayed
     var i_it = i_top
-    while (i_it <= corpus.lastIndex && corpus.instanceStartPositions(i_it) < c_bottom) {
-      val node = corpus.instancePreviews(i_it)
-      val c_nodeHeight = corpus.instanceEndPositions(i_it) - corpus.instanceStartPositions(i_it)
-      val c_nodeCenter = corpus.instanceStartPositions(i_it) + 0.5 * c_nodeHeight
+    while (i_it <= corpus.lastIndex && corpus.iws(i_it).corpusOffsetStart < c_bottom) {
+      val node = corpus.iws(i_it).preview
+      val c_nodeHeight = corpus.iws(i_it).corpusOffsetEnd - corpus.iws(i_it).corpusOffsetStart
+      val c_nodeCenter = corpus.iws(i_it).corpusOffsetStart + 0.5 * c_nodeHeight
       val s_nodeCenter = 2 * (c_nodeCenter - c_top)/c_totalHeight - 1
       val scaling = f_scaling.function(s_nodeCenter) * Configuration.previewScale
       node.scale.set(scaling)
@@ -139,13 +139,15 @@ class PreviewGroup(corpus: Corpus) extends Group {
     val c_pos: Double = (1d + s_pos) * c_totalHeight * 0.5 + c_top
     corpus.getIndex(c_pos) match {
       case Some(i) =>
-        val node = Configuration.visualizationFactory.getRootVisualization(corpus.instances(i), i)
-        node.scale.set(corpus.instancePreviews(i).scale.value)
-        dragInitialScale = node.scale.value
-        node.layoutX = corpus.instancePreviews(i).boundsInParent.value.getMinX
-        node.layoutY = corpus.instancePreviews(i).boundsInParent.value.getMinY
-        draggedNode = Some(node)
-        children.add(node)
+        if (!corpus.iws(i).hasIdAssigned) {
+          val node = Configuration.visualizationFactory.getRootVisualization(corpus.iws(i), i)
+          node.scale.set(corpus.iws(i).preview.scale.value)
+          dragInitialScale = node.scale.value
+          node.layoutX = corpus.iws(i).preview.boundsInParent.value.getMinX
+          node.layoutY = corpus.iws(i).preview.boundsInParent.value.getMinY
+          draggedNode = Some(node)
+          children.add(node)
+        }
       case None => draggedNode = None
     }
     ev.consume()
@@ -158,12 +160,15 @@ class PreviewGroup(corpus: Corpus) extends Group {
         node.translateY = node.translateY.value + ev.y - p_dragLast._2
         if (ev.x < p_dragStart._1) {
           node.scale.set(dragInitialScale)
+          node.getIw.releaseId()
         } else if (ev.x > Configuration.previewSectionWidth) {
           node.scale.set(Configuration.initialScale)
+          node.getIw.assignId()
         } else {
           val scale = dragInitialScale + (Configuration.initialScale - dragInitialScale) *
                                  (ev.x - p_dragStart._1) / (Configuration.previewSectionWidth - p_dragStart._1)
           node.scale.set(scale)
+          node.getIw.releaseId()
         }
       case None =>
     }
@@ -178,6 +183,9 @@ class PreviewGroup(corpus: Corpus) extends Group {
         if (ev.x > Configuration.previewSectionWidth) {
           Main.corpusScene.getChildren.add(node)
           node.enableInteraction()
+          node.getIw.assignId()
+        } else {
+          node.getIw.releaseId()
         }
         draggedNode = None
       case None =>
