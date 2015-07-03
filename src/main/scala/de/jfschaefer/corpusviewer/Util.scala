@@ -1,5 +1,6 @@
 package de.jfschaefer.corpusviewer
 
+import scalafx.beans.property.DoubleProperty
 import scalafx.scene.Node
 import scalafx.scene.input.{ZoomEvent, ScrollEvent}
 
@@ -17,6 +18,23 @@ object Util {
 
       node.scaleX = node.scaleX.value * ev.zoomFactor
       node.scaleY = node.scaleY.value * ev.zoomFactor
+
+      node.translateX = node.translateX.value + shiftX
+      node.translateY = node.translateY.value + shiftY
+    }
+  }
+
+  def handleZoom(node: Node, scale: DoubleProperty): ZoomEvent => Unit = {
+    ev: ZoomEvent => {
+      val bounds = node.boundsInLocal.value
+
+      val localX = ev.x - bounds.getMinX
+      val localY = ev.y - bounds.getMinY
+      val shiftX = scale.value * (1 - ev.zoomFactor) * (localX - bounds.getWidth/2)
+      val shiftY = scale.value * (1 - ev.zoomFactor) * (localY - bounds.getHeight/2)
+
+      scale.set(scale.value * ev.zoomFactor)
+      scale.set(scale.value * ev.zoomFactor)
 
       node.translateX = node.translateX.value + shiftX
       node.translateY = node.translateY.value + shiftY

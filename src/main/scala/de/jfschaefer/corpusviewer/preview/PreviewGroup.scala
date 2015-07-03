@@ -91,14 +91,14 @@ class PreviewGroup(corpus: Corpus) extends Group {
       val c_nodeCenter = corpus.instanceStartPositions(i_it) + 0.5 * c_nodeHeight
       val s_nodeCenter = 2 * (c_nodeCenter - c_top)/c_totalHeight - 1
       val scaling = f_scaling.function(s_nodeCenter) * Configuration.previewScale
-      node.scaleX = scaling
-      node.scaleY = scaling
+      node.scale.set(scaling)
       val p_yCenter = p_totalHeight * f_scaling.normalizedIntegral(s_nodeCenter) //* Configuration.previewScale
       //val p_yCenter = p_totalHeight * f_scaling.reciprocalIntegralFromMinusOne(s_nodeCenter) / f_scaling.reciprocalIntegralFromMinusOne(1)
       val p_yTop = p_yCenter - 0.5 * c_nodeHeight * scaling
       children.add(node)
       node.translateX = node.translateX.value + xOffset - node.boundsInParent.value.getMinX + (    // need some correction in case object hadn't been visible - no clue why
-            if (node.boundsInParent.value.getMinX == 0.0) 0.5 * (node.boundsInParent.value.getWidth - node.boundsInLocal.value.getWidth)  else 0)
+            //if (node.boundsInParent.value.getMinX == 0.0) 1 * (node.boundsInParent.value.getWidth - node.boundsInLocal.value.getWidth)  else 0)
+        if (node.boundsInParent.value.getMinX == 0.0) 0.5 * node.boundsInParent.value.getWidth - 0.5*node.boundsInLocal.value.getWidth/node.scale.value  else 0)
       node.translateY = node.translateY.value + p_yTop - node.boundsInParent.value.getMinY
       i_it += 1
     }
@@ -140,9 +140,8 @@ class PreviewGroup(corpus: Corpus) extends Group {
     corpus.getIndex(c_pos) match {
       case Some(i) =>
         val node = Configuration.visualizationFactory.getRootVisualization(corpus.instances(i), i)
-        node.scaleX = corpus.instancePreviews(i).getScaleX
-        node.scaleY = corpus.instancePreviews(i).getScaleY
-        dragInitialScale = node.scaleX.value
+        node.scale.set(corpus.instancePreviews(i).scale.value)
+        dragInitialScale = node.scale.value
         node.layoutX = corpus.instancePreviews(i).boundsInParent.value.getMinX
         node.layoutY = corpus.instancePreviews(i).boundsInParent.value.getMinY
         draggedNode = Some(node)
@@ -158,16 +157,13 @@ class PreviewGroup(corpus: Corpus) extends Group {
         node.translateX = node.translateX.value + ev.x - p_dragLast._1
         node.translateY = node.translateY.value + ev.y - p_dragLast._2
         if (ev.x < p_dragStart._1) {
-          node.scaleX = dragInitialScale
-          node.scaleY = dragInitialScale
+          node.scale.set(dragInitialScale)
         } else if (ev.x > Configuration.previewSectionWidth) {
-          node.scaleX = Configuration.initialScale
-          node.scaleY = Configuration.initialScale
+          node.scale.set(Configuration.initialScale)
         } else {
           val scale = dragInitialScale + (Configuration.initialScale - dragInitialScale) *
                                  (ev.x - p_dragStart._1) / (Configuration.previewSectionWidth - p_dragStart._1)
-          node.scaleX = scale
-          node.scaleY = scale
+          node.scale.set(scale)
         }
       case None =>
     }

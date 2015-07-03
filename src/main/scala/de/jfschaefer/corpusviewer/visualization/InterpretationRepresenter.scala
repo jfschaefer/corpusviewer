@@ -40,14 +40,16 @@ class InterpretationRepresenter(algType : String, instance: Instance, root: Text
     onMousePressed = { ev: MouseEvent =>
       root.draggedInterpretationNode = {
         val node = Configuration.visualizationFactory.getVisualization(instance, algType, root)
-        node.scaleX = 0.05
-        node.scaleY = 0.05
+        node.scale.set(0.05)
         node.layoutX = boundsInParent.value.getMinX + 0.5 * (boundsInParent.value.getWidth - node.boundsInLocal.value.getWidth)
         node.layoutY = boundsInParent.value.getMinY + 0.5 * (boundsInParent.value.getHeight - node.boundsInLocal.value.getHeight)
         root.children.add(node)
         Some(node)
       }
-      root.draggedInterpretationStartPos = (ev.x, ev.y)
+      //println("ORIGIN: " + ev.x + "  |  " + ev.y)
+      //root.draggedInterpretationStartPos = (ev.x * root.scale.value, ev.y * root.scale.value)
+      //root.draggedInterpretationLastPos = (ev.x * root.scale.value, ev.y * root.scale.value)
+      root.draggedInterpretationStartPos = (ev.sceneX, ev.sceneY)
       root.draggedInterpretationLastPos = (ev.x, ev.y)
       root.draggedInterpretationStartScale = 0.05     //let's start really small
       ev.consume()

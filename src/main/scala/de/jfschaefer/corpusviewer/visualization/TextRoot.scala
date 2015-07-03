@@ -5,6 +5,7 @@ import de.jfschaefer.corpusviewer.{Main, Configuration, Util}
 import de.up.ling.irtg.corpus.Instance
 import de.up.ling.irtg.algebra.StringAlgebra
 
+import scalafx.beans.property.DoubleProperty
 import scalafx.scene.layout.Pane
 import scalafx.scene.Group
 import scalafx.scene.control.Label
@@ -21,6 +22,8 @@ import scala.collection.mutable
 class TextRoot(instance: Instance, indeX: Int) extends Group with RootDisplayable {
   override val parentDisplayable = None
   override val index = indeX
+  override val scale = new DoubleProperty
+  scale.set(1d)
 
   val instanceMap = instance.getInputObjects
 
@@ -47,6 +50,8 @@ class TextRoot(instance: Instance, indeX: Int) extends Group with RootDisplayabl
   // GENERATE CHILDREN
   val pane = new Pane {
     styleClass.add("textRoot")
+    scaleX <== scale
+    scaleY <== scale
   }
 
   val text = new Text("\n" + stringRepresentation) {   //leading \n fixes alignment
@@ -78,23 +83,23 @@ class TextRoot(instance: Instance, indeX: Int) extends Group with RootDisplayabl
 
 
   override def enableInteraction(): Unit = {
-    onZoom = Util.handleZoom(this)
+    onZoom = Util.handleZoom(this, scale)
     onScroll = Util.handleScroll(this)
 
     onMouseDragged = { ev: MouseEvent =>
+      println("x y: " + ev.x + "  |  " + ev.y)
       draggedInterpretationNode match {
         case Some(d: Displayable) =>
           d.translateX = d.translateX.value + ev.x - draggedInterpretationLastPos._1
           d.translateY = d.translateY.value + ev.y - draggedInterpretationLastPos._2
-          val distance = math.sqrt((ev.x - draggedInterpretationStartPos._1) * (ev.x - draggedInterpretationStartPos._1) +
-                                   (ev.y - draggedInterpretationStartPos._2) * (ev.y - draggedInterpretationStartPos._2))
-          val goald = Configuration.textrootInterpretationDragoutDistance / scaleX.value
-          val scale = if (distance < goald)
-              draggedInterpretationStartScale + (scaleX.value - draggedInterpretationStartScale) * distance / goald
-            else Configuration.initialScale     //distance non-negative, so this covers all the cases
+          val distance = math.sqrt((ev.sceneX - draggedInterpretationStartPos._1) * (ev.sceneX - draggedInterpretationStartPos._1) +
+                                   (ev.sceneY - draggedInterpretationStartPos._2) * (ev.sceneY - draggedInterpretationStartPos._2))
+          val goald = Configuration.textrootInterpretationDragoutDistance * math.sqrt(scale.value)
+          val scalE = if (distance < goald)
+              draggedInterpretationStartScale + (scale.value - draggedInterpretationStartScale) * distance / goald
+            else scale.value     //distance non-negative, so this covers all the cases
 
-          d.scaleX = scale
-          d.scaleY = scale
+          d.scale.set(scalE)
 
           draggedInterpretationLastPos = (ev.x, ev.y)
         case None =>
@@ -104,14 +109,13 @@ class TextRoot(instance: Instance, indeX: Int) extends Group with RootDisplayabl
     onMouseReleased = { ev: MouseEvent =>
       draggedInterpretationNode match {
         case Some(d: Displayable) =>
-          val distance = math.sqrt((ev.x - draggedInterpretationStartPos._1) * (ev.x - draggedInterpretationStartPos._1) +
-                                   (ev.y - draggedInterpretationStartPos._2) * (ev.y - draggedInterpretationStartPos._2))
-          val goald = Configuration.textrootInterpretationDragoutDistance / scaleX.value
+          val distance = math.sqrt((ev.sceneX - draggedInterpretationStartPos._1) * (ev.sceneX - draggedInterpretationStartPos._1) +
+            (ev.sceneY - draggedInterpretationStartPos._2) * (ev.sceneY - draggedInterpretationStartPos._2))
+          val goald = Configuration.textrootInterpretationDragoutDistance * math.sqrt(scale.value)
           if (distance < goald) {
             children.remove(d)
           } else {
-            d.scaleX = scaleX.value
-            d.scaleY = scaleY.value
+            d.scale.set(scale.value)
             /*
               d.translateX = d.translateX.value * scaleX.value + translateX.value
               d.translateY = d.translateY.value * scaleY.value + translateY.value
