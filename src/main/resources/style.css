@@ -37,6 +37,10 @@
   -fx-arc-width: 14px;
 }
 
+.rootLocationPolygon {
+  -fx-fill: linear-gradient(to right, rgba(187, 187, 187, 1.0) 0%, rgba(187, 187, 187, 0.0) 100%);
+}
+
 .trash_alert {
   -fx-effect: dropshadow(three-pass-box, rgba(255, 0, 0, 1.0), 8, 0.5, 0, 0);
   -fx-stroke: red;

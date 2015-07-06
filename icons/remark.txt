@@ -1,0 +1,6 @@
+The icons were published as public domain.
+I obtained them from
+https://openclipart.org/user-cliparts/sixsixfive
+
+Convert svg to png:
+qlmanage -t -s 512 -o . file.svg

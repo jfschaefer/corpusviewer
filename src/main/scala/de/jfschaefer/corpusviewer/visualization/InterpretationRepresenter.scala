@@ -1,7 +1,6 @@
 package de.jfschaefer.corpusviewer.visualization
 
 import de.jfschaefer.corpusviewer.{InstanceWrapper, Configuration}
-import de.up.ling.irtg.corpus.Instance
 
 import scalafx.scene.Group
 import scalafx.scene.shape.Rectangle
@@ -41,15 +40,33 @@ class InterpretationRepresenter(algType : String, iw: InstanceWrapper, root: Tex
       root.draggedInterpretationNode = {
         val node = Configuration.visualizationFactory.getVisualization(iw, algType, root)
         node.scale.set(0.05)
-        node.layoutX = boundsInParent.value.getMinX + 0.5 * (boundsInParent.value.getWidth - node.boundsInLocal.value.getWidth)
-        node.layoutY = boundsInParent.value.getMinY + 0.5 * (boundsInParent.value.getHeight - node.boundsInLocal.value.getHeight)
+        node.translateX = boundsInParent.value.getMinX + 0.5 * (bgRect.boundsInLocal.value.getWidth - node.boundsInLocal.value.getWidth)
+        node.layoutY = boundsInParent.value.getMinY + 0.5 * (boundsInLocal.value.getHeight - node.boundsInLocal.value.getHeight)
         root.children.add(node)
         Some(node)
       }
       root.draggedInterpretationStartPos = (ev.sceneX, ev.sceneY)
       root.draggedInterpretationLastPos = (ev.x, ev.y)
       root.draggedInterpretationStartScale = 0.05     //let's start really small
+      root.currentIr = InterpretationRepresenter.this
       ev.consume()
+    }
+  }
+
+  var child: Option[Displayable] = None
+
+  def setChild(displayable: Displayable): Unit = {
+    child match {
+      case Some(c) => c.trash()
+      case None =>
+    }
+    child = Some(displayable)
+  }
+
+  def trash(): Unit = {
+    child match {
+      case Some(c) => c.trash()
+      case None =>
     }
   }
 }

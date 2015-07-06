@@ -2,16 +2,13 @@ package de.jfschaefer.corpusviewer.visualization
 
 import de.jfschaefer.corpusviewer.{InstanceWrapper, Main, Configuration, Util}
 
-import de.up.ling.irtg.corpus.Instance
 import de.up.ling.irtg.algebra.StringAlgebra
 
 import scalafx.beans.property.DoubleProperty
 import scalafx.scene.layout.Pane
 import scalafx.scene.Group
-import scalafx.scene.control.Label
 import scalafx.scene.text.Text
-import scalafx.scene.shape.{Circle, Rectangle}
-import scalafx.scene.input.{MouseEvent, ZoomEvent}
+import scalafx.scene.input.{ScrollEvent, MouseEvent, ZoomEvent}
 import scalafx.Includes._
 
 import scala.collection.JavaConversions._
@@ -57,11 +54,16 @@ class TextRoot(iw: InstanceWrapper, indeX: Int) extends Group with RootDisplayab
     styleClass.add(idstyleclass)
 
     iw.id onChange {
+      onStyleClassIdUpdate()
+    }
+
+    def onStyleClassIdUpdate():Unit = {
+      //styleClass.removeAll(idstyleclass)
       styleClass.remove(styleClass.indexOf(idstyleclass))
       idstyleclass = iw.getStyleClass
       styleClass.add(idstyleclass)
-      val a = 0    //has to return Unit...
     }
+
     minWidth = Configuration.preferredPreviewWidth
   }
 
@@ -77,6 +79,7 @@ class TextRoot(iw: InstanceWrapper, indeX: Int) extends Group with RootDisplayab
   val keyset = instanceMap.keySet
   val interpretationsMap = mutable.HashMap.empty[String, InterpretationRepresenter]
   var irXPos = Configuration.textrootMargin
+  var currentIr : InterpretationRepresenter = null
 
   for (key <- keyset) {
     val ir = new InterpretationRepresenter(key, iw, this)
@@ -96,14 +99,17 @@ class TextRoot(iw: InstanceWrapper, indeX: Int) extends Group with RootDisplayab
 
 
   override def enableInteraction(): Unit = {
-    pane.onZoom = Util.handleZoom(pane, scale)
-    onScroll = Util.handleScroll(this)
+    pane.onZoom = {ev : ZoomEvent => Util.handleZoom(pane, scale)(ev); Util.trashStyleUpdate(this, pane) }
+    onScroll = {ev: ScrollEvent => Util.handleScroll(this)(ev); Util.trashStyleUpdate(this, pane); drawLocationLines() }
+
+    pane.onZoomFinished = {ev: ZoomEvent => Util.trashIfRequired(this) }
+    onScrollFinished = {ev: ScrollEvent => Util.trashIfRequired(this); removeLocationLines() }
 
     onMouseDragged = { ev: MouseEvent =>
       draggedInterpretationNode match {
         case Some(d: Displayable) =>
-          d.translateX = d.translateX.value + ev.x - draggedInterpretationLastPos._1
-          d.translateY = d.translateY.value + ev.y - draggedInterpretationLastPos._2
+          d.translateX = d.translateX.value + (ev.x - draggedInterpretationLastPos._1)
+          d.translateY = d.translateY.value + (ev.y - draggedInterpretationLastPos._2)
           val distance = math.sqrt((ev.sceneX - draggedInterpretationStartPos._1) * (ev.sceneX - draggedInterpretationStartPos._1) +
                                    (ev.sceneY - draggedInterpretationStartPos._2) * (ev.sceneY - draggedInterpretationStartPos._2))
           val goald = Configuration.textrootInterpretationDragoutDistance * math.sqrt(scale.value)
@@ -138,6 +144,8 @@ class TextRoot(iw: InstanceWrapper, indeX: Int) extends Group with RootDisplayab
             d.translateX = d.translateX.value + bounds.getMinX - d.boundsInParent.value.getMinX
             d.translateY = d.translateY.value + bounds.getMinY - d.boundsInParent.value.getMinY
             d.enableInteraction()
+            currentIr.setChild(d)
+            currentIr = null
           }
         case None =>
       }
@@ -146,6 +154,14 @@ class TextRoot(iw: InstanceWrapper, indeX: Int) extends Group with RootDisplayab
 
     for (ir <- interpretationsMap.values) {
       ir.enableInteraction()
+    }
+  }
+
+  override def trash(): Unit = {
+    iw.releaseId()
+    Main.corpusScene.getChildren.remove(this)
+    for (key <- keyset) {
+      interpretationsMap.get(key).get.trash()
     }
   }
 }

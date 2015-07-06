@@ -10,8 +10,10 @@ libraryDependencies ++= Seq(
   //"de.up.ling" %% "alto" % "1.1-SNAPSHOT" from "http://tcl.ling.uni-potsdam.de/artifactory/snapshots/de/up/ling/alto/1.1-SNAPSHOT/alto-1.1-20150701.120313-37.pom",
   //"de.up.ling" %% "alto" % "1.1-SNAPSHOT" from "http://tcl.ling.uni-potsdam.de/artifactory/snapshots/de/up/ling/alto/1.1-SNAPSHOT/alto-1.1-20150701.120313-37-jar-with-dependencies.jar",
   //"de.upling" % "alto" % "1.1-SNAPSHOT" from "http://tcl.ling.uni-potsdam.de/artifactory/snapshots/de/up/ling/alto/1.1-SNAPSHOT/alto-1.1-20150629.140311-32.pom",
-  "de.upling" % "alto" % "1.1-SNAPSHOT" from "http://tcl.ling.uni-potsdam.de/artifactory/snapshots/de/up/ling/alto/1.1-SNAPSHOT/alto-1.1-20150629.140311-32-jar-with-dependencies.jar",
-  "de.up.ling" % "tuio-gesture" % "1.0.3-SNAPSHOT"
+  "de.up.ling" % "alto" % "1.1-SNAPSHOT" from "http://tcl.ling.uni-potsdam.de/artifactory/snapshots/de/up/ling/alto/1.1-SNAPSHOT/alto-1.1-20150629.140311-32-jar-with-dependencies.jar",
+  "de.up.ling" % "tuio-gesture" % "1.0.3-SNAPSHOT",
+  "it.unimi.dsi" % "fastutil" % "6.1.0",
+  "org.jgrapht" % "jgrapht-jdk1.5" % "0.7.3"
 )
 
 resolvers += "TCL Releases" at "http://tcl.ling.uni-potsdam.de/artifactory/release"

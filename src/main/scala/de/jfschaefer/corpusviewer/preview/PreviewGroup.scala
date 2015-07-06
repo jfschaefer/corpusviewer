@@ -96,9 +96,14 @@ class PreviewGroup(corpus: Corpus) extends Group {
       //val p_yCenter = p_totalHeight * f_scaling.reciprocalIntegralFromMinusOne(s_nodeCenter) / f_scaling.reciprocalIntegralFromMinusOne(1)
       val p_yTop = p_yCenter - 0.5 * c_nodeHeight * scaling
       children.add(node)
-      node.translateX = node.translateX.value + xOffset - node.boundsInParent.value.getMinX + (    // need some correction in case object hadn't been visible - no clue why
-            //if (node.boundsInParent.value.getMinX == 0.0) 1 * (node.boundsInParent.value.getWidth - node.boundsInLocal.value.getWidth)  else 0)
-        if (node.boundsInParent.value.getMinX == 0.0) 0.5 * node.boundsInParent.value.getWidth - 0.5*node.boundsInLocal.value.getWidth/node.scale.value  else 0)
+      //node.translateX = node.translateX.value + xOffset - node.boundsInParent.value.getMinX + (    // need some correction in case object hadn't been visible - no clue why
+      //      //if (node.boundsInParent.value.getMinX == 0.0) 1 * (node.boundsInParent.value.getWidth - node.boundsInLocal.value.getWidth)  else 0)
+      //  if (node.boundsInParent.value.getMinX == 0.0) 0.5 * node.boundsInParent.value.getWidth - 0.5*node.boundsInLocal.value.getWidth/node.scale.value  else 0)
+
+
+      //THE ETERNAL FIGHT WITH THE X TRANSLATION ... -.-
+      node.translateX = node.translateX.value + xOffset - node.boundsInParent.value.getMinX + (
+        if (node.boundsInParent.value.getMinX == 0d)     0.5 * node.boundsInParent.value.getWidth - 0.5*node.boundsInLocal.value.getWidth/node.scale.value else 0 )
       node.translateY = node.translateY.value + p_yTop - node.boundsInParent.value.getMinY
       i_it += 1
     }
@@ -156,17 +161,18 @@ class PreviewGroup(corpus: Corpus) extends Group {
   onMouseDragged = { ev: MouseEvent =>
     draggedNode match {
       case Some(node) =>
+        val dragGoalX = Configuration.previewSectionWidth + p_dragLast._1 - node.translateX.value - xOffset
         node.translateX = node.translateX.value + ev.x - p_dragLast._1
         node.translateY = node.translateY.value + ev.y - p_dragLast._2
         if (ev.x < p_dragStart._1) {
           node.scale.set(dragInitialScale)
           node.getIw.releaseId()
-        } else if (ev.x > Configuration.previewSectionWidth) {
+        } else if (ev.x > dragGoalX) {
           node.scale.set(Configuration.initialScale)
           node.getIw.assignId()
         } else {
           val scale = dragInitialScale + (Configuration.initialScale - dragInitialScale) *
-                                 (ev.x - p_dragStart._1) / (Configuration.previewSectionWidth - p_dragStart._1)
+                                 (ev.x - p_dragStart._1) / (dragGoalX - p_dragStart._1)
           node.scale.set(scale)
           node.getIw.releaseId()
         }
@@ -180,7 +186,8 @@ class PreviewGroup(corpus: Corpus) extends Group {
     draggedNode match {
       case Some(node) =>
         children.remove(node)
-        if (ev.x > Configuration.previewSectionWidth) {
+        val dragGoalX = Configuration.previewSectionWidth + p_dragLast._1 - node.translateX.value - xOffset
+        if (ev.x > dragGoalX) {
           Main.corpusScene.getChildren.add(node)
           node.enableInteraction()
           node.getIw.assignId()

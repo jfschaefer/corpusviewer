@@ -1,10 +1,10 @@
 package de.jfschaefer.corpusviewer
 
+import de.jfschaefer.corpusviewer.visualization.Displayable
+
 import scalafx.beans.property.DoubleProperty
 import scalafx.scene.Node
 import scalafx.scene.input.{ZoomEvent, ScrollEvent}
-
-import scalafx.Includes._
 
 object Util {
   def handleZoom(node: Node): ZoomEvent => Unit = {
@@ -48,6 +48,24 @@ object Util {
       node.translateX = node.translateX.value + ev.deltaX
       node.translateY = node.translateY.value + ev.deltaY
       ev.consume()
+    }
+  }
+
+  def trashStyleUpdate(displayable: Displayable, styleNode: Node):Unit = {
+    if (Main.getCorpus.trash.isOverTrash(displayable)) {
+      while (styleNode.styleClass.contains("no_trash_alert")) styleNode.styleClass.remove(styleNode.styleClass.indexOf("no_trash_alert"))
+      if (!styleNode.styleClass.contains("trash_alert")) styleNode.styleClass.add("trash_alert")
+    } else {
+      while (styleNode.styleClass.contains("trash_alert")) styleNode.styleClass.remove(styleNode.styleClass.indexOf("trash_alert"))
+      if (!styleNode.styleClass.contains("no_trash_alert")) styleNode.styleClass.add("no_trash_alert")
+    }
+  }
+
+  def trashIfRequired(displayable: Displayable):Unit = {
+    if (Main.getCorpus.trash.isOverTrash(displayable)) {
+      // displayable.getIw.releaseId()
+      // Main.corpusScene.getChildren.remove(displayable)
+      displayable.trash()
     }
   }
 }

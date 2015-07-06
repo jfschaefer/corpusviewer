@@ -15,6 +15,9 @@ object Configuration {
     windowMargin: Int,
     initialScale: Double,
 
+    trashWidth: Double,
+    trashHeight: Double,
+
     sliderWidth: Int,
     sliderThumbHeight: Int,
     previewMargin: Double,
@@ -31,7 +34,10 @@ object Configuration {
 
     // style settings
     stylesheet: String,
-    numberOfIds: Int
+    numberOfIds: Int,
+
+    // behaviour settings
+    previewIsTrashZone: Boolean
   ) = try {
     val properties = new Properties()
     properties.load(new FileInputStream("corpusviewer.properties"))
@@ -39,9 +45,13 @@ object Configuration {
       // display settings
       properties getProperty "display_screen" toInt,
       properties getProperty "gesture_config_properties",
+
       // layout settings
       properties getProperty "window_margin" toInt,
       properties getProperty "initial_scale" toDouble,
+
+      properties getProperty "trash_width" toDouble,
+      properties getProperty "trash_height" toDouble,
 
       properties getProperty "slider_width" toInt,
       properties getProperty "slider_thumb_height" toInt,
@@ -55,9 +65,13 @@ object Configuration {
 
       properties getProperty "stringvisualization_padding" toDouble,
       properties getProperty "stringvisualization_width" toDouble,
+
       //style settings
       properties getProperty "stylesheet",
-      properties getProperty "number_of_ids" toInt
+      properties getProperty "number_of_ids" toInt,
+
+      //behaviour settings
+      properties getProperty "preview_is_trash_zone" toBoolean
       )
   } catch {
     case exc: Exception =>

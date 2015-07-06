@@ -4,15 +4,12 @@ import java.io.Reader
 import java.util
 
 import de.jfschaefer.corpusviewer.preview.{PreviewGroup, Slider}
-import de.jfschaefer.corpusviewer.visualization.RootDisplayable
 
 import de.up.ling.irtg.algebra.graph.GraphAlgebra
 import de.up.ling.irtg.InterpretedTreeAutomaton
 import de.up.ling.irtg.algebra.{StringAlgebra, Algebra, SetAlgebra}
-import de.up.ling.irtg.corpus.Instance
 
 import scalafx.scene.Group
-import scalafx.Includes._
 
 import scala.collection.JavaConversions._
 
@@ -79,6 +76,9 @@ class Corpus(reader: Reader) extends Group {
 
   val previewGroup = new PreviewGroup(this)
   children.add(previewGroup)
+
+  val trash = new Trash
+  children.add(trash)
 
 
   def getNextIndex(pos: Double): Option[Int] = {
