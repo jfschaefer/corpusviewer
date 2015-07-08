@@ -6,79 +6,59 @@ import java.util.Properties
 import de.jfschaefer.corpusviewer.preview.{PolynomialScalingFunction, AbstractPreviewScalingFunction, ConstantScalingFunction}
 
 object Configuration {
-  val (
-    // display settings
-    displayScreen : Int,
-    gestureConfigProperties: String,
-
-    // layout settings
-    windowMargin: Int,
-    initialScale: Double,
-
-    trashWidth: Double,
-    trashHeight: Double,
-
-    sliderWidth: Int,
-    sliderThumbHeight: Int,
-    previewMargin: Double,
-    previewScale: Double,
-    preferredPreviewWidth: Double,
-    previewSectionWidth: Double,
-
-    textrootIrWidth: Double,
-    textrootMargin: Double,
-    textrootInterpretationDragoutDistance: Double,
-
-    stringvisualizationPadding: Double,
-    stringvisualizationWidth: Double,
-
-    // style settings
-    stylesheet: String,
-    numberOfIds: Int,
-
-    // behaviour settings
-    previewIsTrashZone: Boolean
-  ) = try {
-    val properties = new Properties()
+  var properties = new Properties()
+  try {
     properties.load(new FileInputStream("corpusviewer.properties"))
-    (
-      // display settings
-      properties getProperty "display_screen" toInt,
-      properties getProperty "gesture_config_properties",
-
-      // layout settings
-      properties getProperty "window_margin" toInt,
-      properties getProperty "initial_scale" toDouble,
-
-      properties getProperty "trash_width" toDouble,
-      properties getProperty "trash_height" toDouble,
-
-      properties getProperty "slider_width" toInt,
-      properties getProperty "slider_thumb_height" toInt,
-      properties getProperty "preview_margin" toDouble,
-      properties getProperty "preview_scale" toDouble,
-      properties getProperty "preferred_preview_width" toDouble,
-      properties getProperty "preview_section_width" toDouble,
-      properties getProperty "textroot_ir_width" toDouble,
-      properties getProperty "textroot_margin" toDouble,
-      properties getProperty "textroot_interpretation_dragout_distance" toDouble,
-
-      properties getProperty "stringvisualization_padding" toDouble,
-      properties getProperty "stringvisualization_width" toDouble,
-
-      //style settings
-      properties getProperty "stylesheet",
-      properties getProperty "number_of_ids" toInt,
-
-      //behaviour settings
-      properties getProperty "preview_is_trash_zone" toBoolean
-      )
   } catch {
     case exc: Exception =>
       System.err.println("de.jfschaefer.corpusviewer.Configuration: Couldn't load corpusviewer.properties")
       exc.printStackTrace()
       sys.exit(1)
   }
+
+  val displayScreen = load("display_screen", _.toInt)
+  val gestureConfigProperties = load[String]("gesture_config_properties", {x: String => x})
+  val fullscreen = load("fullscreen", _.toBoolean)
+
+  val windowMargin = load("window_margin", _.toInt)
+  val initialScale = load("initial_scale", _.toDouble)
+
+  val trashWidth = load("trash_width", _.toDouble)
+  val trashHeight = load("trash_height", _.toDouble)
+
+  val sliderWidth = load("slider_width", _.toInt)
+  val sliderThumbHeight = load("slider_thumb_height", _.toInt)
+
+  val previewMargin = load("preview_margin", _.toDouble)
+  val previewScale = load("preview_scale", _.toDouble)
+  val preferredPreviewWidth = load("preferred_preview_width", _.toDouble)
+  val previewSectionWidth = load("preview_section_width", _.toDouble)
+
+  val textrootIrWidth = load("textroot_ir_width", _.toDouble)
+  val textrootMargin = load("textroot_margin", _.toDouble)
+  val textrootInterpretationDragoutDistance = load("textroot_interpretation_dragout_distance", _.toDouble)
+
+  val stringvisualizationPadding = load("stringvisualization_padding", _.toDouble)
+  val stringvisualizationWidth = load("stringvisualization_width", _.toDouble)
+
+  val graphvisualizationPadding = load("graphvisualization_padding", _.toDouble)
+  val graphvisualizationNodePadding = load("graphvisualization_node_padding", _.toDouble)
+
+  val stylesheet = load[String]("stylesheet", {x: String => x})
+  val numberOfIds = load("number_of_ids", _.toInt)
+
+  val previewIsTrashZone = load("preview_is_trash_zone", _.toBoolean)
+
+
+  def load[E](name: String, conversion: String => E): E =
+     try {
+       conversion(properties.getProperty(name))
+     } catch {
+       case exc: Exception =>
+         System.err.println("de.jfschaefer.corpusviewer.Configuration: Couldn't load property " + name + " in corpusviewer.properties")
+         exc.printStackTrace()
+         sys.exit(1)
+     }
 
   val visualizationFactory : AbstractVisualizationFactory = new ConcreteVisualizationFactory
   val previewScaling: AbstractPreviewScalingFunction = new PolynomialScalingFunction

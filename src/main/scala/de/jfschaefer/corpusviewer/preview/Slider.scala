@@ -74,4 +74,8 @@ class Slider extends Pane {
   onMouseDragged = { ev: MouseEvent =>
     value.set(yToValue(ev.y))
   }
+
+  onMouseClicked = { ev: MouseEvent =>
+    value.set(yToValue(ev.y))
+  }
 }

@@ -10,7 +10,8 @@ trait AbstractVisualizationFactory {
 
 class ConcreteVisualizationFactory extends AbstractVisualizationFactory {
   def getVisualization(iw: InstanceWrapper, key: String, parentDisplayable: Displayable): Displayable = {
-    if (key == "string") new StringVisualization(iw, key, parentDisplayable)
+    if (key.equals("string")) new StringVisualization(iw, key, parentDisplayable)
+    else if (key.equals("graph")) new GraphVisualization(iw, key, parentDisplayable)
     else new NoVisualization(iw, key, parentDisplayable)
   }
 

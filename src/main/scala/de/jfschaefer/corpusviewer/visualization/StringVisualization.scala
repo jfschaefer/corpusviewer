@@ -13,25 +13,10 @@ class StringVisualization(iw: InstanceWrapper, key: String, parentD: Displayable
   override val parentDisplayable = Some(parentD)
   override val scale = new DoubleProperty
   override def getIw = iw
+  isInInitialExpansion.set(true)
   scale.set(1d)
 
-  styleClass.clear()
-  styleClass.add("displayable")
-  styleClass.add("no_trash_alert")
-  styleClass.add("no_id_assigned")
-
-  var idstyleclass: String = iw.getStyleClass
-  styleClass.add(idstyleclass)
-
-  iw.id onChange {
-    onStyleClassIdUpdate()
-  }
-
-  def onStyleClassIdUpdate():Unit = {
-    styleClass.removeAll(idstyleclass)
-    idstyleclass = iw.getStyleClass
-    styleClass.add(idstyleclass)
-  }
+  setupStyleStuff()
 
   scaleX <== scale
   scaleY <== scale
@@ -41,7 +26,7 @@ class StringVisualization(iw: InstanceWrapper, key: String, parentD: Displayable
 
   assert(iw.instance.getInputObjects.containsKey(key))
   val algObj = iw.instance.getInputObjects.get(key)
-  assert(algObj.isInstanceOf[java.util.List[String]])
+  assert(algObj.isInstanceOf[java.util.List[String @unchecked]])    // is unchecked due to type erasure
   val stringRepresentation = (new StringAlgebra).representAsString(algObj.asInstanceOf[java.util.List[String]])
 
   val text = new Text("\n" + stringRepresentation) {   //leading \n fixes alignment
@@ -64,6 +49,7 @@ class StringVisualization(iw: InstanceWrapper, key: String, parentD: Displayable
   }
 
   override def trash(): Unit = {
+    removeLocationLines()
     Main.corpusScene.getChildren.remove(this)
   }
 }

@@ -37,7 +37,7 @@ object Main extends JFXApp {
 
   val numberOfScreens = Screen.screens.size
   if (numberOfScreens > Configuration.displayScreen) {
-    fullscreen(Configuration.displayScreen)
+    if (Configuration.fullscreen) fullscreen(Configuration.displayScreen)
   } else {
     System.err.println("de.jfschaefer.corpusviewer.Main: Invalid configuration 'display_screen':")
     System.err.println("Got '" + Configuration.displayScreen + "' (have only " + numberOfScreens + " screens)")

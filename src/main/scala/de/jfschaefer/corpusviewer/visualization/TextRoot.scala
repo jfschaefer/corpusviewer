@@ -119,6 +119,13 @@ class TextRoot(iw: InstanceWrapper, indeX: Int) extends Group with RootDisplayab
 
           d.scale.set(scalE)
 
+
+          if (distance < goald) {
+            d.isInInitialExpansion.set(true)
+          } else {
+            d.isInInitialExpansion.set(false)
+          }
+
           draggedInterpretationLastPos = (ev.x, ev.y)
         case None =>
       }
@@ -133,6 +140,7 @@ class TextRoot(iw: InstanceWrapper, indeX: Int) extends Group with RootDisplayab
           if (distance < goald) {
             children.remove(d)
           } else {
+            d.isInInitialExpansion.set(false)
             d.scale.set(scale.value)
             /*
               d.translateX = d.translateX.value * scaleX.value + translateX.value
@@ -163,5 +171,6 @@ class TextRoot(iw: InstanceWrapper, indeX: Int) extends Group with RootDisplayab
     for (key <- keyset) {
       interpretationsMap.get(key).get.trash()
     }
+    removeLocationLines()
   }
 }

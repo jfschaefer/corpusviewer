@@ -14,35 +14,20 @@ class NoVisualization(iw: InstanceWrapper, key: String, parentD: Displayable) ex
   override def getIw = iw
   scale.set(1d)
 
-  styleClass.clear()
-  styleClass.add("displayable")
-  styleClass.add("no_trash_alert")
-  styleClass.add("no_id_assigned")
-
-  iw.id onChange {
-    onStyleClassIdUpdate()
-  }
-
-  def onStyleClassIdUpdate():Unit = {
-    styleClass.removeAll(idstyleclass)
-    idstyleclass = iw.getStyleClass
-    styleClass.add(idstyleclass)
-  }
-
-  var idstyleclass: String = iw.getStyleClass
-  styleClass.add(idstyleclass)
+  setupStyleStuff()
 
   scaleX <== scale
   scaleY <== scale
-
-  minWidth = Configuration.stringvisualizationWidth + 2 * Configuration.stringvisualizationPadding
-  minHeight = boundsInLocal.value.getHeight + 2 * Configuration.stringvisualizationPadding
 
   val text = new Text("\nThere is no implementation for the visualization of [" + key + "] yet.")
   children.add(text)
 
   text.translateX = text.translateX.value + Configuration.stringvisualizationPadding
   text.translateY = text.translateY.value + Configuration.stringvisualizationPadding
+
+  minWidth = Configuration.stringvisualizationWidth + 2 * Configuration.stringvisualizationPadding
+  minHeight = boundsInLocal.value.getHeight + 2 * Configuration.stringvisualizationPadding
+
 
   override def enableInteraction(): Unit = {
     onZoom = {ev : ZoomEvent => Util.handleZoom(this, scale)(ev); Util.trashStyleUpdate(this, this) }
@@ -53,6 +38,7 @@ class NoVisualization(iw: InstanceWrapper, key: String, parentD: Displayable) ex
   }
 
   override def trash(): Unit = {
+    removeLocationLines()
     Main.corpusScene.getChildren.remove(this)
   }
 }
