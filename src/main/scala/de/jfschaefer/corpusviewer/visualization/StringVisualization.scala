@@ -23,6 +23,12 @@ class StringVisualization(iw: InstanceWrapper, key: String, parentD: Displayable
 
   minWidth = Configuration.stringvisualizationWidth + 2 * Configuration.stringvisualizationPadding
 
+  val menu = new RadialMenu
+  menu.enableInteraction()
+  val header = new Header(getIw.index.toString + ". String", menu)
+  header.translateY = 10
+  children.add(header)
+
 
   assert(iw.instance.getInputObjects.containsKey(key))
   val algObj = iw.instance.getInputObjects.get(key)
@@ -36,7 +42,7 @@ class StringVisualization(iw: InstanceWrapper, key: String, parentD: Displayable
   children.add(text)
 
   text.translateX = text.translateX.value + Configuration.stringvisualizationPadding
-  text.translateY = text.translateY.value + Configuration.stringvisualizationPadding
+  text.translateY = text.translateY.value + Configuration.stringvisualizationPadding + header.boundsInParent.value.getMaxY
 
   minHeight = boundsInLocal.value.getHeight + Configuration.stringvisualizationPadding
 

@@ -10,7 +10,7 @@ import scala.collection._
 // Something that can be "put directly onto the screen", a first-class citizen so to say
 trait Displayable extends Node {
   val parentDisplayable: Option[Displayable]
-  val scale: DoubleProperty
+  val scale: DoubleProperty = new DoubleProperty
   val isInInitialExpansion: BooleanProperty = new BooleanProperty
   def enableInteraction():Unit
   def getIw: InstanceWrapper
@@ -43,90 +43,6 @@ trait Displayable extends Node {
     parentDisplayable match {
       case Some(parent) =>
         removeLocationLines()
-        // Step one: Figure out position relative to parent
-        /*
-        var top: Boolean = false
-        var left: Boolean = false
-        var right: Boolean = false
-        var bottom: Boolean = false
-        val me_b = parent.localToScene(parent.boundsInLocal.value)
-        val parent_b = this.localToScene(boundsInLocal.value)
-        if (me_b.getMaxX < parent_b.getMinX) right = true
-        if (me_b.getMinX > parent_b.getMaxX) left = true
-        if (me_b.getMaxY < parent_b.getMinY) bottom = true
-        if (me_b.getMinY > parent_b.getMaxY) top = true
-
-        assert(!(left && right))
-        assert(!(top && bottom))
-        if (left || right || top || bottom) {
-          val line1 = new Line
-          val line2 = new Line
-          val me_padding = 5 * scale.value
-          val parent_padding = 5 * parent.scale.value
-          if ((top && left) || (bottom && right)) {
-            line1.startX = me_b.getMinX + me_padding
-            line1.startY = me_b.getMaxY - me_padding
-            line1.endX = parent_b.getMinX + parent_padding
-            line1.endY = parent_b.getMaxY - parent_padding
-
-            line2.startX = me_b.getMaxX - me_padding
-            line2.startY = me_b.getMinY + me_padding
-            line2.endX = parent_b.getMaxX - parent_padding
-            line2.endY = parent_b.getMinY + parent_padding
-          } else if ((top && right) || (bottom && left)) {
-            line1.startX = me_b.getMaxX - me_padding
-            line1.startY = me_b.getMaxY - me_padding
-            line1.endX = parent_b.getMaxX - parent_padding
-            line1.endY = parent_b.getMaxY - parent_padding
-
-            line2.startX = me_b.getMinX + me_padding
-            line2.startY = me_b.getMinY + me_padding
-            line2.endX = parent_b.getMinX + parent_padding
-            line2.endY = parent_b.getMinY + parent_padding
-          } else if (top) {
-            line1.startX = me_b.getMinX + me_padding
-            line1.startY = me_b.getMinY + me_padding
-            line1.endX = parent_b.getMinX + parent_padding
-            line1.endY = parent_b.getMaxY - parent_padding
-
-            line2.startX = me_b.getMaxX - me_padding
-            line2.startY = me_b.getMinY + me_padding
-            line2.endX = parent_b.getMaxX - parent_padding
-            line2.endY = parent_b.getMaxY - parent_padding
-          } else if (bottom) {
-            line1.startX = me_b.getMinX + me_padding
-            line1.startY = me_b.getMaxY - me_padding
-            line1.endX = parent_b.getMinX + parent_padding
-            line1.endY = parent_b.getMinY + parent_padding
-
-            line2.startX = me_b.getMaxX - me_padding
-            line2.startY = me_b.getMaxY - me_padding
-            line2.endX = parent_b.getMaxX - parent_padding
-            line2.endY = parent_b.getMinY + parent_padding
-          } else if (right) {
-            line1.startX = me_b.getMaxX - me_padding
-            line1.startY = me_b.getMinY + me_padding
-            line1.endX = parent_b.getMinX + parent_padding
-            line1.endY = parent_b.getMinY + parent_padding
-
-            line2.startX = me_b.getMaxX - me_padding
-            line2.startY = me_b.getMaxY - me_padding
-            line2.endX = parent_b.getMinX + parent_padding
-            line2.endY = parent_b.getMaxY - parent_padding
-          } else if (left) {
-            line1.startX = me_b.getMinX + me_padding
-            line1.startY = me_b.getMinY + me_padding
-            line1.endX = parent_b.getMaxX - parent_padding
-            line1.endY = parent_b.getMinY + parent_padding
-
-            line2.startX = me_b.getMinX + me_padding
-            line2.startY = me_b.getMaxY - me_padding
-            line2.endX = parent_b.getMaxX - parent_padding
-            line2.endY = parent_b.getMaxY - parent_padding
-          } else {
-            System.err.println("de.jfschaefer.corpusviewer.visualization.Displayable.drawLocationLines(): Invalid relative position")
-          }
-         */
 
         val me_padding = 5 * scale.value
         val parent_padding = 5 * parent.scale.value
@@ -223,12 +139,10 @@ trait Displayable extends Node {
           points.add(line2.startX.value)
           points.add(line2.startY.value)
           styleClass.clear()
-          // style = "-fx-fill: linear-gradient(from " + (100*(parent_b.getMinX + parent_b.getWidth * 0.5)/Main.stage.width.value) + "% " +
-          //   (100*(parent_b.getMinY + parent_b.getHeight * 0.5)/Main.stage.height.value) + "% to " + (100*(me_b.getMinX + 0.5 * me_b.getWidth)/Main.stage.width.value) +"% " +
-          //   (100*(me_b.getMinY + 0.5 * me_b.getHeight * 0.5)/Main.stage.height.value) + "%, rgba(187, 187, 187, 1.0) 0%, rgba(187, 187, 187, 0.0) 100%);"
           style = "-fx-fill: linear-gradient(from " + (parent_b.getMinX + parent_b.getWidth * 0.5) + "px " +
             (parent_b.getMinY + parent_b.getHeight * 0.5) + "px to " + (me_b.getMinX + 0.5 * me_b.getWidth) +"px " +
-            (me_b.getMinY + 0.5 * me_b.getHeight * 0.5) + "px, rgba(187, 187, 187, 1.0) 0%, rgba(187, 187, 187, 0.2) 100%);"
+            (me_b.getMinY + 0.5 * me_b.getHeight * 0.5) + "px, " + Configuration.locationPolygonColor1 + " 0%, " +
+            Configuration.locationPolygonColor2 + " 100%);"
         }
         locationLines.add(line1)
         locationLines.add(line2)
@@ -283,8 +197,7 @@ trait RootDisplayable extends Displayable {
       points.add(bottomLine.endY.value)
       points.add(bottomLine.startX.value)
       points.add(bottomLine.startY.value)
-      styleClass.clear()
-      styleClass.add("rootLocationPolygon")
+      style = "-fx-fill: linear-gradient(to right, " + Configuration.locationPolygonColor1 + " 0%, " + Configuration.locationPolygonColor2 + " 100%);"
     }
 
     locationLines.add(topLine)
@@ -292,6 +205,7 @@ trait RootDisplayable extends Displayable {
     locationLines.add(polygon)
     //Main.corpusScene.getChildren.add(topLine)
     //Main.corpusScene.getChildren.add(bottomLine)
+
     Main.corpusScene.getChildren.add(polygon)
   }
 }

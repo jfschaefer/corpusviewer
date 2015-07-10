@@ -19,7 +19,6 @@ import scala.collection.mutable
 class TextRoot(iw: InstanceWrapper, indeX: Int) extends Group with RootDisplayable {
   override val parentDisplayable = None
   override val index = indeX
-  override val scale = new DoubleProperty
   override def getIw = iw
   scale.set(1d)
 
@@ -29,7 +28,7 @@ class TextRoot(iw: InstanceWrapper, indeX: Int) extends Group with RootDisplayab
   var stringRepresentation: String = ""
   if (instanceMap.containsKey("string")) {
     val stringAlgebra = instanceMap.get("string")
-    if (stringAlgebra.isInstanceOf[java.util.List[String]]) {
+    if (stringAlgebra.isInstanceOf[java.util.List[String @unchecked]]) {
       stringRepresentation = (new StringAlgebra).representAsString(stringAlgebra.asInstanceOf[java.util.List[String]])
     }
   }

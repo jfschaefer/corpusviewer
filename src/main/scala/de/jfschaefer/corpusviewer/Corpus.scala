@@ -42,6 +42,7 @@ class Corpus(reader: Reader) extends Group {
 
   for (instance <- corpus.iterator) {
     val iw = new InstanceWrapper(instance)
+    iw.index = index + 1   //Starting from 1, not 0
     iws(index) = iw
     iw.preview = Configuration.visualizationFactory.getRootVisualization(iw, index)
     if (index == 0) {

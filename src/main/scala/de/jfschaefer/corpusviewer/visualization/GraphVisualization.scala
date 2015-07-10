@@ -1,5 +1,6 @@
 package de.jfschaefer.corpusviewer.visualization
 
+import de.jfschaefer.corpusviewer.sugiyama_layout.SugiyamaLayout
 import de.jfschaefer.corpusviewer.{Main, InstanceWrapper, Util, Configuration}
 import de.up.ling.irtg.algebra.StringAlgebra
 import edu.uci.ics.jung.algorithms.layout._
@@ -30,20 +31,43 @@ class GraphVisualization(iw: InstanceWrapper, key: String, parentD: Displayable)
   scaleX <== scale
   scaleY <== scale
 
+  val menu = new RadialMenu
+  menu.enableInteraction()
+  val header = new Header(getIw.index.toString + ". Graph", menu)
+  header.translateY = 10
+  children.add(header)
+
+
   // generate Graph
   assert(iw.instance.getInputObjects.containsKey(key))
   val algObj = iw.instance.getInputObjects.get(key)
   assert(algObj.isInstanceOf[SGraph])
   val sgraph: SGraph = algObj.asInstanceOf[SGraph]
 
-  val graphGroup = new GraphVisualizationGraphGroup(sgraph, this)
+  val graphPane = new Pane {
+    style = "-fx-background-color: rgba(0, 0, 255, 0.5);"
+  }
+  val graphGroup = new GraphVisualizationGraphGroup(sgraph, graphPane)
 
-  children.add(graphGroup)
+  graphPane.children.add(graphGroup)
+  children.add(graphPane)
+  graphPane.translateY = header.boundsInParent.value.getMaxY
 
-  minWidth = graphGroup.boundsInParent.value.width + 2 * Configuration.graphvisualizationPadding
-  minHeight = graphGroup.boundsInParent.value.height + 2 * Configuration.graphvisualizationPadding
-  maxWidth = minWidth.value
-  maxHeight = minHeight.value
+  def updateSize(): Unit = {
+    minWidth = math.max(graphPane.boundsInParent.value.width + 2 * Configuration.graphvisualizationPadding, header.boundsInParent.value.getWidth + Configuration.graphvisualizationPadding)
+    minHeight = graphPane.boundsInParent.value.height + 2 * Configuration.graphvisualizationPadding + header.boundsInParent.value.height
+    maxWidth = minWidth.value
+    maxHeight = minHeight.value
+    translateX = translateX.value - graphPane.translateX.value + graphPane.boundsInLocal.value.getMinX
+    graphPane.translateX = -graphPane.boundsInLocal.value.getMinX
+    translateY = translateY.value - graphPane.translateY.value + graphPane.boundsInLocal.value.getMinY
+    graphPane.translateY = -graphPane.boundsInLocal.value.getMinY
+  }
+
+  graphPane.maxHeightProperty onChange {
+    println("CHNG")
+    updateSize()
+  }
 
   override def enableInteraction(): Unit = {
     onZoom = {ev : ZoomEvent => Util.handleZoom(this, scale)(ev); Util.trashStyleUpdate(this, this) }
@@ -51,7 +75,7 @@ class GraphVisualization(iw: InstanceWrapper, key: String, parentD: Displayable)
 
     onZoomFinished = {ev: ZoomEvent => Util.trashIfRequired(this) }
     onScrollFinished = {ev: ScrollEvent => Util.trashIfRequired(this); removeLocationLines() }
-    graphGroup.enableInteraction()
+    //graphGroup.enableInteraction()
   }
 
   override def trash(): Unit = {
@@ -61,6 +85,7 @@ class GraphVisualization(iw: InstanceWrapper, key: String, parentD: Displayable)
 }
 
 class GraphVisualizationGraphGroup(sgraph: SGraph, parentPane: Pane) extends Group {
+  /*
   val jungGraph : DirectedGraph[GraphNode, GraphEdge] = new DirectedSparseGraph
   val jgrapht_graph : org.jgrapht.DirectedGraph[GraphNode, GraphEdge] = sgraph.getGraph
   for (node <- jgrapht_graph.vertexSet) {
@@ -113,10 +138,49 @@ class GraphVisualizationGraphGroup(sgraph: SGraph, parentPane: Pane) extends Gro
   for (n <- nodemap.values) {
     n.toFront()
   }
+  */
+
+  val sugiyamaLayout = new SugiyamaLayout[GraphNode, GraphEdge]
+
+  val jgrapht_graph : org.jgrapht.DirectedGraph[GraphNode, GraphEdge] = sgraph.getGraph
+  for (node <- jgrapht_graph.vertexSet) {
+    sugiyamaLayout.addVertex(node)
+  }
+  for (edge <- jgrapht_graph.edgeSet) {
+    sugiyamaLayout.addEdge(edge, jgrapht_graph.getEdgeSource(edge), jgrapht_graph.getEdgeTarget(edge))
+  }
+
+  sugiyamaLayout.runAlgorithm()
+  sugiyamaLayout.setSize(Configuration.preferredPreviewWidth, Configuration.preferredPreviewWidth)  //Should improve this
 
   var draggedNode: Option[GraphVisualizationNode] = None
   var dragLastPost = (0d, 0d)
 
+  parentPane.minWidth = sugiyamaLayout.size._1
+  parentPane.maxWidth = sugiyamaLayout.size._1
+  parentPane.minHeight = sugiyamaLayout.size._2
+  parentPane.maxHeight = sugiyamaLayout.size._2
+
+  val nodemap = new collection.mutable.HashMap[GraphNode, GraphVisualizationNode]
+  for (v <- jgrapht_graph.vertexSet) {
+    val n = new GraphVisualizationNode(v, this)
+    n.layoutX = sugiyamaLayout.vertexPosition(v)._1 - n.boundsInLocal.value.getWidth * 0.5
+    n.layoutY = sugiyamaLayout.vertexPosition(v)._2 - n.boundsInLocal.value.getHeight * 0.5
+    nodemap(v) = n
+    children.add(n)
+  }
+
+  for (e <- jgrapht_graph.edgeSet) {
+    val n = new GraphVisualizationEdge2(e, nodemap(jgrapht_graph.getEdgeSource(e)), nodemap(jgrapht_graph.getEdgeTarget(e)),
+            sugiyamaLayout.edgePosition(e))
+    children.add(n)
+  }
+
+  for (n <- nodemap.values) {
+    n.toFront()
+  }
+
+  /*
   def enableInteraction(): Unit = {
     for (n <- nodemap.values) n.enableInteraction()
     onMouseDragged = { ev: MouseEvent =>
@@ -145,6 +209,7 @@ class GraphVisualizationGraphGroup(sgraph: SGraph, parentPane: Pane) extends Gro
       ev.consume()
     }
   }
+   */
 }
 
 class GraphVisualizationNode(node: GraphNode, graph: GraphVisualizationGraphGroup) extends Group {
@@ -162,13 +227,14 @@ class GraphVisualizationNode(node: GraphNode, graph: GraphVisualizationGraphGrou
   rect.width = label.boundsInParent.value.getWidth + 2 * Configuration.graphvisualizationNodePadding
   rect.height = label.boundsInParent.value.getHeight + 2 * Configuration.graphvisualizationNodePadding - 13
 
-  def enableInteraction(): Unit = {
+  /* def enableInteraction(): Unit = {
     onMousePressed = { ev: MouseEvent =>
       graph.dragLastPost = (ev.x + boundsInParent.value.getMinX, ev.y + boundsInParent.value.getMinY + rect.boundsInParent.value.getMinY - label.boundsInParent.value.getMinY)
       graph.draggedNode = Some(this)
       ev.consume()
     }
   }
+  */
 
   def findBoundaryPoint(a0: Point2D, b0: Point2D): Point2D = {
     val EPSILON = 0.5d
@@ -186,6 +252,69 @@ class GraphVisualizationNode(node: GraphNode, graph: GraphVisualizationGraphGrou
   }
 }
 
+
+class GraphVisualizationEdge2(edge: GraphEdge, start: GraphVisualizationNode, end: GraphVisualizationNode, coords: Seq[(Double, Double)]) extends Group {
+  var headLine = new Line {
+    // startX <== start.layoutX + start.boundsInParent.value.getWidth * 0.5
+    // startY <== start.layoutY + start.boundsInParent.value.getHeight * 0.5
+
+    // endX <== end.layoutX + end.boundsInParent.value.getWidth * 0.5
+    // endY <== end.layoutY + end.boundsInParent.value.getHeight * 0.5
+  }
+
+  for (i <- 0 to coords.length - 2) {
+    headLine = new Line {
+      startX = coords(i)._1
+      startY = coords(i)._2
+      endX = coords(i+1)._1
+      endY = coords(i+1)._2
+    }
+    children.add(headLine)
+  }
+
+
+
+  val arrowhead = new Polygon {
+    points.add(0d)
+    points.add(0d)
+    points.add(4d)
+    points.add(8d)
+    points.add(-4d)
+    points.add(8d)
+  }
+
+  val label = new Text(edge.getLabel)
+
+  def updateChildren(): Unit = {
+    val spoint = new Point2D(headLine.startX.value, headLine.startY.value)
+    val epoint = new Point2D(headLine.endX.value, headLine.endY.value)
+    val angle = math.toDegrees(math.atan2(epoint.y - spoint.y, epoint.x - spoint.x))
+    val root = new Point2D(end.layoutX.value, end.layoutY.value)
+    val bp = end.findBoundaryPoint(spoint.subtract(root), epoint.subtract(root))
+    arrowhead.layoutX = bp.x + root.x
+    arrowhead.layoutY = bp.y + root.y
+    arrowhead.transforms.clear()
+    arrowhead.transforms.add(new Rotate(angle + 90, 0, 0))
+    val mp = spoint.midpoint(epoint)
+    label.transforms.clear()
+    label.layoutX = mp.x - 0.5 * label.boundsInParent.value.getWidth
+    label.layoutY = mp.y - 0.5 * label.boundsInParent.value.getHeight
+    label.transforms.add(new Rotate(angle, 0.5 * label.boundsInParent.value.getWidth, 0.5 * label.boundsInParent.value.getHeight))
+
+  }
+
+  // headLine.startXProperty onChange updateChildren
+  // headLine.startYProperty onChange updateChildren
+  // headLine.endXProperty onChange updateChildren
+  // headLine.endYProperty onChange updateChildren
+
+  // children.add(headLine)
+  children.add(arrowhead)
+  children.add(label)
+  updateChildren()
+}
+
+/*
 class GraphVisualizationEdge(edge: GraphEdge, start: GraphVisualizationNode, end: GraphVisualizationNode) extends Group {
   val line = new Line {
     startX <== start.layoutX + start.boundsInParent.value.getWidth * 0.5
@@ -234,3 +363,4 @@ class GraphVisualizationEdge(edge: GraphEdge, start: GraphVisualizationNode, end
   children.add(label)
   updateChildren()
 }
+*/

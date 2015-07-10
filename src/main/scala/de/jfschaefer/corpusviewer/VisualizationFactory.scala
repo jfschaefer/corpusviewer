@@ -16,6 +16,7 @@ class ConcreteVisualizationFactory extends AbstractVisualizationFactory {
   }
 
   def getRootVisualization(iw: InstanceWrapper, index: Int): RootDisplayable = {
-    new TextRoot(iw, index)
+    // new TextRoot(iw, index)
+    new GraphicalRoot(iw, index)
   }
 }
