@@ -54,8 +54,7 @@ class GraphicalRoot(iw: InstanceWrapper, indeX: Int) extends Group with RootDisp
    */
 
   val menu = new RadialMenu {
-    //items = new MenuEntryFunction("abc", None) :: new MenuEntryFunction("def", None) :: new MenuEntryFunction("ghi", None) :: Nil
-    items = Nil
+    items = new MenuEntryFunction("trash", trash)::Nil
     for (key <- instanceMap.keySet) {
       items = new MenuEntryDisplayable(/* key = */ key, /* producer = */ () => Configuration.visualizationFactory.getVisualization(iw, key, GraphicalRoot.this),
                          /* onRelease = */ { disp: Displayable =>
@@ -120,7 +119,7 @@ class GraphicalRoot(iw: InstanceWrapper, indeX: Int) extends Group with RootDisp
       assert(algObj.isInstanceOf[SGraph])
 
       val sgraph: SGraph = algObj.asInstanceOf[SGraph]
-      val graphGroup = new GraphVisualizationGraphGroup(sgraph, this)
+      val graphGroup = new GraphVisualizationGraphGroup(sgraph, this, 1.0)
       children.add(graphGroup)
 
       minWidth = graphGroup.boundsInParent.value.getWidth + 2 * Configuration.graphvisualizationPadding
@@ -145,7 +144,7 @@ class GraphicalRoot(iw: InstanceWrapper, indeX: Int) extends Group with RootDisp
       graphPane.translateX = graphPane.translateX.value - graphPane.boundsInParent.value.getMinX
       //graphPane.translateY = graphPane.translateY.value + textBottom.value - graphPane.boundsInParent.value.getMinY - graphPane.boundsInLocal.value.getMinY
       graphPane.translateY = graphPane.translateY.value + textBottom.value - graphPane.boundsInParent.value.getMinY -
-                        graphPane.boundsInLocal.value.getMinY + (0.5 * graphPane.scaleY.value - 0.5) * graphPane.boundsInLocal.value.getHeight
+                        graphPane.boundsInLocal.value.getMinY //+ (0.5 * graphPane.scaleY.value - 0.5) * graphPane.boundsInLocal.value.getHeight
     }
 
     updateGraphAndItsBottom()

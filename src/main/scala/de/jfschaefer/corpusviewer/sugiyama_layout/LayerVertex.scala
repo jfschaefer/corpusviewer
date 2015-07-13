@@ -5,12 +5,17 @@ class LayerVertex(dummy: Boolean) {
   var children: Set[LayerVertex] = new scala.collection.immutable.HashSet
   var parents: Set[LayerVertex] = new scala.collection.immutable.HashSet
   var xPos = -1
+  var width = 24d
 
   def isDummy: Boolean = dummy
 
   def xpos: Int = {
     assert(xPos != -1)
     xPos
+  }
+
+  def setWidth(w: Double): Unit = {
+    width = w
   }
 
   def xpos_=(x: Int): Unit = {xPos = x}

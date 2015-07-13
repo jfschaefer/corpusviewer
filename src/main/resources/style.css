@@ -49,6 +49,16 @@
   -fx-fill: radial-gradient(radius 200px, rgba(187, 187, 187, 1.0) 0%, rgba(255, 255, 255, 0.7) 100%);
 }
 
+.radialmenu_entry_function {
+  -fx-fill: #ffffff;
+  -fx-stroke: gray;
+}
+
+.radialmenu_entry_displayable {
+  -fx-fill: #999999;
+  -fx-stroke: gray;
+}
+
 /* ID COLORS */
 
 .no_id_assigned {

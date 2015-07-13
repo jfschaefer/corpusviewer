@@ -2,12 +2,16 @@ package de.jfschaefer.corpusviewer.visualization
 
 import de.jfschaefer.corpusviewer.Configuration
 
+import scalafx.beans.property.DoubleProperty
 import scalafx.scene.layout.Pane
 import scalafx.scene.text.Text
 import scalafx.scene.shape.Line
 
 
 class Header(textString: String, radialMenu: RadialMenu) extends Pane {
+  val headerWidth = new DoubleProperty()
+  headerWidth.set(Configuration.preferredPreviewWidth)
+
   val text = new Text("\n" + textString) {
     Configuration.preferredPreviewWidth - 3 * Configuration.graphicalrootMargin - 2 * Configuration.graphicalrootMenuButtonRadius
     styleClass.add("header_font")
@@ -18,13 +22,13 @@ class Header(textString: String, radialMenu: RadialMenu) extends Pane {
   text.layoutY = Configuration.graphicalrootMargin
 
   children.add(radialMenu)
-  radialMenu.layoutX = Configuration.preferredPreviewWidth - Configuration.graphicalrootMargin - Configuration.graphicalrootMenuButtonRadius
+  radialMenu.layoutX <== headerWidth - Configuration.graphicalrootMargin - Configuration.graphicalrootMenuButtonRadius
   radialMenu.layoutY = Configuration.graphicalrootMargin + Configuration.graphicalrootMenuButtonRadius
 
   val separator = new Line {
     startX = Configuration.graphicalrootMargin
     startY = Configuration.graphicalrootMargin * 2 + 2 * Configuration.graphicalrootMenuButtonRadius
-    endX = Configuration.preferredPreviewWidth - Configuration.graphicalrootMargin * 2
+    endX <== headerWidth - Configuration.graphicalrootMargin * 2
     endY = Configuration.graphicalrootMargin * 2 + 2 * Configuration.graphicalrootMenuButtonRadius
   }
 

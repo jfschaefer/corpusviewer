@@ -3,7 +3,7 @@ package de.jfschaefer.corpusviewer.sugiyama_layout
 import scala.collection.mutable
 import scala.collection.immutable
 
-class Vertex {
+class Vertex(width: Double) {
   private val outgoingEdges : mutable.Set[Edge] = new mutable.HashSet
   private val ingoingEdges : mutable.Set[Edge] = new mutable.HashSet
   private var _layer = -1
@@ -18,6 +18,7 @@ class Vertex {
       case Some(l) => l
       case None =>
         val v = new LayerVertex(false)
+        v.setWidth(width)
         _layerVertex = Some(v)
         v
     }

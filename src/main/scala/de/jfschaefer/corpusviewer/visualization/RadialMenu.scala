@@ -57,7 +57,7 @@ class RadialMenu extends Group {
                 d.scale.set(0)  // will be visible at next drag
                 draggedDisplayable = Some(d)
                 draggedDispEntry = Some(i.asInstanceOf[MenuEntryDisplayable])
-              case _ =>
+              case _ =>  // Could highlight currently selected entry
             }
           }
         }
@@ -97,6 +97,14 @@ class RadialMenu extends Group {
             draggedDispEntry = None
           }
         case None =>
+          for ((x, y, i) <- itemPos) {
+            if ((x - ev.x) * (x - ev.x) + (y - ev.y) * (y - ev.y) < entryRadius * entryRadius) {
+              i match {
+                case MenuEntryFunction(_, f) => f()
+                case _ =>
+              }
+            }
+            }
       }
       deflate()
       isExpanded = false
@@ -118,7 +126,11 @@ class RadialMenu extends Group {
       for (i <- items) {
         val circ = new Circle {
           radius = entryRadius
-          style = "-fx-fill: #bbbbbb; -fx-stroke: gray;"
+          styleClass.clear()
+          styleClass.add(i match {
+            case MenuEntryDisplayable(_, _, _) => "radialmenu_entry_displayable"
+            case MenuEntryFunction(_, _) => "radialmenu_entry_function"
+          })
         }
         circ.centerX = math.sin(cumulativeAngle) * (radius.value - entryRadius)
         circ.centerY = math.cos(cumulativeAngle) * (radius.value - entryRadius)
@@ -151,6 +163,7 @@ class RadialMenu extends Group {
       case Some(disp) => children.removeAll(disp)
       case None =>
     }
+    draggedDisplayable = None
   }
 }
 

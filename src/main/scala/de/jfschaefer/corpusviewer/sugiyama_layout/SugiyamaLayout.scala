@@ -4,17 +4,18 @@ import scala.collection.mutable
 import scala.collection.immutable
 import scala.collection.mutable.ArrayBuffer
 
-class SugiyamaLayout[V, E] {
+class SugiyamaLayout[V, E](density: Double) {
   private val vertexMap: mutable.Map[V, Vertex] = new mutable.HashMap
   private val edgeMap: mutable.Map[E, Edge] = new mutable.HashMap
+  private var positioning: mutable.Map[LayerVertex, (Double, Double, Double)] = new mutable.HashMap
   private var algorithmHasBeenRun = false
   private var numberOfLayers = -1
 
   private var layers: mutable.ArraySeq[mutable.ArrayBuffer[LayerVertex]] = null
 
-  def addVertex(vertex: V): Unit = {
+  def addVertex(vertex: V, width: Double): Unit = {
     assertHasntBeenRun()
-    vertexMap += (vertex -> new Vertex)
+    vertexMap += (vertex -> new Vertex(width + 30 * density))
   }
 
   def addEdge(edge: E, from: V, to: V): Unit = {
@@ -36,17 +37,11 @@ class SugiyamaLayout[V, E] {
     }
   }
 
-  private var width = 512d
-  private var height = 512d
+  private var width = 0d
+  private var height = 0d
+  private var minX = 0d
 
-  private var maxLayerLength = 1
-
-  def setSize(w: Double, h: Double): Unit = {
-    width = w
-    height = h
-  }
-
-  def size: (Double, Double) = (width, height)
+  def size: (Double, Double) = (width - minX, height)
 
   def runAlgorithm(): Unit = {
     algorithmHasBeenRun = true
@@ -63,12 +58,56 @@ class SugiyamaLayout[V, E] {
     reorderLayersNeighbors()
     reorderLayersNeighbors()
 
-    maxLayerLength = layers.maxBy(layer => layer.length).length
+    initializePositioning()
+    //makePositioningValid()
+    relaxPositioning()
+    relaxPositioning()
+    relaxPositioning()
+    relaxPositioning()
+    relaxPositioning()
+
+    height = 20 + (layers.length * (80 + 60 * density))
+  }
+
+  def initializePositioning(): Unit = {
+    for (layer <- layers) {
+      var lastP = 0d
+      for (lv <- layer) {
+        // readjust width according to degree
+        val degree = math.max(lv.children.size, 1.3 * lv.parents.size)  //sorry, but parents do count a bit more, because their edges seem to be a bit messier
+        lv.setWidth(lv.width + math.min(math.max(degree * math.sqrt(degree) - 2, 0), 10) * 15 * density)
+        val p = lastP + 0.5 * lv.width
+        positioning += (lv -> (lastP, p, p + 0.5 * lv.width))
+        lastP = p + 0.5 * lv.width + density * 50
+        width = math.max(width, lastP)
+      }
+    }
+  }
+
+  def relaxPositioning(): Unit = {
+    for (layer <- layers) {
+      for (i <- layer.indices.reverse) {
+        val lv = layer(i)
+        var perfectPos = (lv.parents.foldLeft(0d)((a, b) => a + positioning(b)._2) +
+                          lv.children.foldLeft(0d)((a, b) => a + positioning(b)._2)) /
+                         (lv.parents.size + lv.children.size + 0.000001)   //just to avoid division by zero :)
+        //now we need to make sure that it is in the actual boundaries
+        if (i + 1 < layer.length) {
+          perfectPos = math.min(perfectPos, positioning(layer(i + 1))._1 - lv.width * 0.5)
+        }
+        if (i > 0) {
+          perfectPos = math.max(perfectPos, positioning(layer(i - 1))._2 + lv.width * 0.5)
+        }
+        positioning(lv) = (perfectPos - 0.5 * lv.width, perfectPos, perfectPos + 0.5 * lv.width)
+        if (perfectPos - 0.5 * lv.width < minX) minX = perfectPos - 0.5 * lv.width
+      }
+    }
   }
 
   private def vltopos(vl: LayerVertex, layer: Int): (Double, Double) =
     //((vl.xpos + 1) * width/(maxLayerLength + 1), (layer + 1) * height / (layers.length + 1))
-     ((vl.xpos + 1) * width/(layers(layer).length + 1), (layer + 1) * height / (layers.length + 1))
+    // ((vl.xpos + 1) * width/(layers(layer).length + 1), (layer + 1) * height / (layers.length + 1))
+    (positioning(vl)._2 - minX, 20 + (layer * (80 + 60 * density)))   //(layer + 1) * height/layers.length + 1)
 
   def vertexPosition(vertex: V): (Double, Double) = {
     assert(algorithmHasBeenRun)
@@ -84,9 +123,21 @@ class SugiyamaLayout[V, E] {
     var result: ArrayBuffer[(Double, Double)] = new ArrayBuffer
 
     var layer = e.from.layer
-    for (vl <- vls) {
-      //result.append(((vl.xpos + 1) * width/(maxLayerLength + 1), (layer + 1) * height / (layers.length + 1)))
-      result.append(vltopos(vl, layer))
+    for (i <- vls.indices) {
+      val vl = vls(i)
+      var deltaX = 0d
+      if (i == 0) {
+        val sortedChildren = vl.children.toSeq.sortBy(child => child.xPos)
+        val actualWidth = 0.5 * (vl.width - density * 30)
+        deltaX = actualWidth/vl.children.size.toDouble * (sortedChildren.indexOf(vls(i + 1)) + 0.5) - 0.5 * actualWidth
+      }
+      if (i == vls.length - 1) {
+        val sortedParents = vl.parents.toSeq.sortBy(parent => parent.xPos)
+        val actualWidth = 0.5 * (vl.width - density * 30)
+        deltaX = actualWidth/vl.parents.size.toDouble * (sortedParents.indexOf(vls(i - 1)) + 0.5) - 0.5 * actualWidth
+      }
+      val pos = vltopos(vl, layer)
+      result.append((pos._1 + deltaX, pos._2))
       layer += 1
     }
 
