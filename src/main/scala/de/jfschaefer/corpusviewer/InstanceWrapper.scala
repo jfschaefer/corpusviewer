@@ -1,6 +1,6 @@
 package de.jfschaefer.corpusviewer
 
-import de.jfschaefer.corpusviewer.visualization.RootDisplayable
+import de.jfschaefer.corpusviewer.visualization.Preview
 import de.up.ling.irtg.corpus.Instance
 
 import scalafx.beans.property.IntegerProperty
@@ -26,7 +26,7 @@ object InstanceWrapper {
 }
 
 class InstanceWrapper(val instance: Instance) {
-  var preview: RootDisplayable = null
+  var preview: Preview = null
   var id: IntegerProperty = new IntegerProperty
   id.set(-1)       //not assigned
   var index: Int = -1  //not yet assigned

@@ -44,13 +44,13 @@ class Corpus(reader: Reader) extends Group {
     val iw = new InstanceWrapper(instance)
     iw.index = index + 1   //Starting from 1, not 0
     iws(index) = iw
-    iw.preview = Configuration.visualizationFactory.getRootVisualization(iw, index)
+    iw.preview = Configuration.visualizationFactory.getPreview(iw)
     if (index == 0) {
       iw.corpusOffsetStart = 0.5 * Configuration.previewMargin
     } else {
       iw.corpusOffsetStart = iws(index - 1).corpusOffsetEnd + Configuration.previewMargin
     }
-    iw.corpusOffsetEnd = iw.corpusOffsetStart + iw.preview.boundsInLocal.value.getHeight
+    iw.corpusOffsetEnd = iw.corpusOffsetStart + iw.preview.getHeight // iw.preview.boundsInLocal.value.getHeight
     index += 1
   }
 

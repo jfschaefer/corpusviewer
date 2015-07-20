@@ -1,22 +1,35 @@
 package de.jfschaefer.corpusviewer.visualization
 
-import de.jfschaefer.corpusviewer.{Configuration, InstanceWrapper, Main}
-
-import scalafx.beans.property.{BooleanProperty, DoubleProperty}
+import scalafx.beans.property.{DoubleProperty, BooleanProperty}
 import scalafx.scene.Node
-import scalafx.scene.shape.{Polygon, Line}
-import scala.collection._
+import scalafx.scene.input.{ScrollEvent, ZoomEvent}
+import scalafx.scene.shape.{Line, Polygon}
+import scalafx.Includes._
+import scala.collection.mutable
 
-// Something that can be "put directly onto the screen", a first-class citizen so to say
+import de.jfschaefer.corpusviewer.{Util, InstanceWrapper, Main, Configuration}
+
 trait Displayable extends Node {
-  val parentDisplayable: Option[Displayable]
-  val scale: DoubleProperty = new DoubleProperty
-  val isInInitialExpansion: BooleanProperty = new BooleanProperty
-  def enableInteraction():Unit
-  def getIw: InstanceWrapper
-  def trash(): Unit
+  val parentDisplayable : Option[Displayable] = None
+  val scale = new DoubleProperty()
+  val isInInitialExpansion = new BooleanProperty()
+  def getIw : InstanceWrapper
 
-  var idstyleclass: String = "no_id_assigned"
+  def trash(): Unit = {
+    removeLocationLines()
+    getIw.releaseId()
+    Main.corpusScene.getChildren.remove(this)
+  }
+
+  def enableInteraction(): Unit = {
+    onZoom = {ev : ZoomEvent => Util.handleZoom(this, scale)(ev); }
+    onScroll = {ev : ScrollEvent => Util.handleScroll(this)(ev); Util.trashStyleUpdate(this, this); drawLocationLines() }
+
+    onScrollFinished = {ev : ScrollEvent => Util.trashIfRequired(this); removeLocationLines() }
+  }
+
+  var idstyleclass : String = "no_id_assigned"
+
   def setupStyleStuff(): Unit = {
     styleClass.clear()
     styleClass.add("displayable")
@@ -27,13 +40,13 @@ trait Displayable extends Node {
       onStyleClassIdUpdate()
     }
 
-    isInInitialExpansion onChange {
-      onStyleClassIdUpdate()
-    }
+    // isInInitialExpansion onChange {
+    //   onStyleClassIdUpdate()
+    // }
 
     def onStyleClassIdUpdate(): Unit = {
       while (styleClass.contains(idstyleclass)) styleClass.remove(styleClass.indexOf(idstyleclass))
-      idstyleclass = if (isInInitialExpansion.value) "no_id_assigned" else getIw.getStyleClass
+      idstyleclass = getIw.getStyleClass //if (isInInitialExpansion.value) "no_id_assigned" else getIw.getStyleClass
       styleClass.add(idstyleclass)
     }
   }
@@ -154,6 +167,42 @@ trait Displayable extends Node {
         parent.toFront()
         toFront()
       case None =>
+        removeLocationLines()
+        val bounds = this.localToScene(boundsInLocal.value)
+        val slider = Main.getCorpus.slider
+        val topLine = new Line {
+          startX = Configuration.windowMargin + Configuration.sliderWidth
+          startY = slider.layoutY.value + (getIw.corpusOffsetStart - slider.rangeStart.value) * slider.track.height.value / (slider.rangeEnd.value - slider.rangeStart.value)
+          endX = bounds.getMinX + 5 * scale.value
+          endY = bounds.getMinY + 15 * scale.value
+        }
+
+        val bottomLine = new Line {
+          startX = Configuration.windowMargin + Configuration.sliderWidth
+          startY = slider.layoutY.value + (getIw.corpusOffsetEnd - slider.rangeStart.value) * slider.track.height.value / (slider.rangeEnd.value - slider.rangeStart.value)
+          endX = bounds.getMinX + 5 * scale.value
+          endY = bounds.getMaxY - 5 * scale.value
+        }
+
+        val polygon = new Polygon {
+          points.add(topLine.startX.value)
+          points.add(topLine.startY.value)
+          points.add(topLine.endX.value)
+          points.add(topLine.endY.value)
+          points.add(bottomLine.endX.value)
+          points.add(bottomLine.endY.value)
+          points.add(bottomLine.startX.value)
+          points.add(bottomLine.startY.value)
+          style = "-fx-fill: linear-gradient(to right, " + Configuration.locationPolygonColor1 + " 0%, " + Configuration.locationPolygonColor2 + " 100%);"
+        }
+
+        locationLines.add(topLine)
+        locationLines.add(bottomLine)
+        locationLines.add(polygon)
+        //Main.corpusScene.getChildren.add(topLine)
+        //Main.corpusScene.getChildren.add(bottomLine)
+
+        Main.corpusScene.getChildren.add(polygon)
     }
   }
 
@@ -164,48 +213,5 @@ trait Displayable extends Node {
       case Some(parent) => parent.removeLocationLines()
       case None =>
     }
-  }
-}
-
-trait RootDisplayable extends Displayable {
-  val index: Int
-
-  override def drawLocationLines(): Unit = {
-    removeLocationLines()
-    val bounds = this.localToScene(boundsInLocal.value)
-    val slider = Main.getCorpus.slider
-    val topLine = new Line {
-      startX = Configuration.windowMargin + Configuration.sliderWidth
-      startY = slider.layoutY.value + (getIw.corpusOffsetStart - slider.rangeStart.value) * slider.track.height.value / (slider.rangeEnd.value - slider.rangeStart.value)
-      endX = bounds.getMinX + 5 * scale.value
-      endY = bounds.getMinY + 5 * scale.value
-    }
-
-    val bottomLine = new Line {
-      startX = Configuration.windowMargin + Configuration.sliderWidth
-      startY = slider.layoutY.value + (getIw.corpusOffsetEnd - slider.rangeStart.value) * slider.track.height.value / (slider.rangeEnd.value - slider.rangeStart.value)
-      endX = bounds.getMinX + 5 * scale.value
-      endY = bounds.getMaxY - 5 * scale.value
-    }
-
-    val polygon = new Polygon {
-      points.add(topLine.startX.value)
-      points.add(topLine.startY.value)
-      points.add(topLine.endX.value)
-      points.add(topLine.endY.value)
-      points.add(bottomLine.endX.value)
-      points.add(bottomLine.endY.value)
-      points.add(bottomLine.startX.value)
-      points.add(bottomLine.startY.value)
-      style = "-fx-fill: linear-gradient(to right, " + Configuration.locationPolygonColor1 + " 0%, " + Configuration.locationPolygonColor2 + " 100%);"
-    }
-
-    locationLines.add(topLine)
-    locationLines.add(bottomLine)
-    locationLines.add(polygon)
-    //Main.corpusScene.getChildren.add(topLine)
-    //Main.corpusScene.getChildren.add(bottomLine)
-
-    Main.corpusScene.getChildren.add(polygon)
   }
 }

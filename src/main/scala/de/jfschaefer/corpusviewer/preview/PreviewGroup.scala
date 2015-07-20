@@ -1,6 +1,6 @@
 package de.jfschaefer.corpusviewer.preview
 
-import de.jfschaefer.corpusviewer.visualization.RootDisplayable
+import de.jfschaefer.corpusviewer.visualization.{Preview, Displayable}
 import de.jfschaefer.corpusviewer.{Corpus, Configuration, Main}
 
 import scalafx.beans.property.ReadOnlyDoubleProperty
@@ -12,7 +12,7 @@ import scalafx.Includes._
 class PreviewGroup(corpus: Corpus) extends Group {
   // Due to the desired generality (arbitrary scaling function, varying heights of previews within one corpus),
   // this code is rather tricky, especially, because certain things have multiple representations
-  // Therefore the following prefix conventions will hopefully help a bit
+  // Therefore, the following prefix conventions will hopefully help a bit
   //   c_*  -> pixel offset in corpus listing
   //   f_*  -> function object
   //   i_*  -> index in corpus
@@ -102,8 +102,10 @@ class PreviewGroup(corpus: Corpus) extends Group {
 
 
       //THE ETERNAL FIGHT WITH THE X TRANSLATION ... -.-
-      node.translateX = node.translateX.value + xOffset - node.boundsInParent.value.getMinX + (
+       node.translateX = node.translateX.value + xOffset - node.boundsInParent.value.getMinX + (
         if (node.boundsInParent.value.getMinX == 0d)     0.5 * node.boundsInParent.value.getWidth - 0.5*node.boundsInLocal.value.getWidth/node.scale.value else 0 )
+      //node.translateX = node.translateX.value+ xOffset - node.boundsInParent.value.getMinX
+      //node.layoutX = xOffset
       node.translateY = node.translateY.value + p_yTop - node.boundsInParent.value.getMinY
       i_it += 1
     }
@@ -136,7 +138,7 @@ class PreviewGroup(corpus: Corpus) extends Group {
   var p_dragStart = (0d, 0d)
   var dragInitialScale = 0d
   var p_dragLast = (0d, 0d)
-  var draggedNode : Option[RootDisplayable] = None
+  var draggedNode : Option[Displayable] = None
   onMousePressed = { ev: MouseEvent =>
     p_dragStart = (ev.x, ev.y)
     p_dragLast = (ev.x, ev.y)
@@ -145,7 +147,7 @@ class PreviewGroup(corpus: Corpus) extends Group {
     corpus.getIndex(c_pos) match {
       case Some(i) =>
         if (!corpus.iws(i).hasIdAssigned) {
-          val node = Configuration.visualizationFactory.getRootVisualization(corpus.iws(i), i)
+          val node = Configuration.visualizationFactory.getVisualization(corpus.iws(i), "overview", None)//getPreview(corpus.iws(i))
           node.scale.set(corpus.iws(i).preview.scale.value)
           dragInitialScale = node.scale.value
           node.layoutX = corpus.iws(i).preview.boundsInParent.value.getMinX
