@@ -169,6 +169,7 @@ class GraphicalRoot(iw: InstanceWrapper, indeX: Int) extends Group with RootDisp
     pane.maxHeight = graphBottom.value + Configuration.graphicalrootMargin
   }
 
+  header.toFront()
   menu.toFront()
 
   override def enableInteraction(): Unit = {
