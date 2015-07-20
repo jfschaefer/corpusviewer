@@ -14,7 +14,9 @@ class OverviewDisplayable(iw : InstanceWrapper, parentDisp : Option[Displayable]
   setupStyleStuff()
 
   // HEADER
-  val header = new Header(iw.index + ". Overview", None)
+  val menu = new RadialMenu
+  menu.enableInteraction()
+  val header = new Header(iw.index + ". Overview", Some(menu))
 
   children.add(header)
 
@@ -24,6 +26,8 @@ class OverviewDisplayable(iw : InstanceWrapper, parentDisp : Option[Displayable]
 
   children.add(overviewGroup)
 
+
+  header.toFront
 
   minHeight = overviewGroup.getHeight + Configuration.previewMargin + header.getHeight
   minWidth = Configuration.preferredPreviewWidth

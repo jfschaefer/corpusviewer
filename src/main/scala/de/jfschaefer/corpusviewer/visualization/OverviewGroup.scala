@@ -27,7 +27,7 @@ class OverviewGroup(iw : InstanceWrapper, forPreview : Boolean = false) extends 
     }
     text.translateX = Configuration.previewMargin;
     text.translateY = cumulativeHeight
-    cumulativeHeight += Configuration.previewMargin + text.boundsInLocal.value.getHeight
+    cumulativeHeight += text.boundsInLocal.value.getHeight
     children.add(text)
   }
 
