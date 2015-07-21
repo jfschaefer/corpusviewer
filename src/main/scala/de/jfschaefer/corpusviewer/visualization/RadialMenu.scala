@@ -42,6 +42,7 @@ class RadialMenu extends Group {
     onMousePressed = { ev: MouseEvent =>
       if (!isExpanded) expand()
       isExpanded = true
+      ev.consume()
     }
 
     onMouseDragged = { ev: MouseEvent =>
@@ -73,6 +74,7 @@ class RadialMenu extends Group {
           case None => System.err.println("This shouldn't have happened (in de.jfschaefer.corpusviewer.visualization.RadialMenu)")
         }
       }
+      ev.consume()
     }
 
     onMouseReleased = { ev: MouseEvent =>
@@ -108,6 +110,7 @@ class RadialMenu extends Group {
       }
       deflate()
       isExpanded = false
+      ev.consume()
     }
   }
 

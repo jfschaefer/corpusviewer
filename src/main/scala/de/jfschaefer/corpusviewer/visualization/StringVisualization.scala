@@ -1,6 +1,6 @@
 package de.jfschaefer.corpusviewer.visualization
 
-import de.jfschaefer.corpusviewer.{Configuration, InstanceWrapper}
+import de.jfschaefer.corpusviewer.{Util, Configuration, InstanceWrapper}
 
 import de.up.ling.irtg.algebra.StringAlgebra
 
@@ -17,19 +17,23 @@ class StringVisualization(iw : InstanceWrapper, parentDisp : Option[Displayable]
   setupStyleStuff()
 
   val instanceMap = iw.instance.getInputObjects
-
-  // HEADER
-  val menu = new RadialMenu
-  menu.enableInteraction()
-  val header = new Header(iw.index + ". String", Some(menu))
-
-  children.add(header)
-
-  // CONTENT
   assert(instanceMap.containsKey(key))
   val algObj = instanceMap.get(key)
   assert(algObj.isInstanceOf[java.util.List[String @unchecked]])
   val stringRepresentation = (new StringAlgebra).representAsString(algObj.asInstanceOf[java.util.List[String]])
+
+  // HEADER
+  val menu = new RadialMenu {
+    items = new MenuEntryFunction("Copy", () => {
+      Util.copyIntoClipboard(stringRepresentation)
+    })::new MenuEntryFunction("Trash", () => trash() )::Nil
+  }
+  menu.enableInteraction()
+  override val header = new Header(iw.index + ". String", Some(menu))
+
+  children.add(header)
+
+  // CONTENT
   val textField = new Text("\n" + stringRepresentation) {
     wrappingWidth = Configuration.stringvisualizationWidth - 2 * Configuration.stringvisualizationPadding
   }

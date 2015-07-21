@@ -10,7 +10,7 @@ import scala.collection.JavaConversions._
 
 import de.up.ling.irtg.algebra.graph.{SGraph, GraphNode, GraphEdge}
 import de.jfschaefer.sugiyamalayout.visualizationFX.{GraphFX, GraphFXNodeFactory}
-import de.jfschaefer.sugiyamalayout.{Layout, DiGraph}
+import de.jfschaefer.sugiyamalayout.{Layout, DiGraph, LatexGenerator}
 
 import scalafx.scene.shape.Rectangle
 
@@ -34,6 +34,14 @@ class SGraphPane(sgraph : SGraph) extends Pane {
 
   def getWidth: Double = layout.getWidth()
   def getHeight: Double = layout.getHeight()
+  def getLaTeX(): String = {
+    val map : java.util.Map[GraphNode, String] = new java.util.HashMap()
+    for (node : GraphNode <- jgrapht_graph.vertexSet()) {
+      map.put(node, node.getLabel)
+    }
+    val lg = new LatexGenerator(layout, map, config)
+    return lg.getLatex()
+  }
 }
 
 class DefaultGraphFXNodeFactory extends GraphFXNodeFactory[GraphNode] {
@@ -43,7 +51,7 @@ class DefaultGraphFXNodeFactory extends GraphFXNodeFactory[GraphNode] {
       width = width_
       height = height_
       styleClass.clear()
-      style = "-fx-fill: white"
+      styleClass.add("graph_node")
     }
     val label = new Text("\n" + node.getLabel())
     label.layoutX = width_ * 0.5 - label.boundsInLocal.value.getWidth * 0.5

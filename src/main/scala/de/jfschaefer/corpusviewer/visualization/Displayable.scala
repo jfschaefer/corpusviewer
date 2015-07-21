@@ -2,7 +2,7 @@ package de.jfschaefer.corpusviewer.visualization
 
 import scalafx.beans.property.{DoubleProperty, BooleanProperty}
 import scalafx.scene.Node
-import scalafx.scene.input.{ScrollEvent, ZoomEvent}
+import scalafx.scene.input.{MouseEvent, ScrollEvent, ZoomEvent}
 import scalafx.scene.shape.{Line, Polygon}
 import scalafx.Includes._
 import scala.collection.mutable
@@ -14,6 +14,7 @@ trait Displayable extends Node {
   val scale = new DoubleProperty()
   val childDisplayables : mutable.Set[Displayable] = new mutable.HashSet
   val isInInitialExpansion = new BooleanProperty()
+  val header : Header = null
   def getIw : InstanceWrapper
 
   def trash(): Unit = {
@@ -21,13 +22,38 @@ trait Displayable extends Node {
     for (child <- childDisplayables) {
       child.trash()
     }
-    if (parentDisplayable == None) getIw.releaseId()
+    if (parentDisplayable.isEmpty) getIw.releaseId()
     Main.corpusScene.getChildren.remove(this)
   }
 
+  private var interactionDragStartX = 0d
+  private var interactionDragStartY = 0d
   def enableInteraction(): Unit = {
     onZoom = {ev : ZoomEvent => Util.handleZoom(this, scale)(ev); }
     onScroll = {ev : ScrollEvent => Util.handleScroll(this)(ev); Util.trashStyleUpdate(this, this); drawLocationLines() }
+
+    if (header != null) {
+      header.onMousePressed = { ev: MouseEvent =>
+        drawLocationLines()
+        interactionDragStartX = ev.sceneX
+        interactionDragStartY = ev.sceneY
+        ev.consume()
+      }
+      header.onMouseDragged = { ev: MouseEvent =>
+        drawLocationLines()
+        translateX = translateX.value + ev.sceneX - interactionDragStartX
+        translateY = translateY.value + ev.sceneY - interactionDragStartY
+        interactionDragStartX = ev.sceneX
+        interactionDragStartY = ev.sceneY
+        Util.trashStyleUpdate(this, this)
+        ev.consume()
+      }
+      header.onMouseReleased = { ev: MouseEvent =>
+        Util.trashIfRequired(this)
+        removeLocationLines()
+        ev.consume()
+      }
+    }
 
     onScrollFinished = {ev : ScrollEvent => Util.trashIfRequired(this); removeLocationLines() }
   }
@@ -44,13 +70,13 @@ trait Displayable extends Node {
       onStyleClassIdUpdate()
     }
 
-    // isInInitialExpansion onChange {
-    //   onStyleClassIdUpdate()
-    // }
+    isInInitialExpansion onChange {
+      onStyleClassIdUpdate()
+    }
 
     def onStyleClassIdUpdate(): Unit = {
       while (styleClass.contains(idstyleclass)) styleClass.remove(styleClass.indexOf(idstyleclass))
-      idstyleclass = getIw.getStyleClass //if (isInInitialExpansion.value) "no_id_assigned" else getIw.getStyleClass
+      idstyleclass = if (isInInitialExpansion.value) "no_id_assigned" else getIw.getStyleClass
       styleClass.add(idstyleclass)
     }
   }

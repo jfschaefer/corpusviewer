@@ -102,13 +102,14 @@ class PreviewGroup(corpus: Corpus) extends Group {
       //      //if (node.boundsInParent.value.getMinX == 0.0) 1 * (node.boundsInParent.value.getWidth - node.boundsInLocal.value.getWidth)  else 0)
       //  if (node.boundsInParent.value.getMinX == 0.0) 0.5 * node.boundsInParent.value.getWidth - 0.5*node.boundsInLocal.value.getWidth/node.scale.value  else 0)
 
-       node.translateX = node.translateX.value + xOffset - node.boundsInParent.value.getMinX + (
-        if (node.boundsInParent.value.getMinX == 0d)  0.5 * (node.boundsInParent.value.getWidth * (node.scale.value - 1)) else 0 )
+      // node.translateX = node.translateX.value + xOffset - node.boundsInParent.value.getMinX + (
+      //  if (node.boundsInParent.value.getMinX == 0d)  0.5 * (node.boundsInParent.value.getWidth * (node.scale.value - 1)) else 0 )
       //node.translateX = node.translateX.value+ xOffset - node.boundsInParent.value.getMinX
-      //node.layoutX = xOffset
+      node.layoutX = xOffset + 0.5 * (node.boundsInParent.value.getWidth - node.boundsInLocal.value.getWidth)
 
 
-      node.translateY = node.translateY.value + p_yTop - node.boundsInParent.value.getMinY
+      //node.translateY = node.translateY.value + p_yTop - node.boundsInParent.value.getMinY
+      node.layoutY = p_yTop + 0.5 * (node.boundsInParent.value.getHeight - node.boundsInLocal.value.getHeight)
       i_it += 1
     }
   }

@@ -6,6 +6,9 @@ import scalafx.beans.property.DoubleProperty
 import scalafx.scene.Node
 import scalafx.scene.input.{ZoomEvent, ScrollEvent}
 
+import java.awt.datatransfer.{StringSelection, Clipboard}
+import java.awt.Toolkit;
+
 object Util {
   def handleZoom(node: Node): ZoomEvent => Unit = {
     ev: ZoomEvent => {
@@ -67,5 +70,11 @@ object Util {
       // Main.corpusScene.getChildren.remove(displayable)
       displayable.trash()
     }
+  }
+
+  def copyIntoClipboard(string : String): Unit = {
+    val selection = new StringSelection(string)
+    val clipboard : Clipboard = Toolkit.getDefaultToolkit.getSystemClipboard
+    clipboard.setContents(selection, null)
   }
 }
