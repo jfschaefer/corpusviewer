@@ -1,6 +1,6 @@
 package de.jfschaefer.corpusviewer.preview
 
-import de.jfschaefer.corpusviewer.visualization.{Preview, Displayable}
+import de.jfschaefer.corpusviewer.visualization.Displayable
 import de.jfschaefer.corpusviewer.{Corpus, Configuration, Main}
 
 import scalafx.beans.property.ReadOnlyDoubleProperty
@@ -96,16 +96,18 @@ class PreviewGroup(corpus: Corpus) extends Group {
       //val p_yCenter = p_totalHeight * f_scaling.reciprocalIntegralFromMinusOne(s_nodeCenter) / f_scaling.reciprocalIntegralFromMinusOne(1)
       val p_yTop = p_yCenter - 0.5 * c_nodeHeight * scaling
       children.add(node)
+
+      //THE ETERNAL FIGHT WITH THE X TRANSLATION ... -.-
       //node.translateX = node.translateX.value + xOffset - node.boundsInParent.value.getMinX + (    // need some correction in case object hadn't been visible - no clue why
       //      //if (node.boundsInParent.value.getMinX == 0.0) 1 * (node.boundsInParent.value.getWidth - node.boundsInLocal.value.getWidth)  else 0)
       //  if (node.boundsInParent.value.getMinX == 0.0) 0.5 * node.boundsInParent.value.getWidth - 0.5*node.boundsInLocal.value.getWidth/node.scale.value  else 0)
 
-
-      //THE ETERNAL FIGHT WITH THE X TRANSLATION ... -.-
        node.translateX = node.translateX.value + xOffset - node.boundsInParent.value.getMinX + (
-        if (node.boundsInParent.value.getMinX == 0d)     0.5 * node.boundsInParent.value.getWidth - 0.5*node.boundsInLocal.value.getWidth/node.scale.value else 0 )
+        if (node.boundsInParent.value.getMinX == 0d)  0.5 * (node.boundsInParent.value.getWidth * (node.scale.value - 1)) else 0 )
       //node.translateX = node.translateX.value+ xOffset - node.boundsInParent.value.getMinX
       //node.layoutX = xOffset
+
+
       node.translateY = node.translateY.value + p_yTop - node.boundsInParent.value.getMinY
       i_it += 1
     }

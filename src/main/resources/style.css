@@ -22,10 +22,10 @@
    SECTION: VISUALIZATION
  */
 
-.displayable {
+/* .displayable {
   -fx-arc-height: 14px;
   -fx-arc-width: 14px;
-}
+} */
 
 .trash_alert {
   -fx-effect: dropshadow(three-pass-box, rgba(255, 0, 0, 1.0), 8, 0.5, 0, 0);
@@ -42,21 +42,36 @@
 
 .header_font {
   -fx-font-size: 1.8em;
+  -fx-fill: white;
+}
+
+.header {
+  -fx-background-color: rgba(0, 0, 0, 0.5);
 }
 
 
 .radialmenu_expanded_circle {
-  -fx-fill: radial-gradient(radius 200px, rgba(187, 187, 187, 1.0) 0%, rgba(255, 255, 255, 0.7) 100%);
+  -fx-fill: radial-gradient(radius 200px, rgba(187, 187, 187, 0.7) 0%, rgba(255, 255, 255, 0.4) 100%);
 }
 
 .radialmenu_entry_function {
-  -fx-fill: #ffffff;
-  -fx-stroke: gray;
+  -fx-fill: radial-gradient(radius 100px, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.6) 100%);
+  -fx-stroke: black;
+}
+
+.radialmenu_entry_function_text {
+  -fx-fill: black;
+  -fx-font-size: 1.2em;
 }
 
 .radialmenu_entry_displayable {
-  -fx-fill: #999999;
-  -fx-stroke: gray;
+  -fx-fill: radial-gradient(radius 100px, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.6) 100%);
+  -fx-stroke: black;
+}
+
+.radialmenu_entry_displayable_text {
+  -fx-fill: white;
+  -fx-font-size: 1.2em;
 }
 
 /* ID COLORS */

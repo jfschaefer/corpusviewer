@@ -22,10 +22,10 @@ class RadialMenu extends Group {
     image = Configuration.radialMenuButtonImage
   }
 
-  iv.fitWidth = Configuration.graphicalrootMenuButtonRadius * 2
-  iv.fitHeight = Configuration.graphicalrootMenuButtonRadius * 2
-  iv.layoutX = -Configuration.graphicalrootMenuButtonRadius
-  iv.layoutY = -Configuration.graphicalrootMenuButtonRadius
+  iv.fitWidth = Configuration.headerMenuButtonRadius * 2
+  iv.fitHeight = Configuration.headerMenuButtonRadius * 2
+  iv.layoutX = -Configuration.headerMenuButtonRadius
+  iv.layoutY = -Configuration.headerMenuButtonRadius
 
   var draggedDisplayable : Option[Displayable] = None
   var draggedDispEntry: Option[MenuEntryDisplayable] = None
@@ -138,7 +138,13 @@ class RadialMenu extends Group {
 
         itemPos = (circ.centerX.value, circ.centerY.value, i) :: itemPos
 
-        val text = new Text("\n" + i.getLabel)
+        val text = new Text("\n" + i.getLabel) {
+          styleClass.clear()
+          styleClass.add( i match {
+            case MenuEntryDisplayable(_, _, _) => "radialmenu_entry_displayable_text"
+            case MenuEntryFunction(_, _) => "radialmenu_entry_function_text"
+          })
+        }
 
         def updateTextPos(): Unit = {
           text.layoutX = circ.centerX.value - text.boundsInParent.value.getWidth * 0.5

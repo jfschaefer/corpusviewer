@@ -38,19 +38,12 @@ object Configuration {
   val preferredPreviewWidth = load("preferred_preview_width", _.toDouble)
   val previewSectionWidth = load("preview_section_width", _.toDouble)
 
-  val textrootIrWidth = load("textroot_ir_width", _.toDouble)
-  val textrootMargin = load("textroot_margin", _.toDouble)
-  val textrootInterpretationDragoutDistance = load("textroot_interpretation_dragout_distance", _.toDouble)
-
-  val graphicalrootMargin = load("graphicalroot_margin", _.toDouble)
-  val graphicalrootMenuButtonRadius = load("graphicalroot_menu_button_radius", _.toDouble)
+  val headerMargin = load("header_margin", _.toDouble)
+  val headerMenuButtonRadius = load("header_menu_button_radius", _.toDouble)
   val radialMenuExpansionRadius = load("radial_menu_expansion_radius", _.toDouble)
 
   val stringvisualizationPadding = load("stringvisualization_padding", _.toDouble)
   val stringvisualizationWidth = load("stringvisualization_width", _.toDouble)
-
-  val graphvisualizationPadding = load("graphvisualization_padding", _.toDouble)
-  val graphvisualizationNodePadding = load("graphvisualization_node_padding", _.toDouble)
 
   // style settings
   val stylesheet = load[String]("stylesheet", {x: String => x})

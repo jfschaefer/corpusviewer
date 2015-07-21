@@ -16,35 +16,28 @@ class Header(textString: String, radialMenu: Option[RadialMenu]) extends Pane {
   val text = new Text("\n" + textString) {
     styleClass.add("header_font")
   }
-  text.setFill(Color.WHITE)
 
   children.add(text)
-  text.layoutX = Configuration.graphicalrootMargin
-  text.layoutY = Configuration.graphicalrootMargin
+  text.layoutX = Configuration.headerMargin
+  text.layoutY = Configuration.headerMargin
 
   radialMenu match {
     case Some(menu) => {
       children.add (menu)
-      menu.layoutX <== headerWidth - Configuration.graphicalrootMenuButtonRadius - 5
-      menu.layoutY = Configuration.graphicalrootMenuButtonRadius + 5
+      menu.layoutX <== headerWidth - Configuration.headerMenuButtonRadius - 5
+      menu.layoutY = Configuration.headerMenuButtonRadius + 5
     }
     case None =>
   }
 
-  /* val separator = new Line {
-    startX = Configuration.graphicalrootMargin
-    startY = 2 * Configuration.graphicalrootMenuButtonRadius
-    endX <== headerWidth - Configuration.graphicalrootMargin * 2
-    endY = 2 * Configuration.graphicalrootMenuButtonRadius
-  }
-
-  children.add(separator) */
-  style = "-fx-background-color: rgba(0, 0, 0, 0.5)"
+  //style = "-fx-background-color: rgba(0, 0, 0, 0.5)"
+  styleClass.clear()
+  styleClass.add("header")
   minWidth <== headerWidth
   maxWidth <== headerWidth
 
   minHeight.set(getHeight)
   maxHeight.set(getHeight)
 
-  def getHeight: Double = 2 * Configuration.graphicalrootMenuButtonRadius + 10
+  def getHeight: Double = 2 * Configuration.headerMenuButtonRadius + 10
 }

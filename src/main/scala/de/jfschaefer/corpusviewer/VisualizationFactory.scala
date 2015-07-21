@@ -15,6 +15,10 @@ class ConcreteVisualizationFactory extends AbstractVisualizationFactory {
     else new NoVisualization(iw, key, parentDisplayable) */
     if (key.equals("overview")) {
       return new OverviewDisplayable(iw, parentDisplayable)
+    } else if (key.equals("string")) {
+      return new StringVisualization(iw, parentDisplayable, key)
+    } else if (key.equals("graph")) {
+      return new GraphVisualization(iw, parentDisplayable, key)
     }
     null
   }

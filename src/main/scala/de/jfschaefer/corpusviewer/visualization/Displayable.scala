@@ -12,12 +12,16 @@ import de.jfschaefer.corpusviewer.{Util, InstanceWrapper, Main, Configuration}
 trait Displayable extends Node {
   val parentDisplayable : Option[Displayable] = None
   val scale = new DoubleProperty()
+  val childDisplayables : mutable.Set[Displayable] = new mutable.HashSet
   val isInInitialExpansion = new BooleanProperty()
   def getIw : InstanceWrapper
 
   def trash(): Unit = {
     removeLocationLines()
-    getIw.releaseId()
+    for (child <- childDisplayables) {
+      child.trash()
+    }
+    if (parentDisplayable == None) getIw.releaseId()
     Main.corpusScene.getChildren.remove(this)
   }
 
@@ -83,10 +87,10 @@ trait Displayable extends Node {
           (x - c_c_x) * normX + (y - c_c_y) * normY
 
         var parentminx = parent_b.getMinX + parent_padding
-        var parentminy = parent_b.getMinY + parent_padding
+        var parentminy = parent_b.getMinY + 10 + parent_padding
         var parentmaxx = parent_b.getMinX + parent_padding
-        var parentmaxy = parent_b.getMinY + parent_padding
-        var parentmindist = getDistance(parentminx + parent_padding, parentminy + parent_padding)
+        var parentmaxy = parent_b.getMinY + 10 + parent_padding
+        var parentmindist = getDistance(parentminx + parent_padding, parentminy + 10 + parent_padding)
         var parentmaxdist = parentmindist
 
         def updateParentMinMax(x: Double, y: Double): Unit = {
@@ -104,14 +108,14 @@ trait Displayable extends Node {
         }
 
         updateParentMinMax(parent_b.getMinX + parent_padding, parent_b.getMaxY - parent_padding)
-        updateParentMinMax(parent_b.getMaxX - parent_padding, parent_b.getMinY + parent_padding)
+        updateParentMinMax(parent_b.getMaxX - parent_padding, parent_b.getMinY + 10 + parent_padding)
         updateParentMinMax(parent_b.getMaxX - parent_padding, parent_b.getMaxY - parent_padding)
 
         var meminx = me_b.getMinX + me_padding
-        var meminy = me_b.getMinY + me_padding
+        var meminy = me_b.getMinY + 10 + me_padding
         var memaxx = me_b.getMinX + me_padding
-        var memaxy = me_b.getMinY + me_padding
-        var memindist = getDistance(meminx + me_padding, meminy + me_padding)
+        var memaxy = me_b.getMinY + 10 + me_padding
+        var memindist = getDistance(meminx + me_padding, meminy + 10 + me_padding)
         var memaxdist = memindist
 
         def updateMeMinMax(x: Double, y: Double): Unit = {
@@ -129,7 +133,7 @@ trait Displayable extends Node {
         }
 
         updateMeMinMax(me_b.getMinX + me_padding, me_b.getMaxY - me_padding)
-        updateMeMinMax(me_b.getMaxX - me_padding, me_b.getMinY + me_padding)
+        updateMeMinMax(me_b.getMaxX - me_padding, me_b.getMinY + 10 + me_padding)
         updateMeMinMax(me_b.getMaxX - me_padding, me_b.getMaxY - me_padding)
 
         line1.startX = meminx
