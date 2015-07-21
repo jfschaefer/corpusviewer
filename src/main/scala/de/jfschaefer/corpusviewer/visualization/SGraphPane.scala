@@ -19,17 +19,20 @@ class SGraphPane(sgraph : SGraph) extends Pane {
   //style = "-fx-background-color: lightblue"
   val jgrapht_graph : org.jgrapht.DirectedGraph[GraphNode, GraphEdge] = sgraph.getGraph
   val digraph : DiGraph[GraphNode, GraphEdge] = new DiGraph()
+  val labelMap: java.util.Map[GraphEdge, String] = new java.util.HashMap()
   for (node : GraphNode <- jgrapht_graph.vertexSet) {
     digraph.addNode(node, node.getLabel.length * 10 + 30, 30)
   }
   for (edge : GraphEdge <- jgrapht_graph.edgeSet) {
     digraph.addEdge(edge, edge.getSource, edge.getTarget)
+    labelMap.put(edge, edge.getLabel);
   }
   val config = new de.jfschaefer.sugiyamalayout.Configuration
   config.setUseAlternativeAlgorithm(false)
+  config.setLayerDistance(81d);
   val layout : Layout[GraphNode, GraphEdge] = digraph.generateLayout(config)
 
-  val graphfx : GraphFX[GraphNode, GraphEdge] = new GraphFX(layout, new DefaultGraphFXNodeFactory)
+  val graphfx : GraphFX[GraphNode, GraphEdge] = new GraphFX(layout, new DefaultGraphFXNodeFactory, labelMap)
   children.add(graphfx)
 
   def getWidth: Double = layout.getWidth()
@@ -39,7 +42,7 @@ class SGraphPane(sgraph : SGraph) extends Pane {
     for (node : GraphNode <- jgrapht_graph.vertexSet()) {
       map.put(node, node.getLabel)
     }
-    val lg = new LatexGenerator(layout, map, config)
+    val lg = new LatexGenerator(layout, map, labelMap, config)
     return lg.getLatex()
   }
 }
