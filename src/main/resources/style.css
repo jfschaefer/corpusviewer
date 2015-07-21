@@ -56,7 +56,7 @@
 
 .radialmenu_entry_function {
   -fx-fill: radial-gradient(radius 100px, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.6) 100%);
-  -fx-stroke: black;
+  -fx-stroke: white;
 }
 
 .radialmenu_entry_function_text {

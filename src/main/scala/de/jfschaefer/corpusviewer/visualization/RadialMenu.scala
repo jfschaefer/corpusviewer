@@ -8,7 +8,7 @@ import scalafx.scene.image.ImageView
 import scalafx.scene.input.MouseEvent
 import scalafx.Includes._
 import scalafx.scene.shape.Circle
-import scalafx.scene.text.Text
+import scalafx.scene.control.Label
 
 class RadialMenu extends Group {
   var items : List[MenuEntry] = Nil
@@ -66,8 +66,8 @@ class RadialMenu extends Group {
         draggedDisplayable match {
           case Some(disp) =>
             val distance = math.sqrt(ev.x * ev.x + ev.y * ev.y)
-            val scale = if (distance / radius.value < 2) 0.5 * distance/radius.value else 1
-            disp.isInInitialExpansion.set(distance < 2 * radius.value)
+            val scale = if (distance / radius.value < 1.5) distance/(radius.value * 1.5) else 1
+            disp.isInInitialExpansion.set(distance < 1.5 * radius.value)
             disp.scale.set(scale)
             disp.layoutX = ev.x - disp.boundsInLocal.value.getWidth * 0.5
             disp.layoutY = ev.y - disp.boundsInLocal.value.getHeight * 0.5
@@ -114,7 +114,7 @@ class RadialMenu extends Group {
     }
   }
 
-  var entryRadius = 50
+  var entryRadius = Configuration.radialMenuEntryRadius
 
   def expand(): Unit = {
     toFront()
@@ -141,12 +141,13 @@ class RadialMenu extends Group {
 
         itemPos = (circ.centerX.value, circ.centerY.value, i) :: itemPos
 
-        val text = new Text("\n" + i.getLabel) {
+        val text = new Label(i.getLabel) {
           styleClass.clear()
           styleClass.add( i match {
             case MenuEntryDisplayable(_, _, _) => "radialmenu_entry_displayable_text"
             case MenuEntryFunction(_, _) => "radialmenu_entry_function_text"
           })
+          textAlignment.set(javafx.scene.text.TextAlignment.CENTER)
         }
 
         def updateTextPos(): Unit = {
