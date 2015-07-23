@@ -1,7 +1,7 @@
 
 
 .idea/
-project/
+project/target
 target/
 testFile.log
 .DS_Store
