@@ -5,6 +5,12 @@ import de.up.ling.irtg.corpus.Instance
 
 import scalafx.beans.property.IntegerProperty
 
+
+/*
+    A simple wrapper around de.up.ling.irtg.corpus.Instance.
+    Its main task at the moment is to manage the ids, which correspond to the colors.
+ */
+
 object InstanceWrapper {
   val idsInUse = new scala.collection.mutable.HashSet[Int]
 

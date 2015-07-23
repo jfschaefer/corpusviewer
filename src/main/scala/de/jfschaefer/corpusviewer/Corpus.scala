@@ -1,10 +1,6 @@
 package de.jfschaefer.corpusviewer
 
-import java.io.Reader
-import java.util
-
 import de.jfschaefer.corpusviewer.preview.{PreviewGroup, Slider}
-
 
 import scalafx.scene.Group
 
@@ -20,27 +16,28 @@ class Corpus(iterator: java.util.Iterator[de.up.ling.irtg.corpus.Instance]) exte
      STEP 1: LOAD CORPUS
    */
 
-  //val iws: Array[InstanceWrapper] = new Array(iterator.size)
-  val iws : util.ArrayList[InstanceWrapper]= new util.ArrayList[InstanceWrapper]()
+  val iws : java.util.ArrayList[InstanceWrapper]= new java.util.ArrayList[InstanceWrapper]()
 
-  var index = 0
-
-  for (instance <- iterator) {
-    val iw = new InstanceWrapper(instance)
-    iw.index = index + 1   //Starting from 1, not 0
-    //iws(index) = iw
-    iws.add(iw)
-    iw.preview = Configuration.visualizationFactory.getPreview(iw)
-    if (index == 0) {
-      iw.corpusOffsetStart = 0.5 * Configuration.previewMargin
-    } else {
-      iw.corpusOffsetStart = iws(index - 1).corpusOffsetEnd + Configuration.previewMargin
+  def loadInstances(): Int = {
+    var index = 0
+    for (instance <- iterator) {
+      val iw = new InstanceWrapper (instance)
+      iw.index = index + 1 //Starting from 1, not 0
+      //iws(index) = iw
+      iws.add (iw)
+      iw.preview = Configuration.visualizationFactory.getPreview (iw)
+      if (index == 0) {
+        iw.corpusOffsetStart = 0.5 * Configuration.previewMargin
+      } else {
+        iw.corpusOffsetStart = iws (index - 1).corpusOffsetEnd + Configuration.previewMargin
+      }
+      iw.corpusOffsetEnd = iw.corpusOffsetStart + iw.preview.getHeight // iw.preview.boundsInLocal.value.getHeight
+      index += 1
     }
-    iw.corpusOffsetEnd = iw.corpusOffsetStart + iw.preview.getHeight // iw.preview.boundsInLocal.value.getHeight
-    index += 1
+    index - 1
   }
 
-  val lastIndex = index - 1
+  val lastIndex = loadInstances()
 
   println("Done generating visualizations")
 

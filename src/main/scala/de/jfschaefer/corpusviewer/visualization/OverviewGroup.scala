@@ -8,11 +8,16 @@ import de.up.ling.irtg.algebra.StringAlgebra
 import scalafx.scene.Group
 import scalafx.scene.text.Text
 
+/*
+    A group displaying several interpretations, if they are available.
+    If a graph is too large, it's scaled down.
+    This makes it perfect for preview/overview Displayables.
+ */
+
 class OverviewGroup(iw : InstanceWrapper, forPreview : Boolean = false) extends Group {
   val instanceMap = iw.instance.getInputObjects
 
   var cumulativeHeight = 0d
-
 
   /*
     STRING REPRESENTATION

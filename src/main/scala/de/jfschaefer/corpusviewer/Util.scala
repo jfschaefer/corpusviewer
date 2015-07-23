@@ -7,7 +7,7 @@ import scalafx.scene.Node
 import scalafx.scene.input.{ZoomEvent, ScrollEvent}
 
 import java.awt.datatransfer.{StringSelection, Clipboard}
-import java.awt.Toolkit;
+import java.awt.Toolkit
 
 object Util {
   def handleZoom(node: Node): ZoomEvent => Unit = {

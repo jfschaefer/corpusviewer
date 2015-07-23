@@ -5,6 +5,10 @@ import de.jfschaefer.corpusviewer.{Configuration, InstanceWrapper}
 import scalafx.scene.layout.Pane
 import scalafx.scene.text.Text
 
+/*
+    Displayable, when no visualization is available for a certain interpretation.
+ */
+
 class NoVisualization(iw : InstanceWrapper, parentDisp : Option[Displayable], key : String) extends Pane with Displayable{
   override val parentDisplayable = parentDisp
   override def getIw = iw

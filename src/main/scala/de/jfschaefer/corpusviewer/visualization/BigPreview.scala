@@ -2,10 +2,12 @@ package de.jfschaefer.corpusviewer.visualization
 
 import de.jfschaefer.corpusviewer.{Configuration, InstanceWrapper}
 
-import de.up.ling.irtg.algebra.graph.SGraph
-
-import scalafx.scene.Group
 import scalafx.scene.layout.Pane
+
+
+/*
+  A preview that displays several interpretations if they are available.
+ */
 
 class BigPreview(iw : InstanceWrapper) extends Pane with Preview {
   override def getIw = iw

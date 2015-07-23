@@ -1,6 +1,8 @@
 package de.jfschaefer.corpusviewer.preview
 
-//import org.apache.commons.math3.complex.Complex
+/*
+  This functions are used in the preview group for the scaling of the preview images.
+ */
 
 abstract class AbstractPreviewScalingFunction {
   // The actual scaling function (function(x) is the scaling factor for a Displayable at position x)
@@ -71,7 +73,6 @@ class PolynomialScalingFunction extends AbstractPreviewScalingFunction {
   def helper(x: Double): Double = {
     //according to wolfram alpha: integral 1/(1-x x (1.5-0.75 x x)) dx =
     // (1.03795-0.278119 i) tan^(-1)((0.240858+0.898895 i) x)+(0.278119-1.03795 i) tanh^(-1)((0.898895+0.240858 i) x)+constant
-    //TODO: Use exact formula instead
 
     val c1 = new Complex(1.03795, -0.278119)
     val c2 = new Complex(0.278119, -1.03795)

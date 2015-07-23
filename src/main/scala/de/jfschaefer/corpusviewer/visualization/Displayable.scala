@@ -9,6 +9,16 @@ import scala.collection.mutable
 
 import de.jfschaefer.corpusviewer.{Util, InstanceWrapper, Main, Configuration}
 
+/*
+    A Displayable is something that can be dragged over the screen.
+    It is associated with some corpus instance.
+    Displayables have a tree-like hierarchy.
+
+    Most of the code below is for displaying the location lines. Maybe we should put it somewhere else instead.
+    Also, the code for drawing the location lines isn't perfect yet - at some point, it should be rewritten.
+    I know how it should be implemented - when I have some time, I'll do it.
+ */
+
 trait Displayable extends Node {
   val parentDisplayable : Option[Displayable] = None
   val scale = new DoubleProperty()

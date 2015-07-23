@@ -1,10 +1,7 @@
 package de.jfschaefer.corpusviewer.visualization
 
-import de.jfschaefer.corpusviewer.InstanceWrapper
-
 import scalafx.scene.layout.Pane
 import scalafx.scene.text.Text
-import scalafx.scene.Node
 
 import scala.collection.JavaConversions._
 
@@ -13,6 +10,10 @@ import de.jfschaefer.sugiyamalayout.visualizationFX.{GraphFX, GraphFXNodeFactory
 import de.jfschaefer.sugiyamalayout.{Layout, DiGraph, LatexGenerator}
 
 import scalafx.scene.shape.Rectangle
+
+/*
+    A Pane that visualizes an SGraph, using de.jfschaefer.sugiyamalayout
+ */
 
 class SGraphPane(sgraph : SGraph, bezier: Boolean = true, alternative: Boolean = true) extends Pane {
   styleClass.clear()

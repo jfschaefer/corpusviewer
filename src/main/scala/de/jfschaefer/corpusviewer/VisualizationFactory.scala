@@ -10,22 +10,18 @@ trait AbstractVisualizationFactory {
 
 class ConcreteVisualizationFactory extends AbstractVisualizationFactory {
   override def getVisualization(iw: InstanceWrapper, key: String, parentDisplayable: Option[Displayable]): Displayable = {
-    /* if (key.equals("string")) new StringVisualization(iw, key, parentDisplayable)
-    else if (key.equals("graph")) new GraphVisualization(iw, key, parentDisplayable)
-    else new NoVisualization(iw, key, parentDisplayable) */
     if (key.equals("overview")) {
-      return new OverviewDisplayable(iw, parentDisplayable)
+      new OverviewDisplayable(iw, parentDisplayable)
     } else if (key.equals("string")) {
-      return new StringVisualization(iw, parentDisplayable, key)
+      new StringVisualization(iw, parentDisplayable, key)
     } else if (key.equals("graph")) {
-      return new GraphVisualization(iw, parentDisplayable, key)
+      new GraphVisualization(iw, parentDisplayable, key)
+    } else {
+      new NoVisualization(iw, parentDisplayable, key)
     }
-    null
   }
 
   override def getPreview(iw: InstanceWrapper): Preview = {
-    // new TextRoot(iw, index)
-    //new GraphicalRoot(iw)
     new BigPreview(iw)
   }
 }

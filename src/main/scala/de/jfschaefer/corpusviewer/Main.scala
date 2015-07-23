@@ -4,8 +4,6 @@ import de.jfschaefer.corpusviewer.opendialog.OpenCorpusDialog
 
 import de.up.ling.gesture.JavaFxAdapter
 
-import java.io.Reader
-
 import scalafx.application.JFXApp
 import scalafx.scene.Scene
 import scalafx.stage.{StageStyle, Screen}

@@ -4,10 +4,11 @@ import de.jfschaefer.corpusviewer.Configuration
 
 import scalafx.beans.property.DoubleProperty
 import scalafx.scene.layout.Pane
-import scalafx.scene.paint.Color
 import scalafx.scene.text.Text
-import scalafx.scene.shape.Line
 
+/*
+    The header is the top part of a Displayable. It contains a title and a RadialMenu.
+ */
 
 class Header(textString: String, radialMenu: Option[RadialMenu]) extends Pane {
   val headerWidth = new DoubleProperty()
@@ -30,7 +31,6 @@ class Header(textString: String, radialMenu: Option[RadialMenu]) extends Pane {
     case None =>
   }
 
-  //style = "-fx-background-color: rgba(0, 0, 0, 0.5)"
   styleClass.clear()
   styleClass.add("header")
   minWidth <== headerWidth

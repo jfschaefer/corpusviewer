@@ -7,7 +7,11 @@ import de.up.ling.irtg.algebra.StringAlgebra
 import scalafx.scene.layout.Pane
 import scalafx.scene.text.Text
 
-class StringVisualization(iw : InstanceWrapper, parentDisp : Option[Displayable], key : String) extends Pane with Displayable{
+/*
+    A Displayable for the string interpretation of an instance.
+ */
+
+class StringVisualization(iw : InstanceWrapper, parentDisp : Option[Displayable], key : String) extends Pane with Displayable {
   override val parentDisplayable = parentDisp
   override def getIw = iw
 

@@ -2,10 +2,14 @@ package de.jfschaefer.corpusviewer.visualization
 
 import de.jfschaefer.corpusviewer.{InstanceWrapper, Configuration}
 
-
 import scalafx.scene.layout.Pane
 
 import scala.collection.JavaConversions._
+
+/*
+  A good root Displayable, as it displays several interpretations, if they are available
+  and provides menu entries to get each interpretation as a separate child Displayable.
+ */
 
 class OverviewDisplayable(iw : InstanceWrapper, parentDisp : Option[Displayable]) extends Pane with Displayable {
   override val parentDisplayable = parentDisp

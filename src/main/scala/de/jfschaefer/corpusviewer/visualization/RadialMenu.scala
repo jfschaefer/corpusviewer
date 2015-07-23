@@ -10,6 +10,13 @@ import scalafx.Includes._
 import scalafx.scene.shape.Circle
 import scalafx.scene.control.Label
 
+
+/*
+    A RadialMenu, that can be provided with a list of MenuEntries.
+    A MenuEntry is either a MenuEntryFunction (in this case a function is called when it is selected)
+    or a MenuEntryDisplayable (in this case a Displayable can be pulled out of the menu).
+ */
+
 class RadialMenu extends Group {
   var items : List[MenuEntry] = Nil
   var itemNodes: List[Node] = Nil
