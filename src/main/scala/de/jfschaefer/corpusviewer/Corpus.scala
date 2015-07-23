@@ -5,9 +5,6 @@ import java.util
 
 import de.jfschaefer.corpusviewer.preview.{PreviewGroup, Slider}
 
-import de.up.ling.irtg.algebra.graph.GraphAlgebra
-import de.up.ling.irtg.InterpretedTreeAutomaton
-import de.up.ling.irtg.algebra.{StringAlgebra, Algebra, SetAlgebra}
 
 import scalafx.scene.Group
 
@@ -18,32 +15,21 @@ import scala.collection.JavaConversions._
    Both, the Corpus itself, and the GUI component for scrolling through it
  */
 
-class Corpus(reader: Reader) extends Group {
+class Corpus(iterator: java.util.Iterator[de.up.ling.irtg.corpus.Instance]) extends Group {
   /*
      STEP 1: LOAD CORPUS
    */
-  val algebraMap : java.util.Map[String, Algebra[_]] = new util.HashMap()
-  algebraMap.put("string", new StringAlgebra)
-  algebraMap.put("graph", new GraphAlgebra)
-  algebraMap.put("set", new SetAlgebra)
-  val irtg = InterpretedTreeAutomaton.forAlgebras(algebraMap)
-  val corpus = de.up.ling.irtg.corpus.Corpus.readCorpus(reader, irtg)
 
-  println("Loaded " + corpus.getNumberOfInstances + " instances")
-
-  println("Generating preview visualizations")
-
-  val iws: Array[InstanceWrapper] = new Array(corpus.getNumberOfInstances)
-  // val instanceStartPositions: Array[Double] = new Array(corpus.getNumberOfInstances)
-  // val instanceEndPositions: Array[Double] = new Array(corpus.getNumberOfInstances)
-  // val instancePreviews: Array[RootDisplayable] = new Array(corpus.getNumberOfInstances)
+  //val iws: Array[InstanceWrapper] = new Array(iterator.size)
+  val iws : util.ArrayList[InstanceWrapper]= new util.ArrayList[InstanceWrapper]()
 
   var index = 0
 
-  for (instance <- corpus.iterator) {
+  for (instance <- iterator) {
     val iw = new InstanceWrapper(instance)
     iw.index = index + 1   //Starting from 1, not 0
-    iws(index) = iw
+    //iws(index) = iw
+    iws.add(iw)
     iw.preview = Configuration.visualizationFactory.getPreview(iw)
     if (index == 0) {
       iw.corpusOffsetStart = 0.5 * Configuration.previewMargin

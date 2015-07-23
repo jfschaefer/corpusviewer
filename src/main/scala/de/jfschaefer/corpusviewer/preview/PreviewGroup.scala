@@ -9,6 +9,10 @@ import scalafx.scene.input.{MouseEvent, ScrollEvent}
 import scalafx.scene.shape.Rectangle
 import scalafx.Includes._
 
+/*
+  Displays an interval of the corpus for preview. Sentences can be dragged out for further inspection
+ */
+
 class PreviewGroup(corpus: Corpus) extends Group {
   // Due to the desired generality (arbitrary scaling function, varying heights of previews within one corpus),
   // this code is rather tricky, especially, because certain things have multiple representations
@@ -74,7 +78,7 @@ class PreviewGroup(corpus: Corpus) extends Group {
           System.err.println("de.jfschaefer.corpusviewer.preview.PreviewGroup: No instances loaded")
           return
         }
-        else if (c_top > corpus.iws(corpus.lastIndex).corpusOffsetEnd) i_top = corpus.lastIndex //let's keep it simple
+        else if (c_top > corpus.iws.get(corpus.lastIndex).corpusOffsetEnd) i_top = corpus.lastIndex //let's keep it simple
         else {
           System.err.println("de.jfschaefer.corpusviewer.preview.PreviewGroup: ...Corpus.getNextIndex returned None")
           return
@@ -85,10 +89,10 @@ class PreviewGroup(corpus: Corpus) extends Group {
 
     // iterate over all the nodes to be displayed
     var i_it = i_top
-    while (i_it <= corpus.lastIndex && corpus.iws(i_it).corpusOffsetStart < c_bottom) {
-      val node = corpus.iws(i_it).preview
-      val c_nodeHeight = corpus.iws(i_it).corpusOffsetEnd - corpus.iws(i_it).corpusOffsetStart
-      val c_nodeCenter = corpus.iws(i_it).corpusOffsetStart + 0.5 * c_nodeHeight
+    while (i_it <= corpus.lastIndex && corpus.iws.get(i_it).corpusOffsetStart < c_bottom) {
+      val node = corpus.iws.get(i_it).preview
+      val c_nodeHeight = corpus.iws.get(i_it).corpusOffsetEnd - corpus.iws.get(i_it).corpusOffsetStart
+      val c_nodeCenter = corpus.iws.get(i_it).corpusOffsetStart + 0.5 * c_nodeHeight
       val s_nodeCenter = 2 * (c_nodeCenter - c_top)/c_totalHeight - 1
       val scaling = f_scaling.function(s_nodeCenter) * Configuration.previewScale
       node.scale.set(scaling)
@@ -118,90 +122,94 @@ class PreviewGroup(corpus: Corpus) extends Group {
   // EVENT HANDLING - scrolling
   var c_prevScrollY = 0d
 
-  // Using the same notation as in update()
-  onScrollStarted = { ev: ScrollEvent =>
-    updateVars()
-    val p_yPos = ev.y
-    val s_pos = f_scaling.normalizedIntegralInverse(p_yPos / p_totalHeight)
-    c_prevScrollY = (1 + s_pos) * c_totalHeight * 0.5 + c_top
-    ev.consume()
-  }
+  enableInteraction()
 
-  onScroll = { ev: ScrollEvent =>
-    updateVars()
-    val p_yPos = ev.y
-    val s_pos: Double = f_scaling.normalizedIntegralInverse(p_yPos / p_totalHeight)
-    val c_newY: Double = (1d + s_pos) * c_totalHeight * 0.5 + c_top
-    corpus.offset.set(corpus.offset.value - (c_newY - c_prevScrollY)) // minus as direction reversed
-    //c_prevScrollY = c_newY    //don't just enable this line - it's stupid
-    ev.consume()
-  }
-
-  // EVENT HANDLING - dragging
-  var p_dragStart = (0d, 0d)
-  var dragInitialScale = 0d
-  var p_dragLast = (0d, 0d)
-  var draggedNode : Option[Displayable] = None
-  onMousePressed = { ev: MouseEvent =>
-    p_dragStart = (ev.x, ev.y)
-    p_dragLast = (ev.x, ev.y)
-    val s_pos: Double = f_scaling.normalizedIntegralInverse(ev.y / p_totalHeight)
-    val c_pos: Double = (1d + s_pos) * c_totalHeight * 0.5 + c_top
-    corpus.getIndex(c_pos) match {
-      case Some(i) =>
-        if (!corpus.iws(i).hasIdAssigned) {
-          val node = Configuration.visualizationFactory.getVisualization(corpus.iws(i), "overview", None)//getPreview(corpus.iws(i))
-          node.scale.set(corpus.iws(i).preview.scale.value)
-          dragInitialScale = node.scale.value
-          node.layoutX = corpus.iws(i).preview.boundsInParent.value.getMinX
-          node.layoutY = corpus.iws(i).preview.boundsInParent.value.getMinY
-          draggedNode = Some(node)
-          children.add(node)
-        }
-      case None => draggedNode = None
+  def enableInteraction(): Unit = {
+    // Using the same notation as in update()
+    onScrollStarted = { ev: ScrollEvent =>
+      updateVars()
+      val p_yPos = ev.y
+      val s_pos = f_scaling.normalizedIntegralInverse(p_yPos / p_totalHeight)
+      c_prevScrollY = (1 + s_pos) * c_totalHeight * 0.5 + c_top
+      ev.consume()
     }
-    ev.consume()
-  }
 
-  onMouseDragged = { ev: MouseEvent =>
-    draggedNode match {
-      case Some(node) =>
-        val dragGoalX = Configuration.previewSectionWidth + p_dragLast._1 - node.translateX.value - xOffset
-        node.translateX = node.translateX.value + ev.x - p_dragLast._1
-        node.translateY = node.translateY.value + ev.y - p_dragLast._2
-        if (ev.x < p_dragStart._1) {
-          node.scale.set(dragInitialScale)
-          node.getIw.releaseId()
-        } else if (ev.x > dragGoalX) {
-          node.scale.set(Configuration.initialScale)
-          node.getIw.assignId()
-        } else {
-          val scale = dragInitialScale + (Configuration.initialScale - dragInitialScale) *
-                                 (ev.x - p_dragStart._1) / (dragGoalX - p_dragStart._1)
-          node.scale.set(scale)
-          node.getIw.releaseId()
-        }
-      case None =>
+    onScroll = { ev: ScrollEvent =>
+      updateVars()
+      val p_yPos = ev.y
+      val s_pos: Double = f_scaling.normalizedIntegralInverse(p_yPos / p_totalHeight)
+      val c_newY: Double = (1d + s_pos) * c_totalHeight * 0.5 + c_top
+      corpus.offset.set(corpus.offset.value - (c_newY - c_prevScrollY)) // minus as direction reversed
+      //c_prevScrollY = c_newY    //don't just enable this line - it's stupid
+      ev.consume()
     }
-    p_dragLast = (ev.x, ev.y)
-    ev.consume()
-  }
 
-  onMouseReleased = { ev: MouseEvent =>
-    draggedNode match {
-      case Some(node) =>
-        children.remove(node)
-        val dragGoalX = Configuration.previewSectionWidth + p_dragLast._1 - node.translateX.value - xOffset
-        if (ev.x > dragGoalX) {
-          Main.corpusScene.getChildren.add(node)
-          node.enableInteraction()
-          node.getIw.assignId()
-        } else {
-          node.getIw.releaseId()
-        }
-        draggedNode = None
-      case None =>
+    // EVENT HANDLING - dragging
+    var p_dragStart = (0d, 0d)
+    var dragInitialScale = 0d
+    var p_dragLast = (0d, 0d)
+    var draggedNode : Option[Displayable] = None
+    onMousePressed = { ev: MouseEvent =>
+      p_dragStart = (ev.x, ev.y)
+      p_dragLast = (ev.x, ev.y)
+      val s_pos: Double = f_scaling.normalizedIntegralInverse(ev.y / p_totalHeight)
+      val c_pos: Double = (1d + s_pos) * c_totalHeight * 0.5 + c_top
+      corpus.getIndex(c_pos) match {
+        case Some(i) =>
+          if (!corpus.iws.get(i).hasIdAssigned) {
+            val node = Configuration.visualizationFactory.getVisualization(corpus.iws.get(i), "overview", None)//getPreview(corpus.iws(i))
+            node.scale.set(corpus.iws.get(i).preview.scale.value)
+            dragInitialScale = node.scale.value
+            node.layoutX = corpus.iws.get(i).preview.boundsInParent.value.getMinX
+            node.layoutY = corpus.iws.get(i).preview.boundsInParent.value.getMinY
+            draggedNode = Some(node)
+            children.add(node)
+          }
+        case None => draggedNode = None
+      }
+      ev.consume()
     }
-    ev.consume()
+
+    onMouseDragged = { ev: MouseEvent =>
+      draggedNode match {
+        case Some(node) =>
+          val dragGoalX = Configuration.previewSectionWidth + p_dragLast._1 - node.translateX.value - xOffset
+          node.translateX = node.translateX.value + ev.x - p_dragLast._1
+          node.translateY = node.translateY.value + ev.y - p_dragLast._2
+          if (ev.x < p_dragStart._1) {
+            node.scale.set(dragInitialScale)
+            node.getIw.releaseId()
+          } else if (ev.x > dragGoalX) {
+            node.scale.set(Configuration.initialScale)
+            node.getIw.assignId()
+          } else {
+            val scale = dragInitialScale + (Configuration.initialScale - dragInitialScale) *
+              (ev.x - p_dragStart._1) / (dragGoalX - p_dragStart._1)
+            node.scale.set(scale)
+            node.getIw.releaseId()
+          }
+        case None =>
+      }
+      p_dragLast = (ev.x, ev.y)
+      ev.consume()
+    }
+
+    onMouseReleased = { ev: MouseEvent =>
+      draggedNode match {
+        case Some(node) =>
+          children.remove(node)
+          val dragGoalX = Configuration.previewSectionWidth + p_dragLast._1 - node.translateX.value - xOffset
+          if (ev.x > dragGoalX) {
+            Main.corpusScene.getChildren.add(node)
+            node.enableInteraction()
+            node.getIw.assignId()
+          } else {
+            node.getIw.releaseId()
+          }
+          draggedNode = None
+        case None =>
+      }
+      ev.consume()
+    }
   }
 }

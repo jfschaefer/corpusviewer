@@ -47,8 +47,8 @@ object Main extends JFXApp {
 
   openCorpusScene.root = new OpenCorpusDialog(openCorpus)
 
-  def openCorpus(reader: Reader): Unit = {
-    corpus = new Corpus(reader)
+  def openCorpus(iterator: java.util.Iterator[de.up.ling.irtg.corpus.Instance]): Unit = {
+    corpus = new Corpus(iterator)
     corpusScene.root = corpus
     stage.scene = corpusScene
     corpus.previewGroup.update()
