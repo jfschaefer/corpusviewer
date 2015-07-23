@@ -60,7 +60,7 @@
 }
 
 .radialmenu_entry_function_text {
-  -fx-fill: black;
+  -fx-text-fill: black;
   -fx-font-size: 1.2em;
 }
 
@@ -70,7 +70,7 @@
 }
 
 .radialmenu_entry_displayable_text {
-  -fx-fill: white;
+  -fx-text-fill: white;
   -fx-font-size: 1.2em;
 }
 

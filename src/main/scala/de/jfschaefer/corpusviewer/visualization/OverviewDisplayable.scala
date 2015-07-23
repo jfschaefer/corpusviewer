@@ -18,7 +18,25 @@ class OverviewDisplayable(iw : InstanceWrapper, parentDisp : Option[Displayable]
 
   // HEADER
   val menu = new RadialMenu {
-    items = Nil
+    items = new MenuEntryFunction("Trash", () => trash())::
+      new MenuEntryFunction("Children\nToFront", () =>
+        {
+          for (child <- childDisplayables) {
+            child.toFront()
+            //child.drawLocationLines()
+          }
+          /* new Thread(new Runnable {
+            def run(): Unit = {
+              Thread.sleep(1000)
+              for (child <- childDisplayables) {
+                child.removeLocationLines()
+              }
+            }
+          }).start() */
+        }
+      )::new MenuEntryFunction("Trash\nChildren", () =>
+        for (child <- childDisplayables) child.trash())::
+      Nil
     for (key <- iw.instance.getInputObjects.keySet) {
       items = new MenuEntryDisplayable(label = key,
         dispProducer = () => Configuration.visualizationFactory.getVisualization(iw, key, Some(OverviewDisplayable.this)),

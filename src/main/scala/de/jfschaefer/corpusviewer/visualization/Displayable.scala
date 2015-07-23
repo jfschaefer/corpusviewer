@@ -29,14 +29,15 @@ trait Displayable extends Node {
   private var interactionDragStartX = 0d
   private var interactionDragStartY = 0d
   def enableInteraction(): Unit = {
-    onZoom = {ev : ZoomEvent => Util.handleZoom(this, scale)(ev); }
-    onScroll = {ev : ScrollEvent => Util.handleScroll(this)(ev); Util.trashStyleUpdate(this, this); drawLocationLines() }
+    onZoom = {ev : ZoomEvent => Util.handleZoom(this, scale)(ev); toFront()}
+    onScroll = {ev : ScrollEvent => Util.handleScroll(this)(ev); toFront(); Util.trashStyleUpdate(this, this); drawLocationLines() }
 
     if (header != null) {
       header.onMousePressed = { ev: MouseEvent =>
         drawLocationLines()
         interactionDragStartX = ev.sceneX
         interactionDragStartY = ev.sceneY
+        toFront()
         ev.consume()
       }
       header.onMouseDragged = { ev: MouseEvent =>
@@ -46,16 +47,22 @@ trait Displayable extends Node {
         interactionDragStartX = ev.sceneX
         interactionDragStartY = ev.sceneY
         Util.trashStyleUpdate(this, this)
+        toFront()
         ev.consume()
       }
       header.onMouseReleased = { ev: MouseEvent =>
         Util.trashIfRequired(this)
         removeLocationLines()
+        toFront()
+        ev.consume()
+      }
+      header.onMouseClicked = { ev: MouseEvent =>
+        toFront()
         ev.consume()
       }
     }
 
-    onScrollFinished = {ev : ScrollEvent => Util.trashIfRequired(this); removeLocationLines() }
+    onScrollFinished = {ev : ScrollEvent => Util.trashIfRequired(this); toFront(); removeLocationLines() }
   }
 
   var idstyleclass : String = "no_id_assigned"

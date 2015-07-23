@@ -81,7 +81,7 @@ class RadialMenu extends Group {
       draggedDisplayable match {
         case Some(disp) =>
           val distance = math.sqrt(ev.x * ev.x + ev.y * ev.y)
-          if (distance >= 2 * radius.value) {
+          if (distance >= 1.5 * radius.value) {
             val boundsInScene = disp.localToScene(disp.boundsInLocal.value)
             children.removeAll(disp)
             Main.corpusScene.getChildren.add(disp)

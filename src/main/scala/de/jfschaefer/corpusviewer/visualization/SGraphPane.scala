@@ -14,7 +14,7 @@ import de.jfschaefer.sugiyamalayout.{Layout, DiGraph, LatexGenerator}
 
 import scalafx.scene.shape.Rectangle
 
-class SGraphPane(sgraph : SGraph) extends Pane {
+class SGraphPane(sgraph : SGraph, bezier: Boolean = true, alternative: Boolean = true) extends Pane {
   styleClass.clear()
   //style = "-fx-background-color: lightblue"
   val jgrapht_graph : org.jgrapht.DirectedGraph[GraphNode, GraphEdge] = sgraph.getGraph
@@ -28,7 +28,8 @@ class SGraphPane(sgraph : SGraph) extends Pane {
     labelMap.put(edge, edge.getLabel);
   }
   val config = new de.jfschaefer.sugiyamalayout.Configuration
-  config.setUseAlternativeAlgorithm(false)
+  config.setUseAlternativeAlgorithm(alternative)
+  config.setUseBezierCurves(bezier)
   config.setLayerDistance(81d);
   val layout : Layout[GraphNode, GraphEdge] = digraph.generateLayout(config)
 
