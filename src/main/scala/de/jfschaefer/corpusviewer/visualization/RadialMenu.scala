@@ -15,6 +15,8 @@ import scalafx.scene.control.Label
     A RadialMenu, that can be provided with a list of MenuEntries.
     A MenuEntry is either a MenuEntryFunction (in this case a function is called when it is selected)
     or a MenuEntryDisplayable (in this case a Displayable can be pulled out of the menu).
+
+    TODO: Rewrite this code, as it got fairly messy
  */
 
 class RadialMenu extends Group {
@@ -53,10 +55,12 @@ class RadialMenu extends Group {
     }
 
     onMouseDragged = { ev: MouseEvent =>
+      if (draggedDisplayable == None) for (item <- items) item.setNormalLayout()
       if (!isExpanded) expand()
       if (draggedDisplayable.isEmpty) {
         for ((x, y, i) <- itemPos) {
           if ((x - ev.x) * (x - ev.x) + (y - ev.y) * (y - ev.y) < entryRadius * entryRadius) {
+            i.setMarkedLayout()
             i match {
               case MenuEntryDisplayable(_, producer, _) =>
                 val d = producer()
@@ -146,6 +150,8 @@ class RadialMenu extends Group {
         circ.centerY = math.cos(cumulativeAngle) * (radius.value - entryRadius)
         children.add(circ)
 
+        i.setCircle(Some(circ))
+
         itemPos = (circ.centerX.value, circ.centerY.value, i) :: itemPos
 
         val text = new Label(i.getLabel) {
@@ -180,6 +186,9 @@ class RadialMenu extends Group {
       case Some(disp) => children.removeAll(disp)
       case None =>
     }
+    for (i <- items) {
+      i.setCircle(None)
+    }
     draggedDisplayable = None
   }
 }
@@ -187,16 +196,49 @@ class RadialMenu extends Group {
 
 
 abstract class MenuEntry(label: String) {
+  var circle: Option[Circle] = None
   def getLabel: String = label
+  def getCircle: Option[Circle] = circle
+  def setCircle(circle: Option[Circle]): Unit = { this.circle = circle }
+  def setNormalLayout(): Unit
+  def setMarkedLayout(): Unit
 }
 
 case class MenuEntryDisplayable(label: String, dispProducer: () => Displayable, onRelease: (Displayable) => Unit) extends MenuEntry(label) {
   // use currying to achieve lazy evaluation
   def getDisplayable: Displayable = dispProducer()
   def release(d : Displayable) = onRelease(d)
+
+  override def setNormalLayout(): Unit = {
+    println("THIS: " + this + "    normal")
+    getCircle match {
+      case Some(x: Circle) => { x.styleClass.clear(); x.styleClass.add("radialmenu_entry_displayable") }
+      case None => {}
+    }
+  }
+  override def setMarkedLayout(): Unit = {
+    println("THIS: " + this + "    unnormal")
+    getCircle match {
+      case Some(x: Circle) => { x.styleClass.clear(); x.styleClass.add("radialmenu_entry_displayable_marked") }
+      case None => {}
+    }
+  }
 }
 
 case class MenuEntryFunction(label: String, function: () => Unit) extends MenuEntry(label) {
   def callFunction(): Unit = function()
+
+  override def setNormalLayout(): Unit = {
+    getCircle match {
+      case Some(x: Circle) => { x.styleClass.clear(); x.styleClass.add("radialmenu_entry_function") }
+      case None => {}
+    }
+  }
+  override def setMarkedLayout(): Unit = {
+    getCircle match {
+      case Some(x: Circle) => { x.styleClass.clear(); x.styleClass.add("radialmenu_entry_function_marked") }
+      case None => {}
+    }
+  }
 }
 

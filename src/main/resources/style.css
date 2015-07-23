@@ -59,6 +59,12 @@
   -fx-stroke: white;
 }
 
+.radialmenu_entry_function_marked {
+  -fx-fill: radial-gradient(radius 100px, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.6) 100%);
+  -fx-stroke: white;
+  -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 1.0), 8, 0, 0, 0);
+}
+
 .radialmenu_entry_function_text {
   -fx-text-fill: black;
   -fx-font-size: 1.2em;
@@ -67,6 +73,12 @@
 .radialmenu_entry_displayable {
   -fx-fill: radial-gradient(radius 100px, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.6) 100%);
   -fx-stroke: black;
+}
+
+.radialmenu_entry_displayable_marked {
+  -fx-fill: radial-gradient(radius 100px, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.4) 100%);
+  -fx-stroke: black;
+  -fx-effect: dropshadow(three-pass-box, rgba(255, 255, 255, 1.0), 14, 0.6, 0, 0);  /* white isn't that easily visible on a light gray background */
 }
 
 .radialmenu_entry_displayable_text {
