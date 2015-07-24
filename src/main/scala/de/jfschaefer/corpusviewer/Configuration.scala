@@ -53,6 +53,8 @@ object Configuration {
 
   // style settings
   val stylesheet = load[String]("stylesheet", {x: String => x})
+  val backgroundColor = load("background_color", identity)
+  val graphColor = load("graph_color", identity)
   val numberOfIds = load("number_of_ids", _.toInt)
   val locationPolygonColor1 = load("location_polygon_color_1", identity)
   val locationPolygonColor2 = load("location_polygon_color_2", identity)

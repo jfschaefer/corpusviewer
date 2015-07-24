@@ -6,6 +6,7 @@ import de.up.ling.gesture.JavaFxAdapter
 
 import scalafx.application.JFXApp
 import scalafx.scene.Scene
+import scalafx.scene.paint.Color
 import scalafx.stage.{StageStyle, Screen}
 import scalafx.Includes._
 
@@ -15,10 +16,12 @@ import scalafx.Includes._
 object Main extends JFXApp {
   val corpusScene = new Scene {
     stylesheets += Configuration.stylesheet
+    fill = Configuration.backgroundColor
   }
 
   val openCorpusScene = new Scene {
     stylesheets += Configuration.stylesheet
+    fill = Configuration.backgroundColor
   }
 
   private var corpus: Corpus = null

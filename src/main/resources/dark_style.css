@@ -4,60 +4,57 @@
  */
 
 .slider_track {
-  -fx-fill: lightgray;
-  -fx-stroke: gray;
+  -fx-fill: #444444;
+  -fx-stroke: #666666;
   -fx-stroke-width: 1px;
 }
 
 .slider_thumb {
-  -fx-fill: gray;
+  -fx-fill: #888888;
 }
 
 .previewGroup_bgRect {
-  -fx-fill: white;
+  -fx-fill: #222222;
 }
+
 /*
    SECTION: OPEN CORPUS
 */
 
 .open_corpus_file_selected {
-  -fx-fill: lightgray;
-  -fx-stroke-width: 3px;
-  -fx-stroke: gray;
+  -fx-fill: #666666;
 }
 
 .open_corpus_file_file {
-  -fx-fill: lightgray;
-  -fx-stroke-width: 3px;
-  -fx-stroke: #444488;
+  -fx-fill: #444444;
 }
 
 .open_corpus_file_dir {
-  -fx-fill: lightgray;
-  -fx-stroke-width: 3px;
-  -fx-stroke: #448844;
+  -fx-fill: #444444;
 }
 
 .open_corpus_file_error {
-  -fx-fill: #bb8888;
-  -fx-stroke-width: 6px;
-  -fx-stroke: red;
+  -fx-fill: #444444;
 }
 
 .open_corpus_file_file_l {
   -fx-font-size: 1.2em;
+  -fx-text-fill: #009900;
 }
 
 .open_corpus_file_dir_l {
   -fx-font-size: 1.2em;
+  -fx-text-fill: #8888ff;
 }
 
 .open_corpus_file_error_l {
   -fx-font-size: 1.2em;
+  -fx-text-fill: #ff0000;
 }
 
 .open_corpus_pwd {
   -fx-font-size: 2em;
+  -fx-fill: #eeeeee;
 }
 
 
@@ -85,10 +82,11 @@
 
 .header_font {
   -fx-font-size: 1.8em;
-  -fx-fill: white;
+  -fx-fill: rgba(255, 255, 255, 0.7);
 }
 
 .header {
+  /* -fx-background-color: rgba(255, 255, 255, 0.3); */
   -fx-background-color: rgba(0, 0, 0, 0.5);
 }
 
@@ -138,53 +136,53 @@
 /* ID COLORS */
 
 .no_id_assigned {
-  -fx-background-color: white;
+  -fx-background-color: #888888;
 }
 
 .id_0 {
-  -fx-background-color: #bbbbff;
+  -fx-background-color: #6666cc;
 }
 
 .id_1 {
-  -fx-background-color: #bbffbb;
+  -fx-background-color: #55aa55;
 }
 
 .id_2 {
-  -fx-background-color: #ffbbbb;
+  -fx-background-color: #bb5555;
 }
 
 .id_3 {
-  -fx-background-color: #ffbbff;
+  -fx-background-color: #aa55aa;
 }
 
 .id_4 {
-  -fx-background-color: #bbffff;
+  -fx-background-color: #55aaaa;
 }
 
 .id_5 {
-  -fx-background-color: #ffffbb;
+  -fx-background-color: #aaaa55;
 }
 
 .id_6 {
-  -fx-background-color: #ffddbb;
+  -fx-background-color: #aa8855;
 }
 
 .id_7 {
-  -fx-background-color: #bbffdd;
+  -fx-background-color: #8855aa;
 }
 
 .id_8 {
-  -fx-background-color: #ddbbff;
+  -fx-background-color: #55aa88;
 }
 
 .id_9 {
-  -fx-background-color: #ffbbdd;
+  -fx-background-color: #88aa55;
 }
 
 .id_10 {
-  -fx-background-color: #bbddff;
+  -fx-background-color: #5588aa;
 }
 
 .id_11 {
-  -fx-background-color: #ddffbb;
+  -fx-background-color: #aa5588;
 }

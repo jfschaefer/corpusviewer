@@ -23,7 +23,7 @@ class FileDisplay(file : File, displayString : String, onClick : (File) => Boole
 
   val label = new Label(displayString) {
     styleClass.clear()
-    styleClass.add("open_corpus_file_label")
+    styleClass.add(if (file == null) "open_corpus_file_error_l" else if (file.isFile) "open_corpus_file_file_l" else "open_corpus_file_dir_l")
   }
   label.layoutX = Configuration.openCorpusMargin
   label.boundsInParentProperty.onChange {
@@ -33,9 +33,13 @@ class FileDisplay(file : File, displayString : String, onClick : (File) => Boole
   children.add(label)
 
   bgRect.onMouseClicked = { ev : MouseEvent =>
+    bgRect.styleClass.clear()
+    bgRect.styleClass.add("open_corpus_file_selected")
     if (!onClick(file)) {
       bgRect.styleClass.clear()
       bgRect.styleClass.add("open_corpus_file_error")
+      label.styleClass.clear()
+      label.styleClass.add("open_corpus_file_error_l")
     }
   }
 

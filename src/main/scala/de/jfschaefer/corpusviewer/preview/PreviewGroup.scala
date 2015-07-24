@@ -1,7 +1,7 @@
 package de.jfschaefer.corpusviewer.preview
 
 import de.jfschaefer.corpusviewer.visualization.Displayable
-import de.jfschaefer.corpusviewer.{Corpus, Configuration, Main}
+import de.jfschaefer.corpusviewer.{Util, Corpus, Configuration, Main}
 
 import scalafx.beans.property.ReadOnlyDoubleProperty
 import scalafx.scene.Group
@@ -188,6 +188,7 @@ class PreviewGroup(corpus: Corpus) extends Group {
             node.scale.set(scale)
             node.getIw.releaseId()
           }
+          Util.trashStyleUpdate(node, node)
         case None =>
       }
       p_dragLast = (ev.x, ev.y)
@@ -203,6 +204,7 @@ class PreviewGroup(corpus: Corpus) extends Group {
             Main.corpusScene.getChildren.add(node)
             node.enableInteraction()
             node.getIw.assignId()
+            Util.trashIfRequired(node)
           } else {
             node.getIw.releaseId()
           }

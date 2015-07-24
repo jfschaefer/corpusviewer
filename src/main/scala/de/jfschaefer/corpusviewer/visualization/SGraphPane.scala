@@ -1,5 +1,7 @@
 package de.jfschaefer.corpusviewer.visualization
 
+import javafx.scene.paint.Color
+
 import scalafx.scene.layout.Pane
 import scalafx.scene.text.Text
 
@@ -8,6 +10,8 @@ import scala.collection.JavaConversions._
 import de.up.ling.irtg.algebra.graph.{SGraph, GraphNode, GraphEdge}
 import de.jfschaefer.sugiyamalayout.visualizationFX.{GraphFX, GraphFXNodeFactory}
 import de.jfschaefer.sugiyamalayout.{Layout, DiGraph, LatexGenerator}
+
+import de.jfschaefer.corpusviewer.Configuration
 
 import scalafx.scene.shape.Rectangle
 
@@ -34,7 +38,7 @@ class SGraphPane(sgraph : SGraph, bezier: Boolean = true, alternative: Boolean =
   config.setLayerDistance(81d);
   val layout : Layout[GraphNode, GraphEdge] = digraph.generateLayout(config)
 
-  val graphfx : GraphFX[GraphNode, GraphEdge] = new GraphFX(layout, new DefaultGraphFXNodeFactory, labelMap)
+  val graphfx : GraphFX[GraphNode, GraphEdge] = new GraphFX(layout, new DefaultGraphFXNodeFactory, labelMap, Color.web(Configuration.graphColor), Color.web(Configuration.graphColor))
   children.add(graphfx)
 
   def getWidth: Double = layout.getWidth()
