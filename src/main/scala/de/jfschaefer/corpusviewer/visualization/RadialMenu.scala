@@ -210,14 +210,12 @@ case class MenuEntryDisplayable(label: String, dispProducer: () => Displayable, 
   def release(d : Displayable) = onRelease(d)
 
   override def setNormalLayout(): Unit = {
-    println("THIS: " + this + "    normal")
     getCircle match {
       case Some(x: Circle) => { x.styleClass.clear(); x.styleClass.add("radialmenu_entry_displayable") }
       case None => {}
     }
   }
   override def setMarkedLayout(): Unit = {
-    println("THIS: " + this + "    unnormal")
     getCircle match {
       case Some(x: Circle) => { x.styleClass.clear(); x.styleClass.add("radialmenu_entry_displayable_marked") }
       case None => {}

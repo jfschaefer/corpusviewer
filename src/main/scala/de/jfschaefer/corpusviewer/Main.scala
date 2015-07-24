@@ -18,7 +18,7 @@ object Main extends JFXApp {
   }
 
   val openCorpusScene = new Scene {
-
+    stylesheets += Configuration.stylesheet
   }
 
   private var corpus: Corpus = null

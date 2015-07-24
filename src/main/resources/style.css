@@ -17,6 +17,37 @@
   -fx-fill: white;
 }
 
+/*
+   SECTION: OPEN CORPUS
+*/
+
+.open_corpus_file_file {
+  -fx-fill: lightgray;
+  -fx-stroke-width: 3px;
+  -fx-stroke: #444488;
+}
+
+.open_corpus_file_dir {
+  -fx-fill: lightgray;
+  -fx-stroke-width: 3px;
+  -fx-stroke: #448844;
+}
+
+.open_corpus_file_error {
+  -fx-fill: #bb8888;
+  -fx-stroke-width: 6px;
+  -fx-stroke: red;
+}
+
+.open_corpus_pwd {
+  -fx-font-size: 2em;
+}
+
+.open_corpus_file_label {
+  -fx-font-size: 1.2em;
+}
+
+
 
 /*
    SECTION: VISUALIZATION

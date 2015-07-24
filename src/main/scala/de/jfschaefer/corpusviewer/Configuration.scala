@@ -27,6 +27,11 @@ object Configuration {
   val windowMargin = load("window_margin", _.toDouble)
   val initialScale = load("initial_scale", _.toDouble)
 
+  val openCorpusCols = load("open_corpus_cols", _.toInt)
+  val openCorpusMargin = load("open_corpus_margin", _.toDouble)
+  val openCorpusMaxEntryHeight = load("open_corpus_max_entry_height", _.toDouble)
+  val openCorpusMaxEntriesPerCol = load("open_corpus_max_entries_per_col", _.toInt)
+
   val trashWidth = load("trash_width", _.toDouble)
   val trashHeight = load("trash_height", _.toDouble)
 
