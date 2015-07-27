@@ -42,15 +42,17 @@ class SGraphPane(sgraph : SGraph, bezier: Boolean = true, alternative: Boolean =
   val graphfx : GraphFX[GraphNode, GraphEdge] = new GraphFX(layout, new DefaultGraphFXNodeFactory, labelMap, Color.web(Configuration.graphColor), Color.web(Configuration.graphColor))
   children.add(graphfx)
 
-  def getWidth: Double = layout.getWidth()
-  def getHeight: Double = layout.getHeight()
+  def getWidth: Double = layout.getWidth
+
+  def getHeight: Double = layout.getHeight
+
   def getLaTeX(): String = {
     val map : java.util.Map[GraphNode, String] = new java.util.HashMap()
     for (node : GraphNode <- jgrapht_graph.vertexSet()) {
       map.put(node, node.getLabel)
     }
     val lg = new LatexGenerator(layout, map, labelMap, config)
-    lg.getLatex()
+    lg.getLatex
   }
 }
 

@@ -22,6 +22,7 @@ class OverviewDisplayable(iw : InstanceWrapper, parentDisp : Option[Displayable]
 
   // HEADER
   val menu = new RadialMenu {
+    displayable = Some(OverviewDisplayable.this)
     items = new MenuEntryFunction("Trash", () => trash())::
       new MenuEntryFunction("Children\nToFront", () =>
         {

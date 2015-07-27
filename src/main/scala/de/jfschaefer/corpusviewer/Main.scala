@@ -6,7 +6,6 @@ import de.up.ling.gesture.JavaFxAdapter
 
 import scalafx.application.JFXApp
 import scalafx.scene.Scene
-import scalafx.scene.paint.Color
 import scalafx.stage.{StageStyle, Screen}
 import scalafx.Includes._
 

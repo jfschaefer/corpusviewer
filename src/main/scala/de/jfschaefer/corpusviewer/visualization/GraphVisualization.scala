@@ -28,6 +28,7 @@ class GraphVisualization(iw : InstanceWrapper, parentDisp : Option[Displayable],
 
   // HEADER
   val menu = new RadialMenu {
+    displayable = Some(GraphVisualization.this)
     items = new MenuEntryFunction("Copy as\nLaTeX", () => {
       Util.copyIntoClipboard(graphpane.getLaTeX())
     })::new MenuEntryFunction("Trash", () => trash() )::

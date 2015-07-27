@@ -20,7 +20,9 @@ class NoVisualization(iw : InstanceWrapper, parentDisp : Option[Displayable], ke
 
 
   // HEADER
-  val menu = new RadialMenu
+  val menu = new RadialMenu {
+    displayable = Some(NoVisualization.this)
+  }
   menu.enableInteraction()
   override val header = new Header(iw.index + ". " + key, Some(menu))
 

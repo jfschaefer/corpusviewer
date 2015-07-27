@@ -6,7 +6,7 @@ import scalafx.scene.Group
 import scalafx.scene.text.Text
 
 import java.io.{BufferedReader, FileReader, File}
-import java.nio.file.{Path, Paths}
+import java.nio.file.Paths
 
 import de.up.ling.irtg.algebra.graph.GraphAlgebra
 import de.up.ling.irtg.InterpretedTreeAutomaton
@@ -36,14 +36,14 @@ class OpenCorpusDialog(load: java.util.Iterator[de.up.ling.irtg.corpus.Instance]
     pwdLabel.text = "\n" + pwd.toString
     children.add(pwdLabel)
 
-    var files : Seq[(File, String)] = pwd.listFiles.foldLeft(Seq.empty[(File, String)] :+ (pwd, ".") :+ (pwd.getParentFile, "..")) (
+    val files : Seq[(File, String)] = pwd.listFiles.foldLeft(Seq.empty[(File, String)] :+ (pwd, ".") :+ (pwd.getParentFile, "..")) (
                                                     (seq, file) => seq :+ (file, file.getName))
     val colStart = 2 * Configuration.windowMargin + pwdLabel.boundsInParent.value.getHeight
     val colHeight = Main.stage.height.value - Configuration.windowMargin - colStart
     var ncols = Configuration.openCorpusCols
     while (1 + files.length / ncols > Configuration.openCorpusMaxEntriesPerCol) ncols += 1
     val colWidth = (Main.stage.width.value - (ncols + 1) * Configuration.windowMargin) / ncols
-    var maxEntriesPerCol : Int = 1 + files.length / ncols
+    val maxEntriesPerCol : Int = 1 + files.length / ncols
     val height = math.min(Configuration.openCorpusMaxEntryHeight, (colHeight - Configuration.openCorpusMargin * maxEntriesPerCol)/ maxEntriesPerCol)
 
     var counter = 0
@@ -72,10 +72,9 @@ class OpenCorpusDialog(load: java.util.Iterator[de.up.ling.irtg.corpus.Instance]
 
         load(corpus.iterator)
       } catch {
-        case exception : Exception => {
+        case exception : Exception =>
           exception.printStackTrace()
           return false
-        }
       }
     } else {
       pwd = f

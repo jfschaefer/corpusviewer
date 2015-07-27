@@ -23,11 +23,10 @@ class Header(textString: String, radialMenu: Option[RadialMenu]) extends Pane {
   text.layoutY = Configuration.headerMargin
 
   radialMenu match {
-    case Some(menu) => {
+    case Some(menu) =>
       children.add (menu)
       menu.layoutX <== headerWidth - Configuration.headerMenuButtonRadius - 5
       menu.layoutY = Configuration.headerMenuButtonRadius + 5
-    }
     case None =>
   }
 

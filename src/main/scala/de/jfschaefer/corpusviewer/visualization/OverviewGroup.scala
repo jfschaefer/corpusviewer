@@ -30,7 +30,7 @@ class OverviewGroup(iw : InstanceWrapper, forPreview : Boolean = false) extends 
     val text = new Text("\n" + (if (forPreview) iw.index + ". " else "") + stringRepresentation) {
       wrappingWidth = Configuration.preferredPreviewWidth - 2 * Configuration.previewMargin
     }
-    text.translateX = Configuration.previewMargin;
+    text.translateX = Configuration.previewMargin
     text.translateY = cumulativeHeight
     cumulativeHeight += text.boundsInLocal.value.getHeight
     children.add(text)

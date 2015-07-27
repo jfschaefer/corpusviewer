@@ -28,6 +28,7 @@ class StringVisualization(iw : InstanceWrapper, parentDisp : Option[Displayable]
 
   // HEADER
   val menu = new RadialMenu {
+    displayable = Some(StringVisualization.this)
     items = new MenuEntryFunction("Copy", () => {
       Util.copyIntoClipboard(stringRepresentation)
     })::new MenuEntryFunction("Trash", () => trash() )::Nil

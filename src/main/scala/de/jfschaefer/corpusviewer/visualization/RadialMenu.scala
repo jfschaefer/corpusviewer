@@ -24,6 +24,7 @@ class RadialMenu extends Group {
   var itemNodes: List[Node] = Nil
   var itemPos : List[(Double, Double, MenuEntry)] = Nil
   var isExpanded = false
+  var displayable : Option[Displayable] = None
 
   val radius = new DoubleProperty()
   radius.set(Configuration.radialMenuExpansionRadius)
@@ -49,13 +50,17 @@ class RadialMenu extends Group {
 
   def enableInteraction(): Unit = {
     onMousePressed = { ev: MouseEvent =>
+      displayable match {
+        case Some(d) => d.toFront()
+        case None =>
+      }
       if (!isExpanded) expand()
       isExpanded = true
       ev.consume()
     }
 
     onMouseDragged = { ev: MouseEvent =>
-      if (draggedDisplayable == None) for (item <- items) item.setNormalLayout()
+      if (draggedDisplayable.isEmpty) for (item <- items) item.setNormalLayout()
       if (!isExpanded) expand()
       if (draggedDisplayable.isEmpty) {
         for ((x, y, i) <- itemPos) {
@@ -211,14 +216,14 @@ case class MenuEntryDisplayable(label: String, dispProducer: () => Displayable, 
 
   override def setNormalLayout(): Unit = {
     getCircle match {
-      case Some(x: Circle) => { x.styleClass.clear(); x.styleClass.add("radialmenu_entry_displayable") }
-      case None => {}
+      case Some(x: Circle) => x.styleClass.clear(); x.styleClass.add("radialmenu_entry_displayable")
+      case None =>
     }
   }
   override def setMarkedLayout(): Unit = {
     getCircle match {
-      case Some(x: Circle) => { x.styleClass.clear(); x.styleClass.add("radialmenu_entry_displayable_marked") }
-      case None => {}
+      case Some(x: Circle) => x.styleClass.clear(); x.styleClass.add("radialmenu_entry_displayable_marked")
+      case None =>
     }
   }
 }
@@ -228,14 +233,14 @@ case class MenuEntryFunction(label: String, function: () => Unit) extends MenuEn
 
   override def setNormalLayout(): Unit = {
     getCircle match {
-      case Some(x: Circle) => { x.styleClass.clear(); x.styleClass.add("radialmenu_entry_function") }
-      case None => {}
+      case Some(x: Circle) => x.styleClass.clear(); x.styleClass.add("radialmenu_entry_function")
+      case None =>
     }
   }
   override def setMarkedLayout(): Unit = {
     getCircle match {
-      case Some(x: Circle) => { x.styleClass.clear(); x.styleClass.add("radialmenu_entry_function_marked") }
-      case None => {}
+      case Some(x: Circle) => x.styleClass.clear(); x.styleClass.add("radialmenu_entry_function_marked")
+      case None =>
     }
   }
 }

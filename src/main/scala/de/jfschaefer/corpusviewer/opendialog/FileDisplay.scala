@@ -1,6 +1,6 @@
 package de.jfschaefer.corpusviewer.opendialog
 
-import de.jfschaefer.corpusviewer.{Configuration, Main}
+import de.jfschaefer.corpusviewer.Configuration
 
 import scalafx.scene.control.Label
 import scalafx.scene.input.MouseEvent

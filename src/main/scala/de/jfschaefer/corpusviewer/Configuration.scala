@@ -5,7 +5,7 @@ import java.util.Properties
 
 import scalafx.scene.image.Image
 
-import de.jfschaefer.corpusviewer.preview.{PolynomialScalingFunction, AbstractPreviewScalingFunction, ConstantScalingFunction}
+import de.jfschaefer.corpusviewer.preview.AbstractPreviewScalingFunction
 
 object Configuration {
   var properties = new Properties()
@@ -76,8 +76,8 @@ object Configuration {
      }
 
   val visualizationFactory : AbstractVisualizationFactory = new ConcreteVisualizationFactory
-  val previewScaling: AbstractPreviewScalingFunction = new PolynomialScalingFunction
-  //val previewScaling: AbstractPreviewScalingFunction = new ConstantScalingFunction
+  val previewScaling: AbstractPreviewScalingFunction = new de.jfschaefer.corpusviewer.preview.PolynomialScalingFunction
+  //val previewScaling: AbstractPreviewScalingFunction = new de.jfschaefer.corpusviewer.preview.ConstantScalingFunction
 
   val radialMenuButtonImage = new Image("file://" + System.getProperty("user.dir") + "/icons/radialmenu.png")
 }
