@@ -39,12 +39,12 @@
 
 .open_corpus_file_file_l {
   -fx-font-size: 1.2em;
-  -fx-text-fill: #009900;
+  -fx-text-fill: #00bb00;
 }
 
 .open_corpus_file_dir_l {
   -fx-font-size: 1.2em;
-  -fx-text-fill: #8888ff;
+  -fx-text-fill: #aaaaff;
 }
 
 .open_corpus_file_error_l {

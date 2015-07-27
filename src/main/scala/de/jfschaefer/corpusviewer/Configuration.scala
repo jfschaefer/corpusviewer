@@ -51,6 +51,8 @@ object Configuration {
   val stringvisualizationPadding = load("stringvisualization_padding", _.toDouble)
   val stringvisualizationWidth = load("stringvisualization_width", _.toDouble)
 
+  val graphvisualizationCentralizeEdges = load("graphvisualization_centralize_edges", _.toBoolean)
+
   // style settings
   val stylesheet = load[String]("stylesheet", {x: String => x})
   val backgroundColor = load("background_color", identity)

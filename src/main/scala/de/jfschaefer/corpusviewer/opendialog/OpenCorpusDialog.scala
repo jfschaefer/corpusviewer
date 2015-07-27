@@ -54,7 +54,6 @@ class OpenCorpusDialog(load: java.util.Iterator[de.up.ling.irtg.corpus.Instance]
       d.layoutY = colStart + (counter % maxEntriesPerCol) * (height + Configuration.openCorpusMargin) + Configuration.openCorpusMargin
       counter += 1
       children.add(d)
-      println(file._2 + " :   " + col + "      " + (d.layoutX.value, d.layoutY.value))
     }
   }
 

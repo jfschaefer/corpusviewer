@@ -30,12 +30,13 @@ class SGraphPane(sgraph : SGraph, bezier: Boolean = true, alternative: Boolean =
   }
   for (edge : GraphEdge <- jgrapht_graph.edgeSet) {
     digraph.addEdge(edge, edge.getSource, edge.getTarget)
-    labelMap.put(edge, edge.getLabel);
+    labelMap.put(edge, edge.getLabel)
   }
   val config = new de.jfschaefer.sugiyamalayout.Configuration
   config.setUseAlternativeAlgorithm(alternative)
   config.setUseBezierCurves(bezier)
-  config.setLayerDistance(81d);
+  config.setLayerDistance(81d)
+  config.setCentralizeEdges(Configuration.graphvisualizationCentralizeEdges)
   val layout : Layout[GraphNode, GraphEdge] = digraph.generateLayout(config)
 
   val graphfx : GraphFX[GraphNode, GraphEdge] = new GraphFX(layout, new DefaultGraphFXNodeFactory, labelMap, Color.web(Configuration.graphColor), Color.web(Configuration.graphColor))
@@ -49,7 +50,7 @@ class SGraphPane(sgraph : SGraph, bezier: Boolean = true, alternative: Boolean =
       map.put(node, node.getLabel)
     }
     val lg = new LatexGenerator(layout, map, labelMap, config)
-    return lg.getLatex()
+    lg.getLatex()
   }
 }
 
@@ -62,7 +63,7 @@ class DefaultGraphFXNodeFactory extends GraphFXNodeFactory[GraphNode] {
       styleClass.clear()
       styleClass.add("graph_node")
     }
-    val label = new Text("\n" + node.getLabel())
+    val label = new Text("\n" + node.getLabel)
     label.layoutX = width_ * 0.5 - label.boundsInLocal.value.getWidth * 0.5
     label.layoutY = height_ * 0.5 - label.boundsInLocal.value.getHeight * 0.5 + 5
     pane.children.add(bg)
