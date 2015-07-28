@@ -193,7 +193,7 @@ class PreviewGroup(corpus: Corpus) extends Group {
           node.translateX = node.translateX.value + ev.x - p_dragLast._1
           node.translateY = node.translateY.value + ev.y - p_dragLast._2
           if (math.abs(ev.x - p_dragStart._1) > math.abs(ev.y - p_dragStart._2)) {
-            if (dragIsScale) {
+            if (dragIsScale && !dragIsLocked) {
               children.add(node)
               node.toFront()
             }

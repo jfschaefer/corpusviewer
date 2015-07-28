@@ -51,8 +51,8 @@ object Util {
       val boundsParent = content.boundsInParent.value
       val boundsLocal = content.boundsInLocal.value
 
-      val xLocal = ev.x - boundsLocal.getMinX
-      val yLocal = ev.y - boundsLocal.getMinY
+      val xLocal = ev.x - boundsLocal.getMinX - boundsParent.getMinX
+      val yLocal = ev.y - boundsLocal.getMinY - boundsParent.getMinY
 
       val oldWidth = boundsParent.getWidth
       val newWidth = oldWidth * ev.zoomFactor

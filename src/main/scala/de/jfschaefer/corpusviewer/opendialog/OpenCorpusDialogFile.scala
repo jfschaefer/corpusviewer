@@ -18,7 +18,7 @@ import de.up.ling.irtg.algebra.{StringAlgebra, Algebra, SetAlgebra}
   can be called to close the dialog and to display the corpus instead.
  */
 
-class OpenCorpusDialog(load: java.util.Iterator[de.up.ling.irtg.corpus.Instance] => Unit) extends Group {
+class OpenCorpusDialogFile(load: java.util.Iterator[de.up.ling.irtg.corpus.Instance] => Unit) extends Group {
 
   var pwd : File = Paths.get("").toAbsolutePath.toFile
 

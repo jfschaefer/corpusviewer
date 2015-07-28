@@ -47,6 +47,7 @@ object Configuration {
   val headerMenuButtonRadius = load("header_menu_button_radius", _.toDouble)
   val radialMenuExpansionRadius = load("radial_menu_expansion_radius", _.toDouble)
   val radialMenuEntryRadius = load("radial_menu_entry_radius", _.toDouble)
+  val radialMenuDragoutFactor = load("radial_menu_dragout_factor", _.toDouble)
 
   val stringvisualizationPadding = load("stringvisualization_padding", _.toDouble)
   val stringvisualizationWidth = load("stringvisualization_width", _.toDouble)

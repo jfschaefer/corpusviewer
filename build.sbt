@@ -7,7 +7,7 @@ libraryDependencies ++= Seq(
   "de.saar.coli" % "basics" % "1.2.34",
   "org.controlsfx" % "controlsfx" % "8.20.8",
   "de.up.ling" % "alto" % "2.0",
-  "de.up.ling" % "tuio-gesture" % "1.0.3-SNAPSHOT",
+  "de.up.ling" % "tuio-gesture" % "1.0.4-SNAPSHOT",
   "it.unimi.dsi" % "fastutil" % "6.1.0",
   "org.jgrapht" % "jgrapht-jdk1.5" % "0.7.3",
   "net.sf.jung" % "jung2" % "2.0.1",
