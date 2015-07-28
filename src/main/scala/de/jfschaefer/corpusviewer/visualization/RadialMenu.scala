@@ -84,8 +84,9 @@ class RadialMenu extends Group {
         draggedDisplayable match {
           case Some(disp) =>
             val distance = math.sqrt(ev.x * ev.x + ev.y * ev.y)
-            val scale = if (distance / radius.value < 1.5) distance/(radius.value * 1.5) else 1
-            disp.isInInitialExpansion.set(distance < 1.5 * radius.value)
+            val scale = if (distance / radius.value < Configuration.radialMenuDragoutFactor) distance /
+                      (radius.value * Configuration.radialMenuDragoutFactor) else 1
+            disp.isInInitialExpansion.set(distance < Configuration.radialMenuDragoutFactor * radius.value)
             //disp.scale.set(scale)
             disp.scaleX = scale
             disp.scaleY = scale
@@ -101,7 +102,7 @@ class RadialMenu extends Group {
       draggedDisplayable match {
         case Some(disp) =>
           val distance = math.sqrt(ev.x * ev.x + ev.y * ev.y)
-          if (distance >= 1.5 * radius.value) {
+          if (distance >= Configuration.radialMenuDragoutFactor * radius.value) {
             val boundsInScene = disp.localToScene(disp.boundsInLocal.value)
             children.removeAll(disp)
             Main.corpusScene.getChildren.add(disp)
