@@ -33,7 +33,7 @@ function select_theme {
 function select_gesture_config {
   echo "Please select the gesture configuration file"
   echo "Remark: Only files matching gesture-config*.properties will be displayed"
-  select cf in "$(ls gesture-config*.properties)"
+  select cf in gesture-config*.properties
   do
     if [ "$cf" = "" ]; then
       echo "Invalid input"
