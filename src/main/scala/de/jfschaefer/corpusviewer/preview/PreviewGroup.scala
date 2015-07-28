@@ -149,7 +149,17 @@ class PreviewGroup(corpus: Corpus) extends Group {
     var dragInitialScale = 0d
     var p_dragLast = (0d, 0d)
     var draggedNode : Option[Displayable] = None
+    var dragIsScale = false
+    var dragIsLocked = false   //can't change dragIsScale anymore
+    var c_prevDragY = 0d
+
     onMousePressed = { ev: MouseEvent =>
+      {
+        updateVars()
+        val p_yPos = ev.y
+        val s_pos = f_scaling.normalizedIntegralInverse(p_yPos / p_totalHeight)
+        c_prevDragY = (1 + s_pos) * c_totalHeight * 0.5 + c_top
+      }
       p_dragStart = (ev.x, ev.y)
       p_dragLast = (ev.x, ev.y)
       val s_pos: Double = f_scaling.normalizedIntegralInverse(ev.y / p_totalHeight)
@@ -165,8 +175,10 @@ class PreviewGroup(corpus: Corpus) extends Group {
             node.layoutX = corpus.iws.get(i).preview.boundsInParent.value.getMinX
             node.layoutY = corpus.iws.get(i).preview.boundsInParent.value.getMinY
             draggedNode = Some(node)
-            children.add(node)
-            node.toFront()
+            dragIsScale = true
+            dragIsLocked = false
+            // children.add(node)
+            // node.toFront()
           }
         case None => draggedNode = None
       }
@@ -180,6 +192,30 @@ class PreviewGroup(corpus: Corpus) extends Group {
           val dragGoalX = Configuration.previewSectionWidth + p_dragLast._1 - node.translateX.value - xOffset
           node.translateX = node.translateX.value + ev.x - p_dragLast._1
           node.translateY = node.translateY.value + ev.y - p_dragLast._2
+          if (math.abs(ev.x - p_dragStart._1) > math.abs(ev.y - p_dragStart._2)) {
+            if (dragIsScale) {
+              children.add(node)
+              node.toFront()
+            }
+            if (!dragIsLocked) dragIsScale = false
+          } else {
+            if (!dragIsScale && !dragIsLocked) {
+              children.remove(node)
+              node.getIw.releaseId()
+            }
+            if (!dragIsLocked) dragIsScale = true
+          }
+          if (dragIsScale) {
+            updateVars()
+            val p_yPos = ev.y
+            val s_pos: Double = f_scaling.normalizedIntegralInverse(p_yPos / p_totalHeight)
+            val c_newY: Double = (1d + s_pos) * c_totalHeight * 0.5 + c_top
+            corpus.offset.set(corpus.offset.value - (c_newY - c_prevDragY)) // minus as direction reversed
+          }
+          if ((ev.x - p_dragStart._1) * (ev.x - p_dragStart._1) + (ev.y - p_dragStart._2) * (ev.y - p_dragStart._2) > 5000) {
+            dragIsLocked = true
+          }
+
           if (ev.x < p_dragStart._1) {
             node.scaleX = dragInitialScale
             node.scaleY = dragInitialScale
@@ -187,7 +223,7 @@ class PreviewGroup(corpus: Corpus) extends Group {
           } else if (ev.x > dragGoalX) {
             node.scaleX = Configuration.initialScale
             node.scaleY = Configuration.initialScale
-            node.getIw.assignId()
+            if (!dragIsScale) node.getIw.assignId()
           } else {
             val scale = dragInitialScale + (Configuration.initialScale - dragInitialScale) *
               (ev.x - p_dragStart._1) / (dragGoalX - p_dragStart._1)
@@ -196,7 +232,13 @@ class PreviewGroup(corpus: Corpus) extends Group {
             node.getIw.releaseId()
           }
           Util.trashStyleUpdate(node, node)
-        case None =>
+        case None => {
+          updateVars()
+          val p_yPos = ev.y
+          val s_pos: Double = f_scaling.normalizedIntegralInverse(p_yPos / p_totalHeight)
+          val c_newY: Double = (1d + s_pos) * c_totalHeight * 0.5 + c_top
+          corpus.offset.set(corpus.offset.value - (c_newY - c_prevDragY)) // minus as direction reversed
+        }
       }
       p_dragLast = (ev.x, ev.y)
       ev.consume()
@@ -207,7 +249,7 @@ class PreviewGroup(corpus: Corpus) extends Group {
         case Some(node) =>
           children.remove(node)
           val dragGoalX = Configuration.previewSectionWidth + p_dragLast._1 - node.translateX.value - xOffset
-          if (ev.x > dragGoalX) {
+          if (!dragIsScale && ev.x > dragGoalX) {
             Main.corpusScene.getChildren.add(node)
             node.enableInteraction()
             node.getIw.assignId()
