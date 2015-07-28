@@ -5,14 +5,16 @@ import de.jfschaefer.corpusviewer.{InstanceWrapper, Util}
 import de.up.ling.irtg.algebra.graph.SGraph
 
 import scalafx.scene.layout.Pane
+import scalafx.scene.input.ZoomEvent
+import scalafx.Includes._
 
 
 class GraphVisualization(iw : InstanceWrapper, parentDisp : Option[Displayable], key : String) extends Pane with Displayable {
   override val parentDisplayable = parentDisp
   override def getIw = iw
 
-  scaleX <== scale
-  scaleY <== scale
+  scaleX  // <== scale
+  scaleY  // <== scale
 
   setupStyleStuff()
   val instanceMap = iw.instance.getInputObjects
@@ -57,10 +59,16 @@ class GraphVisualization(iw : InstanceWrapper, parentDisp : Option[Displayable],
 
     header.toFront()
 
-    header.headerWidth.set(graphpane.getWidth)
-    minWidth = graphpane.getWidth
-    maxWidth = graphpane.getWidth
-    minHeight = graphpane.getHeight + header.getHeight
-
+    updateSize()
   }
+
+  def updateSize(): Unit = {
+    header.headerWidth.set(graphpane.getWidth * graphpane.scaleX.value)
+    minWidth = graphpane.getWidth * graphpane.scaleX.value
+    maxWidth = graphpane.getWidth * graphpane.scaleX.value
+    minHeight = graphpane.getHeight * graphpane.scaleY.value + header.getHeight
+    maxHeight = graphpane.getHeight * graphpane.scaleY.value + header.getHeight
+  }
+
+  onZoom = { ev : ZoomEvent => Util.dispHandleZoom(this, graphpane)(ev); updateSize() }
 }

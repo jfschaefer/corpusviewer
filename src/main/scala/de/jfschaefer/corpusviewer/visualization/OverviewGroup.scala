@@ -57,5 +57,7 @@ class OverviewGroup(iw : InstanceWrapper, forPreview : Boolean = false) extends 
     cumulativeHeight += graphpane.getHeight * scale
   }
 
-  def getHeight : Double = cumulativeHeight
+  def getHeight : Double = {
+    cumulativeHeight * scaleY.value
+  }
 }

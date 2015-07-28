@@ -71,7 +71,9 @@ class RadialMenu extends Group {
                 val d = producer()
                 d.isInInitialExpansion.set(true)
                 children.add(d)
-                d.scale.set(0)  // will be visible at next drag
+                //d.scale.set(0)  // will be visible at next drag
+                d.scaleX = 0
+                d.scaleY = 0
                 draggedDisplayable = Some(d)
                 draggedDispEntry = Some(i.asInstanceOf[MenuEntryDisplayable])
               case _ =>  // Could highlight currently selected entry
@@ -84,7 +86,9 @@ class RadialMenu extends Group {
             val distance = math.sqrt(ev.x * ev.x + ev.y * ev.y)
             val scale = if (distance / radius.value < 1.5) distance/(radius.value * 1.5) else 1
             disp.isInInitialExpansion.set(distance < 1.5 * radius.value)
-            disp.scale.set(scale)
+            //disp.scale.set(scale)
+            disp.scaleX = scale
+            disp.scaleY = scale
             disp.layoutX = ev.x - disp.boundsInLocal.value.getWidth * 0.5
             disp.layoutY = ev.y - disp.boundsInLocal.value.getHeight * 0.5
           case None => System.err.println("This shouldn't have happened (in de.jfschaefer.corpusviewer.visualization.RadialMenu)")
@@ -101,10 +105,13 @@ class RadialMenu extends Group {
             val boundsInScene = disp.localToScene(disp.boundsInLocal.value)
             children.removeAll(disp)
             Main.corpusScene.getChildren.add(disp)
-            disp.scale.set(disp.parentDisplayable match {
-              case Some(d) => d.scale.value
+            //disp.scale.set(disp.parentDisplayable match {
+            val s = disp.parentDisplayable match {
+              case Some(d) => d.scaleX.value
               case None => Configuration.initialScale
-            })
+            }
+            disp.scaleX = s
+            disp.scaleY = s
             disp.translateX = disp.translateX.value - disp.boundsInParent.value.getMinX + boundsInScene.getMinX
             disp.translateY = disp.translateY.value - disp.boundsInParent.value.getMinY + boundsInScene.getMinY
             disp.isInInitialExpansion.set(false)

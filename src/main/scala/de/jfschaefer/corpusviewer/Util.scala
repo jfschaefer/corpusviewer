@@ -46,6 +46,38 @@ object Util {
     }
   }
 
+  def dispHandleZoom(d : Displayable, content : Node): ZoomEvent => Unit = {
+    ev: ZoomEvent => {
+      val boundsParent = content.boundsInParent.value
+      val boundsLocal = content.boundsInLocal.value
+
+      val xLocal = ev.x - boundsLocal.getMinX
+      val yLocal = ev.y - boundsLocal.getMinY
+
+      val oldWidth = boundsParent.getWidth
+      val newWidth = oldWidth * ev.zoomFactor
+
+      val oldHeight = boundsParent.getHeight
+      val newHeight = oldHeight * ev.zoomFactor
+
+      val xRatio = xLocal / oldWidth
+      val yRatio = yLocal / oldHeight
+
+      val shiftX = (newWidth - oldWidth) * xRatio
+      val shiftY = (newHeight - oldHeight) * yRatio
+
+      d.translateX = d.translateX.value - shiftX
+      d.translateY = d.translateY.value - shiftY
+
+      content.scaleX = content.scaleX.value * ev.zoomFactor
+      content.scaleY = content.scaleY.value * ev.zoomFactor
+      content.translateX = content.translateX.value + 0.5 * (newWidth - oldWidth)
+      content.translateY = content.translateY.value + 0.5 * (newHeight - oldHeight)
+
+      ev.consume()
+    }
+  }
+
   def handleScroll(node: Node): ScrollEvent => Unit = {
     ev: ScrollEvent => {
       node.translateX = node.translateX.value + ev.deltaX

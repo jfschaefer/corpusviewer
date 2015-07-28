@@ -21,7 +21,6 @@ import de.jfschaefer.corpusviewer.{Util, InstanceWrapper, Main, Configuration}
 
 trait Displayable extends Node {
   val parentDisplayable : Option[Displayable] = None
-  val scale = new DoubleProperty()
   val childDisplayables : mutable.Set[Displayable] = new mutable.HashSet
   val isInInitialExpansion = new BooleanProperty()
   val header : Header = null
@@ -39,7 +38,7 @@ trait Displayable extends Node {
   private var interactionDragStartX = 0d
   private var interactionDragStartY = 0d
   def enableInteraction(): Unit = {
-    onZoom = {ev : ZoomEvent => Util.handleZoom(this, scale)(ev); toFront()}
+    //onZoom = {ev : ZoomEvent => Util.handleZoom(this, scale)(ev); toFront()}
     onScroll = {ev : ScrollEvent => Util.handleScroll(this)(ev); toFront(); Util.trashStyleUpdate(this, this); drawLocationLines() }
 
     if (header != null) {
@@ -104,8 +103,8 @@ trait Displayable extends Node {
       case Some(parent) =>
         removeLocationLines()
 
-        val me_padding = 5 * scale.value
-        val parent_padding = 5 * parent.scale.value
+        val me_padding = 5// * scale.value
+        val parent_padding = 5// * parent.scale.value
 
         val line1 = new Line
         val line2 = new Line
@@ -220,15 +219,15 @@ trait Displayable extends Node {
         val topLine = new Line {
           startX = Configuration.windowMargin + Configuration.sliderWidth
           startY = slider.layoutY.value + (getIw.corpusOffsetStart - slider.rangeStart.value) * slider.track.height.value / (slider.rangeEnd.value - slider.rangeStart.value)
-          endX = bounds.getMinX + 5 * scale.value
-          endY = bounds.getMinY + 15 * scale.value
+          endX = bounds.getMinX + 5// * scale.value
+          endY = bounds.getMinY + 15// * scale.value
         }
 
         val bottomLine = new Line {
           startX = Configuration.windowMargin + Configuration.sliderWidth
           startY = slider.layoutY.value + (getIw.corpusOffsetEnd - slider.rangeStart.value) * slider.track.height.value / (slider.rangeEnd.value - slider.rangeStart.value)
-          endX = bounds.getMinX + 5 * scale.value
-          endY = bounds.getMaxY - 5 * scale.value
+          endX = bounds.getMinX + 5// * scale.value
+          endY = bounds.getMaxY - 5// * scale.value
         }
 
         val polygon = new Polygon {

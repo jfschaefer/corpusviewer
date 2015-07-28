@@ -158,15 +158,19 @@ class PreviewGroup(corpus: Corpus) extends Group {
         case Some(i) =>
           if (!corpus.iws.get(i).hasIdAssigned) {
             val node = Configuration.visualizationFactory.getVisualization(corpus.iws.get(i), "overview", None)//getPreview(corpus.iws(i))
-            node.scale.set(corpus.iws.get(i).preview.scale.value)
-            dragInitialScale = node.scale.value
+            // node.scale.set(corpus.iws.get(i).preview.scale.value)
+            node.scaleX = corpus.iws.get(i).preview.scale.value
+            node.scaleY = corpus.iws.get(i).preview.scale.value
+            dragInitialScale = corpus.iws.get(i).preview.scale.value
             node.layoutX = corpus.iws.get(i).preview.boundsInParent.value.getMinX
             node.layoutY = corpus.iws.get(i).preview.boundsInParent.value.getMinY
             draggedNode = Some(node)
             children.add(node)
+            node.toFront()
           }
         case None => draggedNode = None
       }
+      this.toFront()
       ev.consume()
     }
 
@@ -177,15 +181,18 @@ class PreviewGroup(corpus: Corpus) extends Group {
           node.translateX = node.translateX.value + ev.x - p_dragLast._1
           node.translateY = node.translateY.value + ev.y - p_dragLast._2
           if (ev.x < p_dragStart._1) {
-            node.scale.set(dragInitialScale)
+            node.scaleX = dragInitialScale
+            node.scaleY = dragInitialScale
             node.getIw.releaseId()
           } else if (ev.x > dragGoalX) {
-            node.scale.set(Configuration.initialScale)
+            node.scaleX = Configuration.initialScale
+            node.scaleY = Configuration.initialScale
             node.getIw.assignId()
           } else {
             val scale = dragInitialScale + (Configuration.initialScale - dragInitialScale) *
               (ev.x - p_dragStart._1) / (dragGoalX - p_dragStart._1)
-            node.scale.set(scale)
+            node.scaleX = scale
+            node.scaleY = scale
             node.getIw.releaseId()
           }
           Util.trashStyleUpdate(node, node)
@@ -211,6 +218,7 @@ class PreviewGroup(corpus: Corpus) extends Group {
           draggedNode = None
         case None =>
       }
+      update()
       ev.consume()
     }
   }

@@ -6,6 +6,8 @@ import de.up.ling.irtg.algebra.StringAlgebra
 
 import scalafx.scene.layout.Pane
 import scalafx.scene.text.Text
+import scalafx.scene.input.ZoomEvent
+import scalafx.Includes._
 
 /*
     A Displayable for the string interpretation of an instance.
@@ -14,9 +16,6 @@ import scalafx.scene.text.Text
 class StringVisualization(iw : InstanceWrapper, parentDisp : Option[Displayable], key : String) extends Pane with Displayable {
   override val parentDisplayable = parentDisp
   override def getIw = iw
-
-  scaleX <== scale
-  scaleY <== scale
 
   setupStyleStuff()
 
@@ -55,4 +54,16 @@ class StringVisualization(iw : InstanceWrapper, parentDisp : Option[Displayable]
   minHeight = textField.boundsInParent.value.getHeight + 2 * Configuration.stringvisualizationPadding + header.getHeight
   minWidth = Configuration.stringvisualizationWidth
   maxWidth = Configuration.stringvisualizationWidth
+
+  def updateSize(): Unit = {
+    minHeight = textField.boundsInParent.value.getHeight + 2 * Configuration.stringvisualizationPadding + header.getHeight
+    maxHeight = textField.boundsInParent.value.getHeight + 2 * Configuration.stringvisualizationPadding + header.getHeight
+    minWidth = Configuration.stringvisualizationWidth * textField.scaleX.value
+    maxWidth = Configuration.stringvisualizationWidth * textField.scaleX.value
+    header.headerWidth.set(Configuration.stringvisualizationWidth * textField.scaleX.value)
+  }
+
+
+  onZoom = { ev : ZoomEvent => Util.dispHandleZoom(this, textField)(ev); updateSize()}
 }
+

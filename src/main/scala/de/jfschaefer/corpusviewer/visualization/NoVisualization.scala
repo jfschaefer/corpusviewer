@@ -13,8 +13,8 @@ class NoVisualization(iw : InstanceWrapper, parentDisp : Option[Displayable], ke
   override val parentDisplayable = parentDisp
   override def getIw = iw
 
-  scaleX <== scale
-  scaleY <== scale
+  scaleX  // <== scale
+  scaleY  // <== scale
 
   setupStyleStuff()
 

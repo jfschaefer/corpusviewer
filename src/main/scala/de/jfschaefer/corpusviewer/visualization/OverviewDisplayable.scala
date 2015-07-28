@@ -1,8 +1,10 @@
 package de.jfschaefer.corpusviewer.visualization
 
-import de.jfschaefer.corpusviewer.{InstanceWrapper, Configuration}
+import de.jfschaefer.corpusviewer.{Util, InstanceWrapper, Configuration}
 
+import scalafx.scene.input.ZoomEvent
 import scalafx.scene.layout.Pane
+import scalafx.Includes._
 
 import scala.collection.JavaConversions._
 
@@ -15,8 +17,8 @@ class OverviewDisplayable(iw : InstanceWrapper, parentDisp : Option[Displayable]
   override val parentDisplayable = parentDisp
   override def getIw = iw
 
-  scaleX <== scale
-  scaleY <== scale
+  scaleX  // <== scale
+  scaleY  // <== scale
 
   setupStyleStuff()
 
@@ -25,19 +27,8 @@ class OverviewDisplayable(iw : InstanceWrapper, parentDisp : Option[Displayable]
     displayable = Some(OverviewDisplayable.this)
     items = new MenuEntryFunction("Trash", () => trash())::
       new MenuEntryFunction("Children\nToFront", () =>
-        {
-          for (child <- childDisplayables) {
-            child.toFront()
-            //child.drawLocationLines()
-          }
-          /* new Thread(new Runnable {
-            def run(): Unit = {
-              Thread.sleep(1000)
-              for (child <- childDisplayables) {
-                child.removeLocationLines()
-              }
-            }
-          }).start() */
+        for (child <- childDisplayables) {
+          child.toFront()
         }
       )::new MenuEntryFunction("Trash\nChildren", () =>
         for (child <- childDisplayables) child.trash())::
@@ -56,7 +47,11 @@ class OverviewDisplayable(iw : InstanceWrapper, parentDisp : Option[Displayable]
   children.add(header)
 
   // CONTENT
-  val overviewGroup = new OverviewGroup(iw)
+  val overviewGroup = new OverviewGroup(iw) {
+    /* scaleX <== scale
+    scaleY <== scale */
+  }
+
   overviewGroup.translateY = header.getHeight + Configuration.previewMargin
 
   children.add(overviewGroup)
@@ -64,7 +59,17 @@ class OverviewDisplayable(iw : InstanceWrapper, parentDisp : Option[Displayable]
 
   header.toFront()
 
-  minHeight = overviewGroup.getHeight + Configuration.previewMargin + header.getHeight
-  minWidth = Configuration.preferredPreviewWidth
-  maxWidth = Configuration.preferredPreviewWidth
+  updateSize()
+
+  def updateSize(): Unit = {
+    minHeight = overviewGroup.getHeight + Configuration.previewMargin + header.getHeight
+    maxHeight = overviewGroup.getHeight + Configuration.previewMargin + header.getHeight
+    minWidth = Configuration.preferredPreviewWidth * overviewGroup.getScaleX
+    maxWidth = Configuration.preferredPreviewWidth * overviewGroup.getScaleX
+    header.headerWidth.set(Configuration.preferredPreviewWidth * overviewGroup.getScaleX)
+  }
+
+
+  onZoom = { ev : ZoomEvent => Util.dispHandleZoom(this, overviewGroup)(ev); updateSize()}
 }
+
