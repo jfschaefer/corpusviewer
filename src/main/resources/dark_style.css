@@ -57,6 +57,11 @@
   -fx-fill: #eeeeee;
 }
 
+.open_corpus_phase_font {
+  -fx-font-size: 3em;
+  -fx-fill: #eeeeee;
+}
+
 
 /*
    SECTION: VISUALIZATION

@@ -48,6 +48,7 @@ object Util {
 
   def dispHandleZoom(d : Displayable, content : Node): ZoomEvent => Unit = {
     ev: ZoomEvent => {
+      d.toFront()
       val boundsParent = content.boundsInParent.value
       val boundsLocal = content.boundsInLocal.value
 

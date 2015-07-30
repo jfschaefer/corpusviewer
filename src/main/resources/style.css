@@ -60,6 +60,10 @@
   -fx-font-size: 2em;
 }
 
+.open_corpus_phase_font {
+  -fx-font-size: 3em;
+}
+
 
 /*
    SECTION: VISUALIZATION
