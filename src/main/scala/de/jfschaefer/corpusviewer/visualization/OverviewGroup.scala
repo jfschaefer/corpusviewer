@@ -55,6 +55,8 @@ class OverviewGroup(iw : InstanceWrapper, forPreview : Boolean = false) extends 
     graphpane.translateX = -(graphpane.getWidth * 0.5 * (1 - scale))
     graphpane.translateY = cumulativeHeight - (graphpane.getHeight * 0.5 * (1 - scale))
     cumulativeHeight += graphpane.getHeight * scale
+  } else {
+    cumulativeHeight += Configuration.previewMargin * 2
   }
 
   def getHeight : Double = {

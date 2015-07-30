@@ -45,7 +45,7 @@ object Main extends JFXApp {
     fullscreen(0)
   }
 
-  openCorpusScene.root = new OpenCorpusDialog()
+  openCorpusScene.root = new OpenCorpusDialog(openCorpus)
 
   def openCorpus(iterator: java.util.Iterator[de.up.ling.irtg.corpus.Instance]): Unit = {
     corpus = new Corpus(iterator)

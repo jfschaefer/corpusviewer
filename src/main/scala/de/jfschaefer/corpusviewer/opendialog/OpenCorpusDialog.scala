@@ -3,6 +3,8 @@ package de.jfschaefer.corpusviewer.opendialog
 import javafx.scene.layout
 
 import de.jfschaefer.corpusviewer.{Main, Configuration}
+import de.up.ling.irtg.InterpretedTreeAutomaton
+import de.up.ling.irtg.algebra.Algebra
 
 import de.up.ling.tclup.perf.DatabaseConnection
 import de.up.ling.tclup.perf.alto.CorpusFromDb
@@ -19,7 +21,7 @@ import scalafx.stage.{Stage, FileChooser}
 import scalafx.scene.control.{ScrollPane, ChoiceBox, Label, Button}
 import scalafx.Includes._
 
-class OpenCorpusDialog extends Group {
+class OpenCorpusDialog(load: java.util.Iterator[de.up.ling.irtg.corpus.Instance] => Unit) extends Group {
 
   val statusText = new Text("Opening Corpus") {
     styleClass.clear()
@@ -151,7 +153,28 @@ class OpenCorpusDialog extends Group {
       pane.children.append(Button.sfxButton2jfx(new Button("Continue") {
         onAction = {
           (_: ActionEvent) => {
+            /* if (grammarCB.value == null) return
+            if (corpusCB.value == null) return
+            */
+            try {
 
+              //Generate algebra map
+              val algebraMap : java.util.Map[String, Algebra[_]] = new java.util.HashMap()
+              val mapping = grammarCB.value.value.unwrap.interpretations
+              for ((key, className) <- mapping) {
+                algebraMap.put(key, Class.forName(className).newInstance().asInstanceOf[Algebra[_]])
+              }
+              val irtg = InterpretedTreeAutomaton.forAlgebras(algebraMap)
+              val corpusfromdb = new CorpusFromDb(db)
+              val corpus = corpusfromdb.readCorpus(corpusCB.value.value.unwrap.id, irtg)
+
+              println("Loaded " + corpus.getNumberOfInstances + " instances")
+
+              load(corpus.iterator)
+            } catch {
+              case exception : Exception =>
+                exception.printStackTrace()
+            }
           }
         }
       }))
