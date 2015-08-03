@@ -1,6 +1,6 @@
 package de.jfschaefer.corpusviewer
 
-import de.jfschaefer.corpusviewer.opendialog.OpenCorpusDialog
+import de.jfschaefer.corpusviewer.opendialog._ //OpenCorpusDialog
 
 import de.up.ling.gesture.JavaFxAdapter
 
@@ -45,14 +45,12 @@ object Main extends JFXApp {
     fullscreen(0)
   }
 
-  openCorpusScene.root = new OpenCorpusDialog(openCorpus)
-
-  var interpretations : Map[String, String] = null
+  //openCorpusScene.root = new OpenCorpusDialog(openCorpus)
+  openCorpusScene.root = new OpenCorpusWizard(openCorpus)
 
   def openCorpus(iterator: java.util.Iterator[de.up.ling.irtg.corpus.Instance],
                  interpretations : Map[String, String]): Unit = {
-    this.interpretations = interpretations
-    corpus = new Corpus(iterator)
+    corpus = new Corpus(iterator, interpretations)
     corpusScene.root = corpus
     stage.scene = corpusScene
     corpus.previewGroup.update()

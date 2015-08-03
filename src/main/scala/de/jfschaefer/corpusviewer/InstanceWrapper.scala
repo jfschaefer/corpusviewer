@@ -31,7 +31,7 @@ object InstanceWrapper {
   }
 }
 
-class InstanceWrapper(val instance: Instance) {
+class InstanceWrapper(val instance: Instance, val interpretations : Map[String, String]) {
   var preview: Preview = null
   var id: IntegerProperty = new IntegerProperty
   id.set(-1)       //not assigned

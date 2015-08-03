@@ -17,7 +17,7 @@ class TreeStringVisualization(iw : InstanceWrapper, parentDisp : Option[Displaya
   val instanceMap = iw.instance.getInputObjects
   assert(instanceMap.containsKey(key))
   val algObj = instanceMap.get(key)
-  assert(algObj.isInstanceOf[Tree[String]])
+  assert(algObj.isInstanceOf[Tree[String @unchecked]])
   val tree = algObj.asInstanceOf[Tree[String]]
 
   // HEADER

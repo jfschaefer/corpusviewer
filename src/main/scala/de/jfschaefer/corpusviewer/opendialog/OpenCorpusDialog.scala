@@ -14,8 +14,9 @@ import de.up.ling.tclup.perf.alto.{GrammarMetadata, CorpusFromDb, GrammarFromDb}
 import scalafx.collections.ObservableBuffer
 import scalafx.event.ActionEvent
 import scalafx.geometry.Pos
+import javafx.geometry.Insets
 import scalafx.scene.{Scene, Group}
-import scalafx.scene.layout.VBox
+import scalafx.scene.layout.{HBox, VBox}
 import scalafx.scene.text.Text
 import scalafx.stage.{Stage, FileChooser}
 import scalafx.scene.control.{ScrollPane, ChoiceBox, Label, Button}
@@ -64,6 +65,7 @@ class OpenCorpusDialog(load: (java.util.Iterator[de.up.ling.irtg.corpus.Instance
 
     def openDatabase(): Unit = {
       pane.children.clear()
+      pane.padding = new Insets(5, 5, 5, 5)
 
       val textField = new Text("The configuration file:\nnull")
       pane.children.append(textField)
@@ -100,14 +102,17 @@ class OpenCorpusDialog(load: (java.util.Iterator[de.up.ling.irtg.corpus.Instance
           GRAMMAR
        */
       val grammarMDs = new GrammarFromDb(db).allIrtgsMetadata
+      val grammarhbox = new HBox()
       val grammarCB: ChoiceBox[ChoiceBoxEntry[GrammarMetadata]] = new ChoiceBox
       val grammarCBItems = new ObservableBuffer[ChoiceBoxEntry[GrammarMetadata]]()
       for (md <- grammarMDs) {
-        grammarCBItems.append(new ChoiceBoxEntry[GrammarMetadata](md, "Grammar " + md.id))
+        grammarCBItems.append(new ChoiceBoxEntry[GrammarMetadata](md, "" + md.id + ".: " + md.name))
       }
       grammarCB.items = grammarCBItems
 
-      pane.children.add(grammarCB)
+      grammarhbox.children.add(new Label("Grammar: "))
+      grammarhbox.children.add(grammarCB)
+      pane.children.add(grammarhbox)
 
       val grammarT = new Text("<No Grammar Selected>")
       val grammarSP = new ScrollPane
@@ -120,7 +125,7 @@ class OpenCorpusDialog(load: (java.util.Iterator[de.up.ling.irtg.corpus.Instance
       pane.children.add(grammarSP)
       grammarCB.value onChange {
         (x, _, _) =>
-          grammarT.text = OpenCorpusDialog.stringFromMeta(x.value.unwrap)
+          grammarT.text = OpenCorpusUtil.stringFromMeta(x.value.unwrap)
       }
 
       /*
@@ -130,11 +135,14 @@ class OpenCorpusDialog(load: (java.util.Iterator[de.up.ling.irtg.corpus.Instance
       val corpusCB: ChoiceBox[ChoiceBoxEntry[CorpusFromDb#CorpusMetadata]] = new ChoiceBox
       val corpusCBItems = new ObservableBuffer[ChoiceBoxEntry[CorpusFromDb#CorpusMetadata]]()
       for (md <- corpusMDs) {
-        corpusCBItems.append(new ChoiceBoxEntry(md, "Corpus " + md.id))
+        corpusCBItems.append(new ChoiceBoxEntry(md, "" + md.id + ".: " + md.name))
       }
       corpusCB.items = corpusCBItems
+      val corpushbox = new HBox()
+      corpushbox.children.add(new Label("Corpus: "))
 
-      pane.children.add(corpusCB)
+      corpushbox.children.add(corpusCB)
+      pane.children.add(corpushbox)
 
       val corpusT = new Text("<No Corpus Selected>")
       val corpusSP = new ScrollPane
@@ -147,7 +155,7 @@ class OpenCorpusDialog(load: (java.util.Iterator[de.up.ling.irtg.corpus.Instance
       pane.children.add(corpusSP)
       corpusCB.value onChange {
         (x, _, _) =>
-          corpusT.text = OpenCorpusDialog.stringFromMeta(x.value.unwrap)
+          corpusT.text = OpenCorpusUtil.stringFromMeta(x.value.unwrap)
       }
 
       pane.children.append(Button.sfxButton2jfx(new Button("Continue") {
@@ -182,46 +190,5 @@ class OpenCorpusDialog(load: (java.util.Iterator[de.up.ling.irtg.corpus.Instance
   }
 }
 
-object OpenCorpusDialog {
-  def stringFromMeta(grammarMetadata: GrammarMetadata): String = {
-    val s = new StringBuilder
-    s.append("name:\t")
-    s.append(grammarMetadata.name)
-    s.append("\nid:\t")
-    s.append(grammarMetadata.id)
-    s.append("\ncomment:\t")
-    s.append(grammarMetadata.comment)
-    s.append("\ninterpretations:")
-    for ((k, v) <- grammarMetadata.interpretations) {
-      s.append("\n    " )
-      s.append(k)
-      s.append(":   ")
-      s.append(v)
-    }
-    s.toString()
-  }
 
-  def stringFromMeta(corpusMeta: CorpusFromDb#CorpusMetadata): String = {
-    val s = new StringBuilder
-    s.append("name:\t")
-    s.append(corpusMeta.name)
-    s.append("\nid:\t")
-    s.append(corpusMeta.id)
-    s.append("\ncomment:\t")
-    s.append(corpusMeta.comments match {
-      case Some(comment) => comment
-      case None => "<no comment>"
-    })
-    s.append("\ninterpretations:")
-    for (i <- corpusMeta.interpretations) {
-      s.append("\n    " )
-      s.append(i)
-    }
-    s.toString()
-  }
-}
 
-class ChoiceBoxEntry[T](content : T, string : String) {
-  def unwrap: T = content
-  override def toString(): String = string
-}

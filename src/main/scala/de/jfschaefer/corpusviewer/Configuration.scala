@@ -65,6 +65,9 @@ object Configuration {
   // behaviour settings
   val previewIsTrashZone = load("preview_is_trash_zone", _.toBoolean)
 
+  // other settings
+  // val openCorpusWizardDefaultConfigFile = load("open_corpus_wizard_default_config_file", identity)
+
 
   def load[E](name: String, conversion: String => E): E =
      try {

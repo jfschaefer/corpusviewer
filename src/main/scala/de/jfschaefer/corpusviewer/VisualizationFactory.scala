@@ -20,7 +20,7 @@ class ConcreteVisualizationFactory extends AbstractVisualizationFactory {
     } else {
       new NoVisualization(iw, parentDisplayable, key)
     }*/
-    val className = Main.interpretations.get(key).get
+    val className = iw.interpretations.get(key).get
     if (className == null) {
       new NoVisualization(iw, parentDisplayable, key, "Sorry, but this interpretation doesn't appear to be defined in the grammar")
     } else if (className == "de.up.ling.irtg.algebra.StringAlgebra") {
