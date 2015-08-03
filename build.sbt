@@ -17,7 +17,8 @@ libraryDependencies ++= Seq(
   "de.up.ling" %% "tclup-perf" % "1.0",
   "de.up.ling" % "alto" % "2.0",
   "de.up.ling" % "tuio-gesture" % "1.0.4-SNAPSHOT",
-  "de.jfschaefer.sugiyamalayout" % "sugiyamalayout" % "1.0-SNAPSHOT"
+  "de.jfschaefer.sugiyamalayout" % "sugiyamalayout" % "1.0-SNAPSHOT",
+  "de.jfschaefer.layeredgraphlayout" % "layeredgraphlayout" % "1.0-SNAPSHOT"
 )
 
 unmanagedJars in Compile += Attributed.blank(file(System.getenv("JAVA_HOME") + "/jre/lib/ext/jfxrt.jar"))

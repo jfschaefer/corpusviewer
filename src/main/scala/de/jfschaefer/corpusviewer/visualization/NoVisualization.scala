@@ -9,7 +9,8 @@ import scalafx.scene.text.Text
     Displayable, when no visualization is available for a certain interpretation.
  */
 
-class NoVisualization(iw : InstanceWrapper, parentDisp : Option[Displayable], key : String) extends Pane with Displayable{
+class NoVisualization(iw : InstanceWrapper, parentDisp : Option[Displayable], key : String,
+                       message : String) extends Pane with Displayable{
   override val parentDisplayable = parentDisp
   override def getIw = iw
 
@@ -22,6 +23,7 @@ class NoVisualization(iw : InstanceWrapper, parentDisp : Option[Displayable], ke
   // HEADER
   val menu = new RadialMenu {
     displayable = Some(NoVisualization.this)
+    items = new MenuEntryFunction("Trash", () => trash())::Nil
   }
   menu.enableInteraction()
   override val header = new Header(iw.index + ". " + key, Some(menu))
@@ -29,7 +31,8 @@ class NoVisualization(iw : InstanceWrapper, parentDisp : Option[Displayable], ke
   children.add(header)
 
   // CONTENT
-  val textField = new Text("\nSorry, there is no visualization for this interpretation (yet)") {
+  val textField = new Text("\n" + message) {
+    wrappingWidth = Configuration.preferredPreviewWidth - 2 * Configuration.previewMargin
   }
 
   textField.translateX = Configuration.previewMargin

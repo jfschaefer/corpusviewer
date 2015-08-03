@@ -41,6 +41,7 @@ class OverviewDisplayable(iw : InstanceWrapper, parentDisp : Option[Displayable]
         }}) :: items
     }
   }
+
   menu.enableInteraction()
   override val header = new Header(iw.index + ". Overview", Some(menu))
 

@@ -47,7 +47,11 @@ object Main extends JFXApp {
 
   openCorpusScene.root = new OpenCorpusDialog(openCorpus)
 
-  def openCorpus(iterator: java.util.Iterator[de.up.ling.irtg.corpus.Instance]): Unit = {
+  var interpretations : Map[String, String] = null
+
+  def openCorpus(iterator: java.util.Iterator[de.up.ling.irtg.corpus.Instance],
+                 interpretations : Map[String, String]): Unit = {
+    this.interpretations = interpretations
     corpus = new Corpus(iterator)
     corpusScene.root = corpus
     stage.scene = corpusScene

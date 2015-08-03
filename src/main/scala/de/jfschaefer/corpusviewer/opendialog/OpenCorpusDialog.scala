@@ -21,7 +21,7 @@ import scalafx.stage.{Stage, FileChooser}
 import scalafx.scene.control.{ScrollPane, ChoiceBox, Label, Button}
 import scalafx.Includes._
 
-class OpenCorpusDialog(load: java.util.Iterator[de.up.ling.irtg.corpus.Instance] => Unit) extends Group {
+class OpenCorpusDialog(load: (java.util.Iterator[de.up.ling.irtg.corpus.Instance], Map[String, String]) => Unit) extends Group {
 
   val statusText = new Text("Opening Corpus") {
     styleClass.clear()
@@ -170,7 +170,7 @@ class OpenCorpusDialog(load: java.util.Iterator[de.up.ling.irtg.corpus.Instance]
 
               println("Loaded " + corpus.getNumberOfInstances + " instances")
 
-              load(corpus.iterator)
+              load(corpus.iterator, grammarCB.value.value.unwrap.interpretations)
             } catch {
               case exception : Exception =>
                 exception.printStackTrace()
