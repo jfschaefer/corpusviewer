@@ -13,7 +13,7 @@ import scala.collection.JavaConversions._
   and provides menu entries to get each interpretation as a separate child Displayable.
  */
 
-class OverviewDisplayable(iw : InstanceWrapper, parentDisp : Option[Displayable]) extends Pane with Displayable {
+class OverviewDisplayable(iw : InstanceWrapper, parentDisp : Option[Displayable], interpretations: Set[String]) extends Pane with Displayable {
   override val parentDisplayable = parentDisp
   override def getIw = iw
 
@@ -48,7 +48,7 @@ class OverviewDisplayable(iw : InstanceWrapper, parentDisp : Option[Displayable]
   children.add(header)
 
   // CONTENT
-  val overviewGroup = new OverviewGroup(iw) {
+  val overviewGroup = new OverviewGroup(iw, interpretations) {
     /* scaleX <== scale
     scaleY <== scale */
   }

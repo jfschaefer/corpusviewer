@@ -9,14 +9,14 @@ import scalafx.scene.layout.Pane
   A preview that displays several interpretations if they are available.
  */
 
-class BigPreview(iw : InstanceWrapper) extends Pane with Preview {
+class BigPreview(iw : InstanceWrapper, interpretations: Set[String]) extends Pane with Preview {
   override def getIw = iw
   scaleX <== scale
   scaleY <== scale
 
   setupStyleStuff()
 
-  val overviewGroup = new OverviewGroup(iw, forPreview = true)
+  val overviewGroup = new OverviewGroup(iw, interpretations, forPreview = true)
 
   overviewGroup.translateY = Configuration.previewMargin
 

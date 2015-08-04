@@ -18,7 +18,9 @@ import scalafx.scene.text.Text
 import scalafx.stage.{FileChooser, Stage}
 import scalafx.Includes._
 
-class OpenCorpusWizard(load: (java.util.Iterator[de.up.ling.irtg.corpus.Instance], Map[String, String]) => Unit) extends Group {
+import scala.collection.mutable
+
+class OpenCorpusWizard(load: (java.util.Iterator[de.up.ling.irtg.corpus.Instance], Map[String, String], Set[String]) => Unit) extends Group {
 
   val PADDING = 15d
   prepareGroup()
@@ -54,6 +56,7 @@ class OpenCorpusWizard(load: (java.util.Iterator[de.up.ling.irtg.corpus.Instance
   var databaseConnection : DatabaseConnection = null
   var corpus : Corpus = null
   var interpretations : Map[String, String] = null
+  var previewInterpretations : mutable.Set[String] = null
 
   chooseConfigFile()
 
@@ -61,7 +64,7 @@ class OpenCorpusWizard(load: (java.util.Iterator[de.up.ling.irtg.corpus.Instance
   def chooseConfigFile(): Unit = {
     prevFunction = { () => }
     prevButton.disable = true
-    nextButton.disable = false
+    nextButton.disable = (configFile == null)
     val vbox = new VBox {
       alignment = Pos.Center
       spacing = 15
@@ -77,6 +80,7 @@ class OpenCorpusWizard(load: (java.util.Iterator[de.up.ling.irtg.corpus.Instance
           if (n != null) {
             textField.text = "The configuration file:\n" + n
             configFile = n
+            nextButton.disable = false
           }
       }
       minWidth = 200
@@ -227,18 +231,24 @@ class OpenCorpusWizard(load: (java.util.Iterator[de.up.ling.irtg.corpus.Instance
     }
 
     val label = new Label("Which intepretations shall be visualized in the preview?") { minWidth = recWidth }
-    val checkboxes = new scala.collection.mutable.HashSet[CheckBox]()
+    val checkboxes = new mutable.HashSet[(CheckBox, String)]()
     vbox.children.add(label)
     for (interpretation <- interpretations.keys) {
       val box = new CheckBox(interpretation) { minWidth = recWidth }
       vbox.children.add(box)
-      checkboxes.add(box)
+      checkboxes.add((box, interpretation))
     }
 
     updateCore(vbox)
 
     nextFunction = { () =>
-      load(corpus.iterator(), interpretations)
+      previewInterpretations = new mutable.HashSet[String]()
+      for ((checkBox, interpretation) <- checkboxes) {
+        if (checkBox.isSelected) {
+          previewInterpretations.add(interpretation)
+        }
+      }
+      load(corpus.iterator(), interpretations, previewInterpretations.toSet)
     }
   }
 

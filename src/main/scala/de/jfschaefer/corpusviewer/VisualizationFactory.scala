@@ -4,8 +4,8 @@ import de.jfschaefer.corpusviewer.visualization._
 
 trait AbstractVisualizationFactory {
   def getVisualization(iw: InstanceWrapper, key: String, parentDisplayable: Option[Displayable]): Displayable
-  def getPreview(iw: InstanceWrapper): Preview
-  def getOverview(iw: InstanceWrapper): Displayable
+  def getPreview(iw: InstanceWrapper, interpretations: Set[String]): Preview
+  def getOverview(iw: InstanceWrapper, interpretations: Set[String]): Displayable
 }
 
 
@@ -34,11 +34,11 @@ class ConcreteVisualizationFactory extends AbstractVisualizationFactory {
     }
   }
 
-  override def getPreview(iw: InstanceWrapper): Preview = {
-    new BigPreview(iw)
+  override def getPreview(iw: InstanceWrapper, interpretations: Set[String]): Preview = {
+    new BigPreview(iw, interpretations)
   }
 
-  override def getOverview(iw: InstanceWrapper) : Displayable = {
-    new OverviewDisplayable(iw, None)
+  override def getOverview(iw: InstanceWrapper, interpretations: Set[String]) : Displayable = {
+    new OverviewDisplayable(iw, None, interpretations)
   }
 }

@@ -168,7 +168,7 @@ class PreviewGroup(corpus: Corpus) extends Group {
         case Some(i) =>
           if (!corpus.iws.get(i).hasIdAssigned) {
             //val node = Configuration.visualizationFactory.getVisualization(corpus.iws.get(i), "overview", None)//getPreview(corpus.iws(i))
-            val node = Configuration.visualizationFactory.getOverview(corpus.iws.get(i))
+            val node = Configuration.visualizationFactory.getOverview(corpus.iws.get(i), corpus.previewInterpretations)
             // node.scale.set(corpus.iws.get(i).preview.scale.value)
             node.scaleX = corpus.iws.get(i).preview.scale.value
             node.scaleY = corpus.iws.get(i).preview.scale.value

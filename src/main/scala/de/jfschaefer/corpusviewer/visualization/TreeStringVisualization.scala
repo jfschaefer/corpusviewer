@@ -46,6 +46,7 @@ class TreeStringVisualization(iw : InstanceWrapper, parentDisp : Option[Displaya
     minWidth = treePane.getWidth * treePane.scaleX.value
     maxWidth = treePane.getWidth * treePane.scaleX.value
     header.headerWidth.set(treePane.getWidth * treePane.scaleX.value)
+    treePane.translateY = treePane.translateY.value - treePane.getBoundsInParent.getMinY + header.getHeight
   }
 
 

@@ -11,12 +11,13 @@ import scala.collection.JavaConversions._
    Both, the Corpus itself, and the GUI component for scrolling through it
  */
 
-class Corpus(iterator: java.util.Iterator[de.up.ling.irtg.corpus.Instance], interpretations: Map[String, String]) extends Group {
+class Corpus(iterator: java.util.Iterator[de.up.ling.irtg.corpus.Instance], interpretations: Map[String, String],
+              val previewInterpretations: Set[String]) extends Group {
   /*
      STEP 1: LOAD CORPUS
    */
 
-  val iws : java.util.ArrayList[InstanceWrapper]= new java.util.ArrayList[InstanceWrapper]()
+  val iws : java.util.ArrayList[InstanceWrapper] = new java.util.ArrayList[InstanceWrapper]()
 
   def loadInstances(): Int = {
     var index = 0
@@ -25,7 +26,7 @@ class Corpus(iterator: java.util.Iterator[de.up.ling.irtg.corpus.Instance], inte
       iw.index = index + 1 //Starting from 1, not 0
       //iws(index) = iw
       iws.add (iw)
-      iw.preview = Configuration.visualizationFactory.getPreview (iw)
+      iw.preview = Configuration.visualizationFactory.getPreview (iw, previewInterpretations)
       if (index == 0) {
         iw.corpusOffsetStart = 0.5 * Configuration.previewMargin
       } else {

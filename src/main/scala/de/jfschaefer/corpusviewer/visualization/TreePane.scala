@@ -17,7 +17,6 @@ class TreePane(tree : de.up.ling.tree.Tree[String]) extends Pane {
   fillTree(t, tree)
   def fillTree(t: Tree[de.up.ling.tree.Tree[String], Object], tree: de.up.ling.tree.Tree[String]): Unit = {
     for (child : de.up.ling.tree.Tree[String] <- tree.getChildren) {
-      println(tree.getLabel + "   ->  " + child.getLabel)
       t.addChild(tree, child, child, child.getLabel.length * 10 + 30, 30)
       fillTree(t, child)
     }
@@ -38,8 +37,6 @@ class TreePane(tree : de.up.ling.tree.Tree[String]) extends Pane {
     nodeNames.put(x, x.getLabel)
     edgeNames.put(x, "")
   }
-
-  println(nodeNames)
 
   val nodeFactory = new SimpleGraphFXNodeFactory[de.up.ling.tree.Tree[String]](nodeNames, "", "")
   val edgeFactory = new SimpleGraphFXEdgeFactory[Object](edgeNames, Color.Black)
