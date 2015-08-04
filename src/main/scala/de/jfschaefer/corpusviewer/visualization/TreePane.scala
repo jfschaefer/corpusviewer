@@ -12,13 +12,26 @@ import scala.collection.JavaConversions._
 import scalafx.scene.paint.Color
 
 class TreePane(tree : de.up.ling.tree.Tree[String]) extends Pane {
+  /*
+      IDEA: Since Tree[String] key seem to cause problems, use Integer keys instead,
+      which can be distinct by simple counting, and map them back to the labels for the factories
+      efficiently (e.g. using a vector)
+   */
   styleClass.clear()
-  val t = new Tree[de.up.ling.tree.Tree[String], Object](tree, tree.getLabel.length * 10 + 30, 30)
-  fillTree(t, tree)
-  def fillTree(t: Tree[de.up.ling.tree.Tree[String], Object], tree: de.up.ling.tree.Tree[String]): Unit = {
+  val labelNames = new mutable.ArrayBuffer[String]()
+  val labelKeys = new mutable.ArrayBuffer[Integer]()
+  labelNames.add(tree.getLabel)
+  labelKeys.add(new Integer(0))
+  val t = new Tree[Integer, Integer](labelKeys.get(0), labelNames.get(0).length * 10 + 30, 30)
+  fillTree(0, t, tree)
+  def fillTree(pos: Int, t: Tree[Integer, Integer], tree: de.up.ling.tree.Tree[String]): Unit = {
     for (child : de.up.ling.tree.Tree[String] <- tree.getChildren) {
-      t.addChild(tree, child, child, child.getLabel.length * 10 + 30, 30)
-      fillTree(t, child)
+      labelNames.add(child.getLabel)
+      val newChild = new Integer(labelKeys.size)
+      labelKeys.add(newChild)
+
+      t.addChild(labelKeys.get(pos), newChild, newChild, child.getLabel.length * 10 + 30, 30)
+      fillTree(labelKeys.size - 1, t, child)
     }
   }
 
@@ -30,17 +43,17 @@ class TreePane(tree : de.up.ling.tree.Tree[String]) extends Pane {
   val layoutconfig = new LayoutConfig
   val layout = lgraph.getLayout(layoutconfig)
 
-  val nodeNames : mutable.Map[de.up.ling.tree.Tree[String], String] = new mutable.HashMap[de.up.ling.tree.Tree[String], String]()
-  val edgeNames : mutable.Map[Object, String] = new mutable.HashMap[Object, String]()
+  val nodeNames = new mutable.HashMap[Integer, String]()
+  val edgeNames = new mutable.HashMap[Integer, String]()
 
-  for (x : de.up.ling.tree.Tree[String] <- tree.getAllNodes) {
-    nodeNames.put(x, x.getLabel)
-    edgeNames.put(x, "")
+  for (i <- labelKeys.indices) {
+    nodeNames.put(labelKeys.get(i), labelNames.get(i))
+    edgeNames.put(labelKeys.get(i), "")
   }
 
-  val nodeFactory = new SimpleGraphFXNodeFactory[de.up.ling.tree.Tree[String]](nodeNames, "", "")
-  val edgeFactory = new SimpleGraphFXEdgeFactory[Object](edgeNames, Color.Black)
-  val graph = new GraphFX[de.up.ling.tree.Tree[String], Object](layout, nodeFactory, edgeFactory)
+  val nodeFactory = new SimpleGraphFXNodeFactory[Integer](nodeNames, "", "")
+  val edgeFactory = new SimpleGraphFXEdgeFactory[Integer](edgeNames, Color.Black)
+  val graph = new GraphFX[Integer, Integer](layout, nodeFactory, edgeFactory)
   children.add(graph)
 
   minWidth(graph.getWidth)
