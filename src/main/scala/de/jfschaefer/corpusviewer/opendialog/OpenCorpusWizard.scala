@@ -1,11 +1,15 @@
 package de.jfschaefer.corpusviewer.opendialog
 
+import java.io.{FileReader, BufferedReader}
+
 import de.jfschaefer.corpusviewer.{Main, Configuration}
 import de.up.ling.irtg.InterpretedTreeAutomaton
 import de.up.ling.irtg.algebra.Algebra
+import de.up.ling.irtg.codec.irtg.IrtgLexer
 import de.up.ling.tclup.perf.DatabaseConnection
 import de.up.ling.tclup.perf.alto.{CorpusFromDb, GrammarMetadata, GrammarFromDb}
 import de.up.ling.irtg.corpus.{Instance, Corpus}
+import org.antlr.v4.runtime.ANTLRInputStream
 
 import scala.collection.mutable.ListBuffer
 import scalafx.collections.ObservableBuffer
@@ -25,6 +29,12 @@ import scala.collection.JavaConversions._
 class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, String], Set[String]) => Unit) extends Group {
 
   val PADDING = 15d
+  val MEDIUM_WIDTH = 400
+  val defaultFilterRule = """
+        |def filter(instance, interpretations):
+        |\treturn True
+      """.stripMargin
+
   prepareGroup()
 
   val borderPane : BorderPane = new BorderPane
@@ -55,27 +65,156 @@ class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, 
       STATUS
    */
 
-  //var configFile : java.io.File = new java.io.File(Configuration.openCorpusWizardDefaultConfigFile)
+  var corpusLocation : String = ""
+  var corpusFile : java.io.File = null
+  var interpretationsFile : java.io.File = null
   var configFile : java.io.File = null
+  var filterRule : String = defaultFilterRule
   var databaseConnection : DatabaseConnection = null
   var corpus : Corpus = null
   var interpretations : Map[String, String] = null
   var previewInterpretations : mutable.Set[String] = null
 
-  chooseConfigFile()
+  selectCorpusLocation()
 
-
-  def chooseConfigFile(): Unit = {
-    prevFunction = { () => }
+  def selectCorpusLocation(): Unit = {
     prevButton.disable = true
+    nextButton.disable = true
+
+    val vbox = new VBox {
+      alignment = Pos.Center
+      spacing = 15
+    }
+
+    vbox.children.add(Button.sfxButton2jfx(new Button("Corpus from File") {
+      minWidth = MEDIUM_WIDTH
+      onAction = {
+        (_: ActionEvent) =>
+          corpusLocation = "file"
+          takeCorpusFromFile()
+      }
+    }))
+
+    vbox.children.add(Button.sfxButton2jfx(new Button("Corpus from Database") {
+      minWidth = MEDIUM_WIDTH
+      onAction = {
+        (_: ActionEvent) =>
+          corpusLocation = "database"
+          chooseConfigFile()
+      }
+    }))
+
+    updateCore(vbox)
+  }
+
+  def takeCorpusFromFile(): Unit = {
+    prevFunction = selectCorpusLocation
+    prevButton.disable = false
+    nextButton.disable = corpusFile == null || interpretationsFile == null
+    val vbox = new VBox {
+      alignment = Pos.Center
+      spacing = 15
+    }
+
+    val textFieldInterpretations = new Text("Interpretations File:\n"+interpretationsFile)
+    textFieldInterpretations.minWidth(MEDIUM_WIDTH)
+    textFieldInterpretations.wrappingWidth = MEDIUM_WIDTH
+    vbox.children.add(textFieldInterpretations)
+    vbox.children.append(Button.sfxButton2jfx(new Button("Change Interpretations") {
+      onAction = {
+        (_: ActionEvent) =>
+          val n = fileChooser.showOpenDialog(stage)
+          if (n != null) {
+            textFieldInterpretations.text = "Interpretations File:\n" + n
+            interpretationsFile = n
+            nextButton.disable = corpusFile == null
+          }
+      }
+      minWidth = MEDIUM_WIDTH
+    }))
+
+    val textFieldCorpus = new Text("Corpus File:\n"+corpusFile)
+    textFieldCorpus.minWidth(MEDIUM_WIDTH)
+    textFieldCorpus.wrappingWidth = MEDIUM_WIDTH
+    vbox.children.add(textFieldCorpus)
+    vbox.children.append(Button.sfxButton2jfx(new Button("Change corpus") {
+      onAction = {
+        (_: ActionEvent) =>
+          val n = fileChooser.showOpenDialog(stage)
+          if (n != null) {
+            textFieldCorpus.text = "Corpus File:\n" + n
+            corpusFile = n
+            nextButton.disable = interpretationsFile == null
+          }
+      }
+      minWidth = MEDIUM_WIDTH
+    }))
+    vbox.minWidth = stage.getWidth - 2 * PADDING
+
+    updateCore(vbox)
+
+    nextFunction = { () =>
+      try {
+        val iregex = """interpretation\s+([^\s:]+)\s*:\s*([^\s]+)""".r
+        val interpretationsTmp = new mutable.HashMap[String, String]
+        for (line <- scala.io.Source.fromFile(interpretationsFile).getLines) {
+          val trimmed = line.trim
+          if (trimmed != "") {
+            trimmed match {
+              case iregex(key, value) => interpretationsTmp.put(key, value)
+              case _ =>
+                val alert = new Alert(AlertType.Warning)
+                alert.setHeaderText("Warning: Couldn't parse line in interpretations file (skipping it)")
+                alert.setContentText(s"Line:\n$line")
+                alert.showAndWait()
+            }
+          }
+        }
+        interpretations = interpretationsTmp.toMap
+
+        try {
+          val algebraMap: java.util.Map[String, Algebra[_]] = new java.util.HashMap()
+          for ((key, className) <- interpretations) {
+            algebraMap.put(key, Class.forName(className).newInstance().asInstanceOf[Algebra[_]])
+          }
+          val irtg = InterpretedTreeAutomaton.forAlgebras(algebraMap)
+          corpus = de.up.ling.irtg.corpus.Corpus.readCorpus(new BufferedReader(new FileReader(corpusFile)), irtg)
+          chooseFilters()
+        } catch {
+          case e: Throwable =>
+            val alert = new Alert(AlertType.Error)
+            alert.setHeaderText("Error: Couldn't load corpus")
+            alert.setContentText(e.toString)
+            alert.showAndWait()
+        }
+      } catch {
+        case e: Throwable =>
+          val alert = new Alert(AlertType.Error)
+          alert.setHeaderText("Error: Couldn't load interpretations")
+          alert.setContentText(e.toString)
+          alert.showAndWait()
+          return
+      }
+
+    }
+  }
+
+
+
+  /*
+      DATABASE CONFIG
+   */
+  def chooseConfigFile(): Unit = {
+    prevFunction = selectCorpusLocation
+    prevButton.disable = false
     nextButton.disable = configFile == null
     val vbox = new VBox {
       alignment = Pos.Center
       spacing = 15
     }
     val textField = new Text("The configuration file:\n"+configFile)
-    textField.minWidth(200)
-    textField.wrappingWidth = 200
+    textField.minWidth(MEDIUM_WIDTH)
+    textField.wrappingWidth = MEDIUM_WIDTH
     vbox.children.add(textField)
     vbox.children.append(Button.sfxButton2jfx(new Button("Change configuration file") {
       onAction = {
@@ -87,7 +226,7 @@ class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, 
             nextButton.disable = false
           }
       }
-      minWidth = 200
+      minWidth = MEDIUM_WIDTH
     }))
     vbox.minWidth = stage.getWidth - 2 * PADDING
 
@@ -96,7 +235,7 @@ class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, 
     nextFunction = { () =>
       try {
         databaseConnection = new DatabaseConnection(configFile.toString)
-        chooseCorpus()
+        chooseCorpusInDB()
       } catch {
         case e: Throwable =>
           val alert = new Alert(AlertType.Error)
@@ -108,7 +247,10 @@ class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, 
     }
   }
 
-  def chooseCorpus(): Unit = {
+  /*
+      DATABASE CORPUS
+   */
+  def chooseCorpusInDB(): Unit = {
     prevButton.disable = false
     nextButton.disable = true
     prevFunction = chooseConfigFile
@@ -120,9 +262,7 @@ class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, 
       spacing = 15
     }
 
-    /*
-        GRAMMAR
-     */
+    //    GRAMMAR
     val grammarMDs = new GrammarFromDb(databaseConnection).allIrtgsMetadata
     val grammarCB: ChoiceBox[ChoiceBoxEntry[GrammarMetadata]] = new ChoiceBox
     val grammarCBItems = new ObservableBuffer[ChoiceBoxEntry[GrammarMetadata]]()
@@ -154,9 +294,7 @@ class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, 
         }
     }
 
-    /*
-        CORPUS
-     */
+    //    CORPUS
     val corpusMDs = new CorpusFromDb(databaseConnection).allCorporaMetadata
     val corpusCB: ChoiceBox[ChoiceBoxEntry[CorpusFromDb#CorpusMetadata]] = new ChoiceBox
     corpusCB.minWidth <== stage.getWidth - 2 * PADDING
@@ -200,6 +338,7 @@ class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, 
           algebraMap.put(key, Class.forName(className).newInstance().asInstanceOf[Algebra[_]])
         }
         val irtg = InterpretedTreeAutomaton.forAlgebras(algebraMap)
+        println(irtg.toString)
         val corpusfromdb = new CorpusFromDb(databaseConnection)
         corpus = corpusfromdb.readCorpus(corpusCB.value.value.unwrap.id, irtg)
         chooseFilters()
@@ -214,10 +353,13 @@ class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, 
     }
   }
 
+  /*
+      FILTERS
+   */
   def chooseFilters(): Unit = {
     nextButton.disable = false
     prevButton.disable = false
-    prevFunction = chooseCorpus
+    prevFunction = if (corpusLocation == "file") takeCorpusFromFile else chooseCorpusInDB
 
     val vbox = new VBox {
       alignment = Pos.Center
@@ -225,16 +367,12 @@ class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, 
     }
 
     val label = new Label("Filter rule:") { minWidth <== stage.width - 2 * PADDING }
-    val textArea = new TextArea(
-      """
-        |def filter(instance, interpretations):
-        |    return True
-      """.stripMargin) {
+    val textArea = new TextArea(filterRule) {
       minWidth <== stage.width - 2 * PADDING
       maxWidth <== stage.width - 2 * PADDING
       wrapText = true
-      minHeight = 200
-      maxHeight = 200
+      minHeight = 300
+      maxHeight = 300
     }
     vbox.children.add(label)
     vbox.children.add(textArea)
@@ -264,12 +402,15 @@ class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, 
   }
 
 
+  /*
+      PREVIEW INTERPRETATIONS
+   */
   def choosePreviewInterpretations(): Unit = {
     nextButton.disable = false
     prevButton.disable = false
     prevFunction = chooseFilters
 
-    val recWidth = 500
+    val recWidth = stage.getWidth - 2 * PADDING
     val vbox = new VBox {
       alignment = Pos.Center
       spacing = 15
@@ -299,6 +440,9 @@ class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, 
   }
 
 
+  /*
+      UTILS
+   */
 
   def updateCore(n : Node): Unit = {
     borderPane.setCenter(n)
