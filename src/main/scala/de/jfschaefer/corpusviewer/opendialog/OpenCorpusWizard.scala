@@ -5,8 +5,9 @@ import de.up.ling.irtg.InterpretedTreeAutomaton
 import de.up.ling.irtg.algebra.Algebra
 import de.up.ling.tclup.perf.DatabaseConnection
 import de.up.ling.tclup.perf.alto.{CorpusFromDb, GrammarMetadata, GrammarFromDb}
-import de.up.ling.irtg.corpus.Corpus
+import de.up.ling.irtg.corpus.{Instance, Corpus}
 
+import scala.collection.mutable.ListBuffer
 import scalafx.collections.ObservableBuffer
 import scalafx.event.ActionEvent
 import scalafx.geometry.Pos
@@ -19,8 +20,9 @@ import scalafx.stage.{FileChooser, Stage}
 import scalafx.Includes._
 
 import scala.collection.mutable
+import scala.collection.JavaConversions._
 
-class OpenCorpusWizard(load: (java.util.Iterator[de.up.ling.irtg.corpus.Instance], Map[String, String], Set[String]) => Unit) extends Group {
+class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, String], Set[String]) => Unit) extends Group {
 
   val PADDING = 15d
   prepareGroup()
@@ -45,6 +47,8 @@ class OpenCorpusWizard(load: (java.util.Iterator[de.up.ling.irtg.corpus.Instance
   var nextFunction : () => Unit = { () => }
   var prevFunction : () => Unit = { () => }
 
+  var filteredInstances : mutable.ArrayBuffer[de.up.ling.irtg.corpus.Instance] = null
+
   setupBorderPane()
 
   /*
@@ -64,7 +68,7 @@ class OpenCorpusWizard(load: (java.util.Iterator[de.up.ling.irtg.corpus.Instance
   def chooseConfigFile(): Unit = {
     prevFunction = { () => }
     prevButton.disable = true
-    nextButton.disable = (configFile == null)
+    nextButton.disable = configFile == null
     val vbox = new VBox {
       alignment = Pos.Center
       spacing = 15
@@ -126,9 +130,9 @@ class OpenCorpusWizard(load: (java.util.Iterator[de.up.ling.irtg.corpus.Instance
       grammarCBItems.append(new ChoiceBoxEntry[GrammarMetadata](md, "" + md.id + ".: " + md.name))
     }
     grammarCB.items = grammarCBItems
-    grammarCB.setMinWidth(stage.getWidth - 2 * PADDING)
+    grammarCB.minWidth <== stage.getWidth - 2 * PADDING
 
-    val grammarLabel = new Label("Grammar:") { minWidth = stage.getWidth - 2*PADDING}
+    val grammarLabel = new Label("Grammar:") { minWidth <== stage.width - 2*PADDING}
     vbox.children.add(grammarLabel)
     vbox.children.add(grammarCB)
 
@@ -137,8 +141,8 @@ class OpenCorpusWizard(load: (java.util.Iterator[de.up.ling.irtg.corpus.Instance
     grammarSP.content.value = grammarT
     grammarSP.setMinHeight(120)
     grammarSP.setMaxHeight(120)
-    grammarSP.setMinWidth(stage.getWidth - 2 * PADDING)
-    grammarSP.setMaxWidth(stage.getWidth - 2 * PADDING)
+    grammarSP.minWidth <== stage.getWidth - 2 * PADDING
+    grammarSP.maxWidth <== stage.getWidth - 2 * PADDING
 
     vbox.children.add(grammarSP)
     grammarCB.value onChange {
@@ -155,13 +159,13 @@ class OpenCorpusWizard(load: (java.util.Iterator[de.up.ling.irtg.corpus.Instance
      */
     val corpusMDs = new CorpusFromDb(databaseConnection).allCorporaMetadata
     val corpusCB: ChoiceBox[ChoiceBoxEntry[CorpusFromDb#CorpusMetadata]] = new ChoiceBox
-    corpusCB.setMinWidth(stage.getWidth - 2 * PADDING)
+    corpusCB.minWidth <== stage.getWidth - 2 * PADDING
     val corpusCBItems = new ObservableBuffer[ChoiceBoxEntry[CorpusFromDb#CorpusMetadata]]()
     for (md <- corpusMDs) {
       corpusCBItems.append(new ChoiceBoxEntry(md, "" + md.id + ".: " + md.name))
     }
     corpusCB.items = corpusCBItems
-    val corpusLabel = new Label("Corpus:") { minWidth = stage.getWidth - 2 * PADDING }
+    val corpusLabel = new Label("Corpus:") { minWidth <== stage.width - 2 * PADDING }
     vbox.children.add(corpusLabel)
 
     vbox.children.add(corpusCB)
@@ -171,8 +175,8 @@ class OpenCorpusWizard(load: (java.util.Iterator[de.up.ling.irtg.corpus.Instance
     corpusSP.content.value = corpusT
     corpusSP.setMinHeight(120)
     corpusSP.setMaxHeight(120)
-    corpusSP.setMinWidth(stage.getWidth - 2 * PADDING)
-    corpusSP.setMaxWidth(stage.getWidth - 2 * PADDING)
+    corpusSP.minWidth <== stage.width - 2 * PADDING
+    corpusSP.maxWidth <== stage.width - 2 * PADDING
 
     vbox.children.add(corpusSP)
     corpusCB.value onChange {
@@ -215,7 +219,48 @@ class OpenCorpusWizard(load: (java.util.Iterator[de.up.ling.irtg.corpus.Instance
     prevButton.disable = false
     prevFunction = chooseCorpus
 
-    choosePreviewInterpretations()
+    val vbox = new VBox {
+      alignment = Pos.Center
+      spacing = 15
+    }
+
+    val label = new Label("Filter rule:") { minWidth <== stage.width - 2 * PADDING }
+    val textArea = new TextArea(
+      """
+        |def filter(instance, interpretations):
+        |    return True
+      """.stripMargin) {
+      minWidth <== stage.width - 2 * PADDING
+      maxWidth <== stage.width - 2 * PADDING
+      wrapText = true
+      minHeight = 200
+      maxHeight = 200
+    }
+    vbox.children.add(label)
+    vbox.children.add(textArea)
+    updateCore(vbox)
+
+    //updateCore(new Label("Here, an amazing filter dialog will emerge"))
+    nextFunction = {
+      () =>
+        val filterText = textArea.getText
+        val filterResult = Filter.createFromJython(filterText)
+        filterResult match {
+          case FilterOk(filter) =>
+            filteredInstances = new mutable.ArrayBuffer[Instance]
+            for (instance <- corpus.iterator()) {
+              if (filter.assess(instance)) {
+                filteredInstances.append(instance)
+              }
+            }
+            choosePreviewInterpretations()
+          case FilterErr(message) =>
+            val alert = new Alert(AlertType.Error)
+            alert.setHeaderText("Error: Couldn't compile filter rule")
+            alert.setContentText(message)
+            alert.showAndWait()
+        }
+    }
   }
 
 
@@ -248,7 +293,8 @@ class OpenCorpusWizard(load: (java.util.Iterator[de.up.ling.irtg.corpus.Instance
           previewInterpretations.add(interpretation)
         }
       }
-      load(corpus.iterator(), interpretations, previewInterpretations.toSet)
+      load(filteredInstances, interpretations, previewInterpretations.toSet)
+      // load(corpus.iterator(), interpretations, previewInterpretations.toSet)
     }
   }
 

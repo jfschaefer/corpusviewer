@@ -51,7 +51,7 @@ class TreePane(tree : de.up.ling.tree.Tree[String]) extends Pane {
     edgeNames.put(labelKeys.get(i), "")
   }
 
-  val nodeFactory = new SimpleGraphFXNodeFactory[Integer](nodeNames, "", "")
+  val nodeFactory = new SimpleGraphFXNodeFactory[Integer](nodeNames, "graph_node", "")
   val edgeFactory = new SimpleGraphFXEdgeFactory[Integer](edgeNames, Color.Black)
   val graph = new GraphFX[Integer, Integer](layout, nodeFactory, edgeFactory)
   children.add(graph)

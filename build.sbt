@@ -5,6 +5,8 @@ version := "1.0"
 scalaVersion := "2.11.7"
 
 libraryDependencies ++= Seq(
+  "org.scala-lang" % "scala-library" % scalaVersion.value,
+  "org.scala-lang" % "scala-compiler" % scalaVersion.value,
   "org.scalafx" %% "scalafx" % "8.0.40-R8",
   "de.saar.coli" % "basics" % "1.2.34",
   "org.controlsfx" % "controlsfx" % "8.20.8",
@@ -18,8 +20,12 @@ libraryDependencies ++= Seq(
   "de.up.ling" % "alto" % "2.0",
   "de.up.ling" % "tuio-gesture" % "1.0.4-SNAPSHOT",
   "de.jfschaefer.sugiyamalayout" % "sugiyamalayout" % "1.0-SNAPSHOT",
-  "de.jfschaefer.layeredgraphlayout" % "layeredgraphlayout" % "1.0-SNAPSHOT"
+  "de.jfschaefer.layeredgraphlayout" % "layeredgraphlayout" % "1.0-SNAPSHOT",
+  // "com.twitter" % "util-eval_2.10" % "6.1.0"  // current release broken for scala 2.11, apparently, they won't maintain util-eval much longer anyway
+  "org.python" % "jython" % "2.5.3"
 )
+
+conflictWarning := ConflictWarning.disable   //otherwise there is a cross-version suffixes conflict in twitterutil-core
 
 unmanagedJars in Compile += Attributed.blank(file(System.getenv("JAVA_HOME") + "/jre/lib/ext/jfxrt.jar"))
 
