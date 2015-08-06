@@ -11,7 +11,6 @@ import de.up.ling.tclup.perf.alto.{CorpusFromDb, GrammarMetadata, GrammarFromDb}
 import de.up.ling.irtg.corpus.{Instance, Corpus}
 import org.antlr.v4.runtime.ANTLRInputStream
 
-import scala.collection.mutable.ListBuffer
 import scalafx.collections.ObservableBuffer
 import scalafx.event.ActionEvent
 import scalafx.geometry.Pos
@@ -30,11 +29,7 @@ class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, 
 
   val PADDING = 15d
   val MEDIUM_WIDTH = 400
-  val defaultFilterRule = """
-        |def filter(instance, interpretations):
-        |\treturn True
-      """.stripMargin
-
+  val defaultFilterRule = "def filter(instance, interpretations):\n\treturn True\n"
   prepareGroup()
 
   val borderPane : BorderPane = new BorderPane
@@ -157,7 +152,7 @@ class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, 
       try {
         val iregex = """interpretation\s+([^\s:]+)\s*:\s*([^\s]+)""".r
         val interpretationsTmp = new mutable.HashMap[String, String]
-        for (line <- scala.io.Source.fromFile(interpretationsFile).getLines) {
+        for (line <- scala.io.Source.fromFile(interpretationsFile).getLines()) {
           val trimmed = line.trim
           if (trimmed != "") {
             trimmed match {
@@ -182,17 +177,11 @@ class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, 
           chooseFilters()
         } catch {
           case e: Throwable =>
-            val alert = new Alert(AlertType.Error)
-            alert.setHeaderText("Error: Couldn't load corpus")
-            alert.setContentText(e.toString)
-            alert.showAndWait()
+            OpenCorpusUtil.showError("Error: Couldn't load corpus", e.toString)
         }
       } catch {
         case e: Throwable =>
-          val alert = new Alert(AlertType.Error)
-          alert.setHeaderText("Error: Couldn't load interpretations")
-          alert.setContentText(e.toString)
-          alert.showAndWait()
+          OpenCorpusUtil.showError("Error: Couldn't load interpretations", e.toString)
           return
       }
 
@@ -238,11 +227,7 @@ class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, 
         chooseCorpusInDB()
       } catch {
         case e: Throwable =>
-          val alert = new Alert(AlertType.Error)
-          alert.setHeaderText("Error: Couldn't setup database connection")
-          alert.setContentText(e.toString)
-          e.printStackTrace()
-          alert.showAndWait();
+          OpenCorpusUtil.showError("Error: Couldn't setup database connection", e.toString)
       }
     }
   }
@@ -344,11 +329,7 @@ class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, 
         chooseFilters()
       } catch {
         case e: Throwable =>
-          val alert = new Alert(AlertType.Error)
-          alert.setHeaderText("Error: Couldn't setup database connection")
-          alert.setContentText(e.toString)
-          e.printStackTrace()
-          alert.showAndWait();
+          OpenCorpusUtil.showError("Error: Failed to load corpus", e.toString)
       }
     }
   }
@@ -359,7 +340,6 @@ class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, 
   def chooseFilters(): Unit = {
     nextButton.disable = false
     prevButton.disable = false
-    prevFunction = if (corpusLocation == "file") takeCorpusFromFile else chooseCorpusInDB
 
     val vbox = new VBox {
       alignment = Pos.Center
@@ -376,27 +356,51 @@ class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, 
     }
     vbox.children.add(label)
     vbox.children.add(textArea)
+    vbox.children.add(Button.sfxButton2jfx(new Button("Load filter rule from file") {
+      onAction = {
+        (_: ActionEvent) =>
+          val file = fileChooser.showOpenDialog(stage)
+          if (file != null) {
+            try {
+              val s = new StringBuilder()
+              for (line <- scala.io.Source.fromFile(file).getLines()) {
+                s.append(line.replaceAll("    ", "\t") + "\n")    //TODO: Find more flexible solution - maybe along with a decent editor
+              }
+              textArea.setText(s.toString)
+            } catch {
+              case e : Exception => OpenCorpusUtil.showError("Couldn't load filter rule", e.toString)
+            }
+          }
+      }
+    }))
     updateCore(vbox)
 
-    //updateCore(new Label("Here, an amazing filter dialog will emerge"))
+
+    prevFunction = { () =>
+      filterRule = textArea.getText
+      if (corpusLocation == "file") takeCorpusFromFile() else chooseCorpusInDB()
+    }
+
     nextFunction = {
       () =>
-        val filterText = textArea.getText
-        val filterResult = Filter.createFromJython(filterText)
+        filterRule = textArea.getText
+        val filterResult = Filter.createFromJython(filterRule)
         filterResult match {
           case FilterOk(filter) =>
             filteredInstances = new mutable.ArrayBuffer[Instance]
-            for (instance <- corpus.iterator()) {
-              if (filter.assess(instance)) {
-                filteredInstances.append(instance)
+            try {
+              for (instance <- corpus.iterator()) {
+                if (filter.assess(instance)) {
+                  filteredInstances.append(instance)
+                }
               }
+              choosePreviewInterpretations()
+            } catch {
+              case e : FilterException =>
+                OpenCorpusUtil.showError("Filter error", "An error occured in the filtering process.\nPlease fix the rules and try again.")
             }
-            choosePreviewInterpretations()
           case FilterErr(message) =>
-            val alert = new Alert(AlertType.Error)
-            alert.setHeaderText("Error: Couldn't compile filter rule")
-            alert.setContentText(message)
-            alert.showAndWait()
+            OpenCorpusUtil.showError("Error: Couldn't compile filter rule", message)
         }
     }
   }

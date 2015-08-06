@@ -1,5 +1,8 @@
 package de.jfschaefer.corpusviewer.opendialog
 
+import scalafx.scene.control.Alert.AlertType
+import scalafx.scene.control._
+
 import de.up.ling.tclup.perf.alto.{CorpusFromDb, GrammarMetadata}
 
 object OpenCorpusUtil {
@@ -38,5 +41,12 @@ object OpenCorpusUtil {
       s.append(i)
     }
     s.toString()
+  }
+
+  def showError(head : String, body : String): Unit = {
+    val alert = new Alert(AlertType.Error)
+    alert.setHeaderText(head)
+    alert.setContentText(body)
+    alert.showAndWait()
   }
 }
