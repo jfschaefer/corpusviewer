@@ -43,7 +43,7 @@ class GraphVisualization(iw : InstanceWrapper, parentDisp : Option[Displayable],
       })::new MenuEntryFunction("Redraw", () => drawGraphPane())::Nil
     }
   menu.enableInteraction()
-  override val header = new Header(iw.index + ". Graph", Some(menu))
+  override val header = new Header(iw.getIDForUser + ". Graph", Some(menu))
   children.add(header)
 
   drawGraphPane()

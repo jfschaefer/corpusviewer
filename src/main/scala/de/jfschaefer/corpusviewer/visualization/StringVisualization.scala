@@ -33,7 +33,7 @@ class StringVisualization(iw : InstanceWrapper, parentDisp : Option[Displayable]
     })::new MenuEntryFunction("Trash", () => trash() )::Nil
   }
   menu.enableInteraction()
-  override val header = new Header(iw.index + ". String", Some(menu))
+  override val header = new Header(iw.getIDForUser + ". String", Some(menu))
 
   children.add(header)
 

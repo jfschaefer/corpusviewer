@@ -26,7 +26,7 @@ class NoVisualization(iw : InstanceWrapper, parentDisp : Option[Displayable], ke
     items = new MenuEntryFunction("Trash", () => trash())::Nil
   }
   menu.enableInteraction()
-  override val header = new Header(iw.index + ". " + key, Some(menu))
+  override val header = new Header(iw.getIDForUser + ". " + key, Some(menu))
 
   children.add(header)
 

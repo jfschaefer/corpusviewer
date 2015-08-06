@@ -57,5 +57,13 @@ class InstanceWrapper(val instance: Instance, val interpretations : Map[String, 
     else InstanceWrapper.getIdStyleClass(id.value)
   }
 
+
+  def getIDForUser: String = {
+    if (instance.getComments.containsKey("corpusviewer_id"))
+      instance.getComments.get("corpusviewer_id")
+    else
+      index.toString
+  }
+
   def hasIdAssigned: Boolean = id.value != -1
 }

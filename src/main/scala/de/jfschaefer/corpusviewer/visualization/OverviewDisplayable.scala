@@ -43,7 +43,7 @@ class OverviewDisplayable(iw : InstanceWrapper, parentDisp : Option[Displayable]
   }
 
   menu.enableInteraction()
-  override val header = new Header(iw.index + ". Overview", Some(menu))
+  override val header = new Header(iw.getIDForUser + ". Overview", Some(menu))
 
   children.add(header)
 

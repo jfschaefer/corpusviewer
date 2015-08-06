@@ -350,7 +350,7 @@ class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, 
     val textArea = new TextArea(filterRule) {
       minWidth <== stage.width - 2 * PADDING
       maxWidth <== stage.width - 2 * PADDING
-      wrapText = true
+      wrapText = false  //after all, it's code
       minHeight = 300
       maxHeight = 300
     }
@@ -372,6 +372,7 @@ class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, 
             }
           }
       }
+      minWidth = MEDIUM_WIDTH
     }))
     updateCore(vbox)
 
@@ -389,7 +390,13 @@ class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, 
           case FilterOk(filter) =>
             filteredInstances = new mutable.ArrayBuffer[Instance]
             try {
+              var instanceCounter = 1
               for (instance <- corpus.iterator()) {
+                if (instance.getComments == null) {
+                  instance.setComments(new java.util.HashMap[String, String])
+                }
+                instance.getComments.put("corpusviewer_id", instanceCounter.toString)
+                instanceCounter += 1
                 if (filter.assess(instance)) {
                   filteredInstances.append(instance)
                 }

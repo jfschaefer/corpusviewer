@@ -20,7 +20,7 @@ class OverviewGroup(iw : InstanceWrapper, previewInterpretations: Set[String], f
   var cumulativeHeight = 0d
 
   if (forPreview) {
-    val text = new Text("\n" + + iw.index)
+    val text = new Text("\n" + iw.getIDForUser)
     text.translateX = Configuration.previewMargin
     text.translateY = cumulativeHeight
     cumulativeHeight += text.boundsInLocal.value.getHeight
