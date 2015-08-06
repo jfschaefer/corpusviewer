@@ -59,14 +59,17 @@ class OverviewGroup(iw : InstanceWrapper, previewInterpretations: Set[String], f
       val sgraph: SGraph = algObj.asInstanceOf[SGraph]
       val graphpane = new SGraphPane(sgraph)
       val maxDim = math.max(graphpane.getWidth, graphpane.getHeight)
-      val scale = math.min(Configuration.preferredPreviewWidth / maxDim, 1d)
-      graphpane.scaleX = scale
-      graphpane.scaleY = scale
+      // don't show overly huge graphs in preview.
+      if (!forPreview || maxDim / Configuration.preferredPreviewWidth < Configuration.previewMaxDownscale) {
+        val scale = math.min(Configuration.preferredPreviewWidth / maxDim, 1d)
+        graphpane.scaleX = scale
+        graphpane.scaleY = scale
 
-      children.add(graphpane)
-      graphpane.translateX = -(graphpane.getWidth * 0.5 * (1 - scale))
-      graphpane.translateY = cumulativeHeight - (graphpane.getHeight * 0.5 * (1 - scale))
-      cumulativeHeight += graphpane.getHeight * scale
+        children.add(graphpane)
+        graphpane.translateX = -(graphpane.getWidth * 0.5 * (1 - scale))
+        graphpane.translateY = cumulativeHeight - (graphpane.getHeight * 0.5 * (1 - scale))
+        cumulativeHeight += graphpane.getHeight * scale
+      }
     }
   }
 
@@ -83,14 +86,17 @@ class OverviewGroup(iw : InstanceWrapper, previewInterpretations: Set[String], f
       val tree = algObj.asInstanceOf[de.up.ling.tree.Tree[String]]
       val treePane = new TreePane(tree)
       val maxDim = math.max(treePane.getWidth, treePane.getHeight)
-      val scale = math.min(Configuration.preferredPreviewWidth / maxDim, 1d)
-      treePane.scaleX = scale
-      treePane.scaleY = scale
+      // don't show overly huge trees in preview
+      if (!forPreview || maxDim / Configuration.preferredPreviewWidth < Configuration.previewMaxDownscale) {
+        val scale = math.min(Configuration.preferredPreviewWidth / maxDim, 1d)
+        treePane.scaleX = scale
+        treePane.scaleY = scale
 
-      children.add(treePane)
-      treePane.translateX = -(treePane.getWidth * 0.5 * (1 - scale))
-      treePane.translateY = cumulativeHeight - (treePane.getHeight * 0.5 * (1 - scale))
-      cumulativeHeight += treePane.getHeight * scale
+        children.add(treePane)
+        treePane.translateX = -(treePane.getWidth * 0.5 * (1 - scale))
+        treePane.translateY = cumulativeHeight - (treePane.getHeight * 0.5 * (1 - scale))
+        cumulativeHeight += treePane.getHeight * scale
+      }
     }
   }
 

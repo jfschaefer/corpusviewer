@@ -42,6 +42,7 @@ object Configuration {
   val previewScale = load("preview_scale", _.toDouble)
   val preferredPreviewWidth = load("preferred_preview_width", _.toDouble)
   val previewSectionWidth = load("preview_section_width", _.toDouble)
+  val previewMaxDownscale = load("preview_max_downscale", _.toDouble)
 
   val headerMargin = load("header_margin", _.toDouble)
   val headerMenuButtonRadius = load("header_menu_button_radius", _.toDouble)
