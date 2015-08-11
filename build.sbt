@@ -19,7 +19,7 @@ libraryDependencies ++= Seq(
   "de.up.ling" %% "tclup-perf" % "1.0",
   "de.up.ling" % "alto" % "2.0",
   "de.up.ling" % "tuio-gesture" % "1.0.4-SNAPSHOT",
-  "de.jfschaefer.sugiyamalayout" % "sugiyamalayout" % "1.0-SNAPSHOT",
+  // "de.jfschaefer.sugiyamalayout" % "sugiyamalayout" % "1.0-SNAPSHOT",
   "de.jfschaefer.layeredgraphlayout" % "layeredgraphlayout" % "1.0-SNAPSHOT",
   // "com.twitter" % "util-eval_2.10" % "6.1.0"  // current release broken for scala 2.11, apparently, they won't maintain util-eval much longer anyway
   "org.python" % "jython" % "2.5.3"
@@ -36,3 +36,8 @@ resolvers += "TCL Snapshots" at "http://tcl.ling.uni-potsdam.de/artifactory/snap
 resolvers += "TCL External" at "http://www.ling.uni-potsdam.de/tcl/maven2/external"
 
 resolvers += Resolver.mavenLocal
+
+// enabel assertion checking
+//fork in run := true
+
+//javaOptions in run += "-ea"

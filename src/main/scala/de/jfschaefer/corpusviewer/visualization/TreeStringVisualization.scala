@@ -19,11 +19,14 @@ class TreeStringVisualization(iw : InstanceWrapper, parentDisp : Option[Displaya
   val algObj = instanceMap.get(key)
   assert(algObj.isInstanceOf[Tree[String @unchecked]])
   val tree = algObj.asInstanceOf[Tree[String]]
+  val treePane = new TreePane(tree)
 
   // HEADER
   val menu = new RadialMenu {
     displayable = Some(TreeStringVisualization.this)
-    items = new MenuEntryFunction("Trash", () => trash() )::Nil
+    items = new MenuEntryFunction("Copy as\nLaTeX", () => {
+      Util.copyIntoClipboard(treePane.getLaTeX())
+    }):: new MenuEntryFunction("Trash", () => trash() )::Nil
   }
   menu.enableInteraction()
   override val header = new Header(iw.getIDForUser + ". " + key, Some(menu))
@@ -31,7 +34,6 @@ class TreeStringVisualization(iw : InstanceWrapper, parentDisp : Option[Displaya
   children.add(header)
 
   // CONTENT
-  val treePane = new TreePane(tree)
   children.add(treePane)
   treePane.translateY = header.getHeight
 

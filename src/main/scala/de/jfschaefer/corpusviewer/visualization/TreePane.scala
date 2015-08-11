@@ -1,5 +1,6 @@
 package de.jfschaefer.corpusviewer.visualization
 
+import de.jfschaefer.layeredgraphlayout.latex.LatexGenerator
 import de.jfschaefer.layeredgraphlayout.layout.LayoutConfig
 import de.jfschaefer.layeredgraphlayout.lgraph.LGraphConfig
 import de.jfschaefer.layeredgraphlayout.tree.Tree
@@ -52,14 +53,19 @@ class TreePane(tree : de.up.ling.tree.Tree[String]) extends Pane {
   }
 
   val nodeFactory = new SimpleGraphFXNodeFactory[Integer](nodeNames, "graph_node", "")
-  val edgeFactory = new SimpleGraphFXEdgeFactory[Integer](edgeNames, Color.Black)
+  val edgeFactory = new SimpleGraphFXEdgeFactory[Integer](layoutconfig, edgeNames, Color.Black)
   val graph = new GraphFX[Integer, Integer](layout, nodeFactory, edgeFactory)
   children.add(graph)
 
-  minWidth(graph.getWidth)
+  /* minWidth(graph.getWidth)
   maxWidth(graph.getWidth)
   minHeight(graph.getHeight)
   maxHeight(graph.getHeight)
+  */
+
+  def getLaTeX(): String = {
+    LatexGenerator.generateLatex(layout, nodeNames, edgeNames)
+  }
 
   def getWidth: Double = layout.getWidth
 
