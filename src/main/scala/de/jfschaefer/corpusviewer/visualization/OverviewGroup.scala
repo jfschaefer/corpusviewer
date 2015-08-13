@@ -102,15 +102,7 @@ class OverviewGroup(iw : InstanceWrapper, previewInterpretations: Set[String], f
 
   cumulativeHeight += 2 * Configuration.previewMargin
 
-
-    /* def findInterpretationKey(value: String): Option[String] = {
-      for ((a, b) <- iw.interpretations) {
-        if (b == value) return Some(a)
-      }
-      None
-    } */
-
-    def getHeight : Double = {
-      cumulativeHeight * scaleY.value
-    }
+  def getHeight : Double = {
+    cumulativeHeight * scaleY.value
+  }
   }
