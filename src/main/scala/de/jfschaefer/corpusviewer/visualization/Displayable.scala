@@ -1,8 +1,8 @@
 package de.jfschaefer.corpusviewer.visualization
 
-import scalafx.beans.property.{DoubleProperty, BooleanProperty}
+import scalafx.beans.property.BooleanProperty
 import scalafx.scene.Node
-import scalafx.scene.input.{MouseEvent, ScrollEvent, ZoomEvent}
+import scalafx.scene.input.{MouseEvent, ScrollEvent}
 import scalafx.scene.shape.{Line, Polygon}
 import scalafx.Includes._
 import scala.collection.mutable
@@ -10,15 +10,18 @@ import scala.collection.mutable
 import de.jfschaefer.corpusviewer.{Util, InstanceWrapper, Main, Configuration}
 
 /*
-    A Displayable is something that can be dragged over the screen.
-    It is associated with some corpus instance.
-    Displayables have a tree-like hierarchy.
+  Most of the code below is for displaying the location lines. Maybe we should put it somewhere else instead.
+  Also, the code for drawing the location lines isn't particularly good yet. At some point, it should be rewritten.
+  I know how it should be implemented - when I have some time, I'll do it.
+*/
 
-    Most of the code below is for displaying the location lines. Maybe we should put it somewhere else instead.
-    Also, the code for drawing the location lines isn't perfect yet - at some point, it should be rewritten.
-    I know how it should be implemented - when I have some time, I'll do it.
- */
 
+
+/** Something that can be dragged over a screen, usually, visualizations
+  *
+  * A Displayable is associated with an instance of the corpus.
+  * Displayables have a tree-like hierarchy, so they can have one parent and arbitrarily many children.
+  */
 trait Displayable extends Node {
   val parentDisplayable : Option[Displayable] = None
   val childDisplayables : mutable.Set[Displayable] = new mutable.HashSet
@@ -26,6 +29,7 @@ trait Displayable extends Node {
   val header : Header = null
   def getIw : InstanceWrapper
 
+  /** Removes this Displayable from the screen */
   def trash(): Unit = {
     removeLocationLines()
     for (child <- childDisplayables) {
@@ -37,6 +41,7 @@ trait Displayable extends Node {
 
   private var interactionDragStartX = 0d
   private var interactionDragStartY = 0d
+  /** Enables interaction with this Displayable, such as zooming and scrolling */
   def enableInteraction(): Unit = {
     //onZoom = {ev : ZoomEvent => Util.handleZoom(this, scale)(ev); toFront()}
     onScroll = {ev : ScrollEvent => Util.handleScroll(this)(ev); toFront(); Util.trashStyleUpdate(this, this); drawLocationLines() }
@@ -98,6 +103,7 @@ trait Displayable extends Node {
   }
 
   val locationLines: mutable.Set[Node] = new mutable.HashSet
+  /** Visualizes the location of this Displayable */
   def drawLocationLines(): Unit = {
     parentDisplayable match {
       case Some(parent) =>

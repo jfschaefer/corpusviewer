@@ -8,12 +8,18 @@ import scalafx.Includes._
 
 import scala.collection.JavaConversions._
 
-/*
-  A good root Displayable, as it displays several interpretations, if they are available
-  and provides menu entries to get each interpretation as a separate child Displayable.
- */
+/** Visualizes several interpretations of an instance
+  *
+  * Every interpretations (including the ones excluded in the overview) can be obtained as a child Displayable
+  * via the menu in the header
+  *
+  * @param iw the instance
+  * @param parentDisp the parent Displayable
+  * @param interpretations the interpretations that shall be included in the overview
+  */
 
-class OverviewDisplayable(iw : InstanceWrapper, parentDisp : Option[Displayable], interpretations: Set[String]) extends Pane with Displayable {
+class OverviewDisplayable(iw : InstanceWrapper, parentDisp : Option[Displayable], interpretations: Set[String])
+                                                                                      extends Pane with Displayable {
   override val parentDisplayable = parentDisp
   override def getIw = iw
 
@@ -25,12 +31,12 @@ class OverviewDisplayable(iw : InstanceWrapper, parentDisp : Option[Displayable]
   // HEADER
   val menu = new RadialMenu {
     displayable = Some(OverviewDisplayable.this)
-    items = new MenuEntryFunction("Trash", () => trash())::
-      new MenuEntryFunction("Children\nToFront", () =>
+    items = new NormalMenuEntryFunction("Trash", () => trash())::
+      new NormalMenuEntryFunction("Children\nToFront", () =>
         for (child <- childDisplayables) {
           child.toFront()
         }
-      )::new MenuEntryFunction("Trash\nChildren", () =>
+      )::new NormalMenuEntryFunction("Trash\nChildren", () =>
         for (child <- childDisplayables) child.trash())::
       Nil
     for (key <- iw.instance.getInputObjects.keySet) {

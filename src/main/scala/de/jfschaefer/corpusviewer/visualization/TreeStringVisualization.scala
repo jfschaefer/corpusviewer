@@ -19,28 +19,36 @@ class TreeStringVisualization(iw : InstanceWrapper, parentDisp : Option[Displaya
   val algObj = instanceMap.get(key)
   assert(algObj.isInstanceOf[Tree[String @unchecked]])
   val tree = algObj.asInstanceOf[Tree[String]]
-  val treePane = new TreePane(tree)
+  var treePane : TreePane = null
+  var wideLayout = false
 
   // HEADER
   val menu = new RadialMenu {
     displayable = Some(TreeStringVisualization.this)
-    items = new MenuEntryFunction("Copy as\nLaTeX", () => {
+    items = new NormalMenuEntryFunction("Copy as\nLaTeX", () => {
       Util.copyIntoClipboard(treePane.getLaTeX())
-    }):: new MenuEntryFunction("Trash", () => trash() )::Nil
+    })::new NormalMenuEntryFunction("Trash", () => trash() )::Nil
   }
   menu.enableInteraction()
   override val header = new Header(iw.getIDForUser + ". " + key, Some(menu))
 
   children.add(header)
+  drawPane()
 
   // CONTENT
-  children.add(treePane)
-  treePane.translateY = header.getHeight
 
-  header.toFront()
-  header.headerWidth.set(treePane.getWidth)
+  /** Creates a new TreePane based on the current settings and replaces the old one with it */
+  def drawPane(): Unit = {
+    if (treePane != null) children.remove(treePane)
+    treePane = new TreePane(tree)
+    children.add(treePane)
+    treePane.translateY = header.getHeight
 
-  updateSize()
+    header.toFront()
+    header.headerWidth.set(treePane.getWidth)
+
+    updateSize()
+  }
 
   def updateSize(): Unit = {
     minHeight = treePane.getHeight * treePane.scaleY.value + header.getHeight

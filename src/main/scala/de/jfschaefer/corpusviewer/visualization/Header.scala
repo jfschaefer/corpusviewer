@@ -6,9 +6,10 @@ import scalafx.beans.property.DoubleProperty
 import scalafx.scene.layout.Pane
 import scalafx.scene.text.Text
 
-/*
-    The header is the top part of a Displayable. It contains a title and a RadialMenu.
- */
+/** Top part of a Displayable. It contains a title and a RadialMenu.
+  * @param textString the title
+  * @param radialMenu the menu
+  */
 
 class Header(textString: String, radialMenu: Option[RadialMenu]) extends Pane {
   val headerWidth = new DoubleProperty()

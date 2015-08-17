@@ -12,6 +12,10 @@ import scala.collection.mutable
 import scala.collection.JavaConversions._
 import scalafx.scene.paint.Color
 
+/** A Pane visualizing a [[de.up.ling.tree.Tree[String]] using [[de.jfschaefer.layeredgraphlayout]]
+ *
+ * @param tree the tree to be visualized
+ */
 class TreePane(tree : de.up.ling.tree.Tree[String]) extends Pane {
   /*
       IDEA: Since Tree[String] key seem to cause problems, use Integer keys instead,
@@ -57,12 +61,7 @@ class TreePane(tree : de.up.ling.tree.Tree[String]) extends Pane {
   val graph = new GraphFX[Integer, Integer](layout, nodeFactory, edgeFactory)
   children.add(graph)
 
-  /* minWidth(graph.getWidth)
-  maxWidth(graph.getWidth)
-  minHeight(graph.getHeight)
-  maxHeight(graph.getHeight)
-  */
-
+  /** Returns the latex representation of the current layout */
   def getLaTeX(): String = {
     LatexGenerator.generateLatex(layout, nodeNames, edgeNames)
   }

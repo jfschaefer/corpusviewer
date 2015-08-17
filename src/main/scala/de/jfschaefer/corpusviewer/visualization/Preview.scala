@@ -5,9 +5,11 @@ import de.jfschaefer.corpusviewer.InstanceWrapper
 import scalafx.beans.property.DoubleProperty
 import scalafx.scene.Node
 
+/** A Node that can be used for preview when scrolling through the corpus */
 trait Preview extends Node {
   val scale = new DoubleProperty()
   def getIw : InstanceWrapper
+  /** Get the actual height (the height property of a Node isn't reliable) */
   def getHeight : Double
 
   var idstyleclass : String = "no_id_assigned"

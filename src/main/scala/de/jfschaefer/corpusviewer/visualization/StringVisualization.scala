@@ -9,10 +9,12 @@ import scalafx.scene.text.Text
 import scalafx.scene.input.ZoomEvent
 import scalafx.Includes._
 
-/*
-    A Displayable for the string interpretation of an instance.
- */
-
+/** A Displayable for objects of a [[de.up.ling.irtg.algebra.StringAlgebra]]
+  *
+  * @param iw the instance containing the object
+  * @param parentDisp the parent Displayable
+  * @param key the name of the string interpretation
+  */
 class StringVisualization(iw : InstanceWrapper, parentDisp : Option[Displayable], key : String) extends Pane with Displayable {
   override val parentDisplayable = parentDisp
   override def getIw = iw
@@ -28,9 +30,9 @@ class StringVisualization(iw : InstanceWrapper, parentDisp : Option[Displayable]
   // HEADER
   val menu = new RadialMenu {
     displayable = Some(StringVisualization.this)
-    items = new MenuEntryFunction("Copy", () => {
+    items = new NormalMenuEntryFunction("Copy", () => {
       Util.copyIntoClipboard(stringRepresentation)
-    })::new MenuEntryFunction("Trash", () => trash() )::Nil
+    })::new NormalMenuEntryFunction("Trash", () => trash() )::Nil
   }
   menu.enableInteraction()
   override val header = new Header(iw.getIDForUser + ". String", Some(menu))

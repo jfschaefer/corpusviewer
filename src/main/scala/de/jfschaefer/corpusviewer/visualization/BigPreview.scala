@@ -5,9 +5,11 @@ import de.jfschaefer.corpusviewer.{Configuration, InstanceWrapper}
 import scalafx.scene.layout.Pane
 
 
-/*
-  A preview that displays several interpretations if they are available.
- */
+/**  Preview node visualizing multiple interpretations
+  *
+  * @param iw the instance
+  * @param interpretations names of the interpretations to be visualized
+  */
 
 class BigPreview(iw : InstanceWrapper, interpretations: Set[String]) extends Pane with Preview {
   override def getIw = iw

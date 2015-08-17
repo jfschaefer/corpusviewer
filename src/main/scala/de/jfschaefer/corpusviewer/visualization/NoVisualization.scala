@@ -5,9 +5,13 @@ import de.jfschaefer.corpusviewer.{Configuration, InstanceWrapper}
 import scalafx.scene.layout.Pane
 import scalafx.scene.text.Text
 
-/*
-    Displayable, when no visualization is available for a certain interpretation.
- */
+/**  Displayable for stating that no visualization is available for a certain interpretation.
+  *
+  * @param iw the instance
+  * @param parentDisp the parent Displayable
+  * @param key the name of the interpretations
+  * @param message the message explaining why there is no visualization
+  */
 
 class NoVisualization(iw : InstanceWrapper, parentDisp : Option[Displayable], key : String,
                        message : String) extends Pane with Displayable{
@@ -23,7 +27,7 @@ class NoVisualization(iw : InstanceWrapper, parentDisp : Option[Displayable], ke
   // HEADER
   val menu = new RadialMenu {
     displayable = Some(NoVisualization.this)
-    items = new MenuEntryFunction("Trash", () => trash())::Nil
+    items = new NormalMenuEntryFunction("Trash", () => trash())::Nil
   }
   menu.enableInteraction()
   override val header = new Header(iw.getIDForUser + ". " + key, Some(menu))

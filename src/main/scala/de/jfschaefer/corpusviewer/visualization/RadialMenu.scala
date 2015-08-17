@@ -10,14 +10,10 @@ import scalafx.Includes._
 import scalafx.scene.shape.Circle
 import scalafx.scene.control.Label
 
+// TODO: Rewrite this code, as it got fairly messy
 
-/*
-    A RadialMenu, that can be provided with a list of MenuEntries.
-    A MenuEntry is either a MenuEntryFunction (in this case a function is called when it is selected)
-    or a MenuEntryDisplayable (in this case a Displayable can be pulled out of the menu).
 
-    TODO: Rewrite this code, as it got fairly messy
- */
+/** A radial menu supporting several kinds of [[de.jfschaefer.corpusviewer.visualization.MenuEntry]]s */
 
 class RadialMenu extends Group {
   var items : List[MenuEntry] = Nil
@@ -126,7 +122,7 @@ class RadialMenu extends Group {
           for ((x, y, i) <- itemPos) {
             if ((x - ev.x) * (x - ev.x) + (y - ev.y) * (y - ev.y) < entryRadius * entryRadius) {
               i match {
-                case MenuEntryFunction(_, f) => f()
+                case f : MenuEntryFunction => f.callFunction()
                 case _ =>
               }
             }
@@ -156,7 +152,7 @@ class RadialMenu extends Group {
           styleClass.clear()
           styleClass.add(i match {
             case MenuEntryDisplayable(_, _, _) => "radialmenu_entry_displayable"
-            case MenuEntryFunction(_, _) => "radialmenu_entry_function"
+            case _ : MenuEntryFunction => "radialmenu_entry_function"
           })
         }
         circ.centerX = math.sin(cumulativeAngle) * (radius.value - entryRadius)
@@ -171,7 +167,7 @@ class RadialMenu extends Group {
           styleClass.clear()
           styleClass.add( i match {
             case MenuEntryDisplayable(_, _, _) => "radialmenu_entry_displayable_text"
-            case MenuEntryFunction(_, _) => "radialmenu_entry_function_text"
+            case _ : MenuEntryFunction => "radialmenu_entry_function_text"
           })
           textAlignment.set(javafx.scene.text.TextAlignment.CENTER)
         }
@@ -207,7 +203,7 @@ class RadialMenu extends Group {
 }
 
 
-
+/** An entry for the [[de.jfschaefer.corpusviewer.visualization.RadialMenu]] */
 abstract class MenuEntry(label: String) {
   var circle: Option[Circle] = None
   def getLabel: String = label
@@ -217,6 +213,12 @@ abstract class MenuEntry(label: String) {
   def setMarkedLayout(): Unit
 }
 
+/** An entry representing a [[de.jfschaefer.corpusviewer.visualization.Displayable]] that can be dragged out
+  *
+  * @param label the label in the menu
+  * @param dispProducer a function creating a new [[de.jfschaefer.corpusviewer.visualization.Displayable]]
+  * @param onRelease a function that is called when the Displayable is released (e.g. for enabling interaction)
+  */
 case class MenuEntryDisplayable(label: String, dispProducer: () => Displayable, onRelease: (Displayable) => Unit) extends MenuEntry(label) {
   // use currying to achieve lazy evaluation
   def getDisplayable: Displayable = dispProducer()
@@ -236,8 +238,9 @@ case class MenuEntryDisplayable(label: String, dispProducer: () => Displayable, 
   }
 }
 
-case class MenuEntryFunction(label: String, function: () => Unit) extends MenuEntry(label) {
-  def callFunction(): Unit = function()
+/** An entry for the [[de.jfschaefer.corpusviewer.visualization.RadialMenu]] representing a function */
+abstract class MenuEntryFunction(label : String) extends MenuEntry(label) {
+  def callFunction(): Unit
 
   override def setNormalLayout(): Unit = {
     getCircle match {
@@ -253,3 +256,44 @@ case class MenuEntryFunction(label: String, function: () => Unit) extends MenuEn
   }
 }
 
+/** A MenuEntryFunction that simply calls a function
+  *
+  * @param label the label for this entry in the menu
+  * @param function the function to be called
+  */
+case class NormalMenuEntryFunction(label: String, function: () => Unit) extends MenuEntryFunction(label) {
+  def callFunction(): Unit = function()
+}
+
+/** A MenuEntryFunction associated with two functions a and b
+  *
+  * Whenever a function is called, the label and the function are switched at the next time.
+  * This way, properties can be activated and deactivated in the menu.
+  *
+  * {{{
+  *   // Let's assume something is initially deactivated.
+  *   val actEntry = new MenuEntryToggleFunction("Activate", "Deactivate", () => { activate() }, () => { deactivate() } )
+  * }}}
+  *
+  * @param labela the first label
+  * @param labelb the alternative label
+  * @param functiona the first function
+  * @param functionb the alternative function
+  */
+case class MenuEntryToggleFunction(labela: String, labelb: String, functiona: () => Unit,
+                                    functionb: () => Unit) extends MenuEntryFunction("") {
+  var state = true
+  override def callFunction(): Unit = {
+    if (state) {
+      functiona()
+    } else {
+      functionb()
+    }
+    state = !state
+  }
+
+  override def getLabel: String = {
+    if (state) labela else labelb
+  }
+
+}

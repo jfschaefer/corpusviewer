@@ -17,12 +17,22 @@ import de.up.ling.irtg.algebra.graph.{SGraph, GraphNode, GraphEdge}
     A Pane that visualizes an SGraph, using de.jfschaefer.layeredgraphlayout
  */
 
-class SGraphPane(sgraph : SGraph, bezier: Boolean = true, alternative: Boolean = true) extends Pane {
+/** A Pane that visualizes an SGraph using [[de.jfschaefer.layeredgraphlayout]]
+ *
+ * @param sgraph the graph to be visualized
+ * @param bezier whether Bezier curves should be used instead of straight line segments
+ * @param iterations number of iterations in the visualization algorithm
+ */
+
+class SGraphPane(sgraph : SGraph, var bezier: Boolean = true, var iterations: Int = 1000) extends Pane {
   styleClass.clear()
   val jgrapht_graph : org.jgrapht.DirectedGraph[GraphNode, GraphEdge] = sgraph.getGraph
-  val ggraph = new gengraph.GenGraph[GraphNode, GraphEdge]()
-  val edgeLabelMap: java.util.Map[GraphEdge, String] = new java.util.HashMap()
-  val nodeLabelMap: java.util.Map[GraphNode, String] = new java.util.HashMap()
+  var largeLayout = false
+
+  // The initial run:
+  var ggraph = new gengraph.GenGraph[GraphNode, GraphEdge]()
+  var edgeLabelMap: java.util.Map[GraphEdge, String] = new java.util.HashMap()
+  var nodeLabelMap: java.util.Map[GraphNode, String] = new java.util.HashMap()
    for (node : GraphNode <- jgrapht_graph.vertexSet) {
      ggraph.addNode(node, node.getLabel.length * 10 + 30, 30)
      nodeLabelMap.put(node, node.getLabel)
@@ -32,22 +42,87 @@ class SGraphPane(sgraph : SGraph, bezier: Boolean = true, alternative: Boolean =
     edgeLabelMap.put(edge, edge.getLabel)
   }
 
-  val pgraph = ggraph.generatePGraph()
-  SGraphPane.addEnergy(pgraph.runSimulatedAnnealing(5000))
-  val lgraphconfig = new lgraph.LGraphConfig
-  val lagraph = pgraph.generateLGraph(lgraphconfig)
+  var pgraph = ggraph.generatePGraph()
+  SGraphPane.addEnergy(pgraph.runSimulatedAnnealing(iterations))
+  var lgraphconfig = new lgraph.LGraphConfig
+  var lagraph = pgraph.generateLGraph(lgraphconfig)
   lagraph.graphPlacement()
-  val layoutconfig = new layout.LayoutConfig
-  val thelayout = lagraph.getLayout(layoutconfig)
+  var layoutconfig = new layout.LayoutConfig
+  layoutconfig.setBezier(bezier)
+  var thelayout = lagraph.getLayout(layoutconfig)
 
-  val graphfx = new GraphFX[GraphNode, GraphEdge](thelayout, new SimpleGraphFXNodeFactory[GraphNode](nodeLabelMap, "graph_node", ""),
+  var graphfx = new GraphFX[GraphNode, GraphEdge](thelayout, new SimpleGraphFXNodeFactory[GraphNode](nodeLabelMap, "graph_node", ""),
                       new SimpleGraphFXEdgeFactory[GraphEdge](layoutconfig, edgeLabelMap, Color.BLACK))
   children.add(graphfx)
+
+
+  /*
+        Methods to re-run the layout algorithm from different points
+   */
+
+  /** Re-runs the node positioning algorithm */
+  def rerunAlgorithm(): Unit = {
+    pgraph.runSimulatedAnnealing(iterations)
+    recreateLGraph()
+  }
+
+  /** Runs the node positioning algorithm 10 times and keeps the best result */
+  def rerunAlgorithm10Times(): Unit = {
+    var pgraphBest = pgraph
+    var score = pgraphBest.runSimulatedAnnealing(iterations)
+    for (i <- 1 to 10) {
+      val newPGraph = ggraph.generatePGraph()
+      val newScore = newPGraph.runSimulatedAnnealing(iterations)
+      if (newScore < score) {
+        pgraphBest = newPGraph
+        score = newScore
+      }
+    }
+    pgraph = pgraphBest
+    recreateLGraph()
+  }
+
+  /** Recreate the LGraph representation from the current pgraph */
+  def recreateLGraph(): Unit = {
+    lgraphconfig = new lgraph.LGraphConfig
+    if (largeLayout) {
+      lgraphconfig.setLayerDistance(121d)
+      lgraphconfig.setGapBetweenNodes(25d)
+      lgraphconfig.setSpecialPaddingA(1d);
+    }
+    lagraph = pgraph.generateLGraph(lgraphconfig)
+    lagraph.graphPlacement()
+    recreateLayout()
+  }
+
+  /** Recreate the Layout from the current lgraph */
+  def recreateLayout(): Unit = {
+    layoutconfig = new layout.LayoutConfig
+    layoutconfig.setBezier(bezier)
+    thelayout = lagraph.getLayout(layoutconfig)
+
+    graphfx = new GraphFX[GraphNode, GraphEdge](thelayout, new SimpleGraphFXNodeFactory[GraphNode](nodeLabelMap, "graph_node", ""),
+      new SimpleGraphFXEdgeFactory[GraphEdge](layoutconfig, edgeLabelMap, Color.BLACK))
+    children.clear()
+    children.add(graphfx)
+  }
 
   def getWidth: Double = thelayout.getWidth
 
   def getHeight: Double = thelayout.getHeight
 
+  /** Sets the number of iterations for the positioning algorithm */
+  def setIterations(iterations: Int): Unit = { this.iterations = iterations }
+
+  /** Sets whether or not Bezier curves should be used */
+  def setBezier(bezier: Boolean): Unit = { this.bezier = bezier }
+
+  /** Sets whether or not a more spacious layout should be used */
+  def setLargeLayout(largeLayout: Boolean): Unit = {
+    this.largeLayout = largeLayout
+  }
+
+  /** Returns the LaTeX representation of the current layout */
   def getLaTeX(): String = {
     LatexGenerator.generateLatex(thelayout, nodeLabelMap, edgeLabelMap)
   }

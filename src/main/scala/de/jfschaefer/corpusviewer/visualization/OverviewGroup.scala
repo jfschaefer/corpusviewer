@@ -8,11 +8,15 @@ import de.up.ling.irtg.algebra.StringAlgebra
 import scalafx.scene.Group
 import scalafx.scene.text.Text
 
-/*
-    A group displaying several interpretations, if they are available.
-    If a graph is too large, it's scaled down.
-    This makes it perfect for preview/overview Displayables.
- */
+/** A Group visualizing several interpretations of an instance if possible.
+  *
+  * Large graphs are scaled down, extremely large graphs would even be skipped.
+  * This makes it perfect for previews etc.
+  *
+  * @param iw the instance
+  * @param previewInterpretations names of the interpretations to be visualized (if possible)
+  * @param forPreview if set to true, the instance's index will be added
+  */
 
 class OverviewGroup(iw : InstanceWrapper, previewInterpretations: Set[String], forPreview : Boolean = false) extends Group {
   val instanceMap = iw.instance.getInputObjects
@@ -57,7 +61,7 @@ class OverviewGroup(iw : InstanceWrapper, previewInterpretations: Set[String], f
       val algObj = instanceMap.get(key)
       assert(algObj.isInstanceOf[SGraph])
       val sgraph: SGraph = algObj.asInstanceOf[SGraph]
-      val graphpane = new SGraphPane(sgraph)
+      val graphpane = new SGraphPane(sgraph, iterations=if (forPreview) 250 else 1500)
       val maxDim = math.max(graphpane.getWidth, graphpane.getHeight)
       // don't show overly huge graphs in preview.
       if (!forPreview || maxDim / Configuration.preferredPreviewWidth < Configuration.previewMaxDownscale) {
@@ -105,4 +109,4 @@ class OverviewGroup(iw : InstanceWrapper, previewInterpretations: Set[String], f
   def getHeight : Double = {
     cumulativeHeight * scaleY.value
   }
-  }
+}
