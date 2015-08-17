@@ -28,6 +28,7 @@ class SGraphPane(sgraph : SGraph, var bezier: Boolean = true, var iterations: In
   styleClass.clear()
   val jgrapht_graph : org.jgrapht.DirectedGraph[GraphNode, GraphEdge] = sgraph.getGraph
   var largeLayout = false
+  var boxed = true
 
   // The initial run:
   var ggraph = new gengraph.GenGraph[GraphNode, GraphEdge]()
@@ -35,6 +36,7 @@ class SGraphPane(sgraph : SGraph, var bezier: Boolean = true, var iterations: In
   var nodeLabelMap: java.util.Map[GraphNode, String] = new java.util.HashMap()
    for (node : GraphNode <- jgrapht_graph.vertexSet) {
      ggraph.addNode(node, node.getLabel.length * 10 + 30, 30)
+     //ggraph.addNode(node, node.getLabel.length * 7 , 16)
      nodeLabelMap.put(node, node.getLabel)
   }
   for (edge : GraphEdge <- jgrapht_graph.edgeSet) {
@@ -59,6 +61,27 @@ class SGraphPane(sgraph : SGraph, var bezier: Boolean = true, var iterations: In
   /*
         Methods to re-run the layout algorithm from different points
    */
+  /** Start from the very beginning */
+  def regenerateGGraph(): Unit = {
+    ggraph = new gengraph.GenGraph[GraphNode, GraphEdge]()
+    edgeLabelMap = new java.util.HashMap()
+    nodeLabelMap = new java.util.HashMap()
+    for (node : GraphNode <- jgrapht_graph.vertexSet) {
+      if (boxed) {
+        ggraph.addNode(node, node.getLabel.length * 10 + 30, 30)
+      } else {
+        ggraph.addNode(node, node.getLabel.length * 7 , 16)
+      }
+      nodeLabelMap.put(node, node.getLabel)
+    }
+    for (edge : GraphEdge <- jgrapht_graph.edgeSet) {
+      ggraph.addEdge(edge, edge.getSource, edge.getTarget)
+      edgeLabelMap.put(edge, edge.getLabel)
+    }
+
+    pgraph = ggraph.generatePGraph()
+    rerunAlgorithm()
+  }
 
   /** Re-runs the node positioning algorithm */
   def rerunAlgorithm(): Unit = {
@@ -101,7 +124,8 @@ class SGraphPane(sgraph : SGraph, var bezier: Boolean = true, var iterations: In
     layoutconfig.setBezier(bezier)
     thelayout = lagraph.getLayout(layoutconfig)
 
-    graphfx = new GraphFX[GraphNode, GraphEdge](thelayout, new SimpleGraphFXNodeFactory[GraphNode](nodeLabelMap, "graph_node", ""),
+    graphfx = new GraphFX[GraphNode, GraphEdge](thelayout, new SimpleGraphFXNodeFactory[GraphNode](nodeLabelMap,
+      if (boxed) "graph_node" else "invisible_rect" , ""),
       new SimpleGraphFXEdgeFactory[GraphEdge](layoutconfig, edgeLabelMap, Color.BLACK))
     children.clear()
     children.add(graphfx)
@@ -120,6 +144,10 @@ class SGraphPane(sgraph : SGraph, var bezier: Boolean = true, var iterations: In
   /** Sets whether or not a more spacious layout should be used */
   def setLargeLayout(largeLayout: Boolean): Unit = {
     this.largeLayout = largeLayout
+  }
+
+  def setBoxed(boxed : Boolean): Unit = {
+    this.boxed = boxed
   }
 
   /** Returns the LaTeX representation of the current layout */

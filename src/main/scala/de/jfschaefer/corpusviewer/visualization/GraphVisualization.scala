@@ -8,7 +8,12 @@ import scalafx.scene.layout.Pane
 import scalafx.scene.input.ZoomEvent
 import scalafx.Includes._
 
-
+/** A Displayable for SGraphs (instances of [[de.up.ling.irtg.algebra.graph.GraphAlgebra]]
+ *
+ * @param iw the instance
+ * @param parentDisp the parent Displayable
+ * @param key the name of the interpretation
+ */
 class GraphVisualization(iw : InstanceWrapper, parentDisp : Option[Displayable], key : String) extends Pane with Displayable {
   override val parentDisplayable = parentDisp
   override def getIw = iw
@@ -33,6 +38,10 @@ class GraphVisualization(iw : InstanceWrapper, parentDisp : Option[Displayable],
       graphpane.setBezier(false); graphpane.recreateLayout(); updateSize()
     }, () => {
       graphpane.setBezier(true); graphpane.recreateLayout(); updateSize()
+    })::new MenuEntryToggleFunction("No Boxes", "Boxes", () => {
+      graphpane.setBoxed(false); graphpane.regenerateGGraph(); updateSize()
+    }, () => {
+      graphpane.setBoxed(true); graphpane.regenerateGGraph(); updateSize()
     })::new MenuEntryToggleFunction("Larger", "Smaller", () => {
       graphpane.setLargeLayout(true); graphpane.recreateLGraph(); updateSize()
     }, () => {
