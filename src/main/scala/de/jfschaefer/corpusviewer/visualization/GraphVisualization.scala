@@ -13,9 +13,6 @@ class GraphVisualization(iw : InstanceWrapper, parentDisp : Option[Displayable],
   override val parentDisplayable = parentDisp
   override def getIw = iw
 
-  scaleX  // <== scale
-  scaleY  // <== scale
-
   setupStyleStuff()
   val instanceMap = iw.instance.getInputObjects
 
@@ -37,9 +34,9 @@ class GraphVisualization(iw : InstanceWrapper, parentDisp : Option[Displayable],
     }, () => {
       graphpane.setBezier(true); graphpane.recreateLayout(); updateSize()
     })::new MenuEntryToggleFunction("Larger", "Smaller", () => {
-      graphpane.setLargeLayout(true); graphpane.recreateLayout(); updateSize()
+      graphpane.setLargeLayout(true); graphpane.recreateLGraph(); updateSize()
     }, () => {
-      graphpane.setLargeLayout(false); graphpane.recreateLayout(); updateSize()
+      graphpane.setLargeLayout(false); graphpane.recreateLGraph(); updateSize()
     }
     )::new MenuEntryToggleFunction("More\nIterations", "Fewer\nIterations", () => {
       graphpane.setIterations(15000); graphpane.rerunAlgorithm(); updateSize()
