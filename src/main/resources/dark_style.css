@@ -67,11 +67,6 @@
    SECTION: VISUALIZATION
  */
 
-/* .displayable {
-  -fx-arc-height: 14px;
-  -fx-arc-width: 14px;
-} */
-
 .trash_alert {
   -fx-effect: dropshadow(three-pass-box, rgba(255, 0, 0, 1.0), 8, 0.5, 0, 0);
   -fx-stroke: red;
@@ -84,6 +79,15 @@
   -fx-stroke-width: 1px
 }
 
+.invisible_rect {
+  -fx-fill: none;
+  -fx-stroke: none;
+}
+
+.graph_node {
+  -fx-fill: rgba(255, 255, 255, 0.5);
+  -fx-stroke: rgba(0, 0, 0, 0.5);
+}
 
 .header_font {
   -fx-font-size: 1.8em;
@@ -95,6 +99,9 @@
   -fx-background-color: rgba(0, 0, 0, 0.5);
 }
 
+/*
+  SECTION: RADIAL MENU
+ */
 
 .radialmenu_expanded_circle {
   -fx-fill: radial-gradient(radius 200px, rgba(187, 187, 187, 0.7) 0%, rgba(255, 255, 255, 0.4) 100%);
@@ -132,11 +139,6 @@
   -fx-font-size: 1.2em;
 }
 
-
-.graph_node {
-  -fx-fill: rgba(255, 255, 255, 0.5);
-  -fx-stroke: rgba(0, 0, 0, 0.5);
-}
 
 /* ID COLORS */
 

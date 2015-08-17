@@ -1,4 +1,3 @@
-
 /*
    SECTION: PREVIEW
  */
@@ -20,45 +19,6 @@
    SECTION: OPEN CORPUS
 */
 
-.open_corpus_file_selected {
-  -fx-fill: lightgray;
-  -fx-stroke-width: 3px;
-  -fx-stroke: gray;
-}
-
-.open_corpus_file_file {
-  -fx-fill: lightgray;
-  -fx-stroke-width: 3px;
-  -fx-stroke: #444488;
-}
-
-.open_corpus_file_dir {
-  -fx-fill: lightgray;
-  -fx-stroke-width: 3px;
-  -fx-stroke: #448844;
-}
-
-.open_corpus_file_error {
-  -fx-fill: #bb8888;
-  -fx-stroke-width: 6px;
-  -fx-stroke: red;
-}
-
-.open_corpus_file_file_l {
-  -fx-font-size: 1.2em;
-}
-
-.open_corpus_file_dir_l {
-  -fx-font-size: 1.2em;
-}
-
-.open_corpus_file_error_l {
-  -fx-font-size: 1.2em;
-}
-
-.open_corpus_pwd {
-  -fx-font-size: 2em;
-}
 
 .open_corpus_phase_font {
   -fx-font-size: 3em;
@@ -68,11 +28,6 @@
 /*
    SECTION: VISUALIZATION
  */
-
-/* .displayable {
-  -fx-arc-height: 14px;
-  -fx-arc-width: 14px;
-} */
 
 .trash_alert {
   -fx-effect: dropshadow(three-pass-box, rgba(255, 0, 0, 1.0), 8, 0.5, 0, 0);
@@ -86,6 +41,15 @@
   -fx-stroke-width: 1px
 }
 
+.graph_node {
+  -fx-fill: rgba(255, 255, 255, 0.5);
+  -fx-stroke: rgba(0, 0, 0, 0.5);
+}
+
+.invisible_rect {
+  -fx-fill: none;
+  -fx-stroke: none;
+}
 
 .header_font {
   -fx-font-size: 1.8em;
@@ -96,6 +60,9 @@
   -fx-background-color: rgba(0, 0, 0, 0.5);
 }
 
+/*
+   SECTION: RADIAL  MENU
+ */
 
 .radialmenu_expanded_circle {
   -fx-fill: radial-gradient(radius 200px, rgba(187, 187, 187, 0.7) 0%, rgba(255, 255, 255, 0.4) 100%);
@@ -134,10 +101,6 @@
 }
 
 
-.graph_node {
-  -fx-fill: rgba(255, 255, 255, 0.5);
-  -fx-stroke: rgba(0, 0, 0, 0.5);
-}
 
 /* ID COLORS */
 
