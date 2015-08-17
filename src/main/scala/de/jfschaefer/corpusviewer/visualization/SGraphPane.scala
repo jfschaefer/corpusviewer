@@ -152,7 +152,7 @@ class SGraphPane(sgraph : SGraph, var bezier: Boolean = true, var iterations: In
 
   /** Returns the LaTeX representation of the current layout */
   def getLaTeX(): String = {
-    LatexGenerator.generateLatex(thelayout, nodeLabelMap, edgeLabelMap)
+    LatexGenerator.generateLatex(thelayout, nodeLabelMap, edgeLabelMap, boxed)
   }
 }
 

@@ -63,7 +63,7 @@ class TreePane(tree : de.up.ling.tree.Tree[String]) extends Pane {
 
   /** Returns the latex representation of the current layout */
   def getLaTeX(): String = {
-    LatexGenerator.generateLatex(layout, nodeNames, edgeNames)
+    LatexGenerator.generateLatex(layout, nodeNames, edgeNames, true)
   }
 
   def getWidth: Double = layout.getWidth
