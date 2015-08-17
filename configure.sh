@@ -20,10 +20,10 @@ function select_theme {
   do
     if [ "$theme" = "Light Theme" ]; then
       switch_to_light_theme
-      exit
+      break
     elif [ "$theme" = "Dark Theme" ]; then
       switch_to_dark_theme
-      exit
+      break
     else
       echo "Invalid theme $theme"
     fi
@@ -39,7 +39,7 @@ function select_gesture_config {
       echo "Invalid input"
     else
       change_property gesture_config_properties "$cf"
-      exit
+      break
     fi
   done
 }
@@ -58,10 +58,10 @@ function change_fullscreen {
   do 
      if [ "$answer" = "Yes" ]; then
        change_property fullscreen true
-       exit
+       break
      elif [ "$answer" = "No" ]; then
        change_property fullscreen false
-       exit
+       break
      else
        echo "Invalid input"
     fi
@@ -74,10 +74,10 @@ function change_trash_zone {
   do 
      if [ "$answer" = "Yes" ]; then
        change_property preview_is_trash_zone true
-       exit
+       break
      elif [ "$answer" = "No" ]; then
        change_property preview_is_trash_zone false
-       exit
+       break
      else
        echo "Invalid input"
     fi
