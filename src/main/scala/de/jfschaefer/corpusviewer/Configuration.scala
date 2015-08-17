@@ -65,6 +65,7 @@ object Configuration {
 
   // behaviour settings
   val previewIsTrashZone = load("preview_is_trash_zone", _.toBoolean)
+  val previewScaling = Class.forName(load("preview_scaling_function", identity)).newInstance().asInstanceOf[AbstractPreviewScalingFunction]
 
   // other settings
   // val openCorpusWizardDefaultConfigFile = load("open_corpus_wizard_default_config_file", identity)
@@ -81,7 +82,8 @@ object Configuration {
      }
 
   val visualizationFactory : AbstractVisualizationFactory = new ConcreteVisualizationFactory
-  val previewScaling: AbstractPreviewScalingFunction = new de.jfschaefer.corpusviewer.preview.PolynomialScalingFunction
+  //val previewScaling: AbstractPreviewScalingFunction =
+  // new de.jfschaefer.corpusviewer.preview.PolynomialScalingFunction
   //val previewScaling: AbstractPreviewScalingFunction = new de.jfschaefer.corpusviewer.preview.ConstantScalingFunction
 
   val radialMenuButtonImage = new Image("file://" + System.getProperty("user.dir") + "/icons/radialmenu.png")
