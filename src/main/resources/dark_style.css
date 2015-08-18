@@ -21,42 +21,6 @@
    SECTION: OPEN CORPUS
 */
 
-.open_corpus_file_selected {
-  -fx-fill: #666666;
-}
-
-.open_corpus_file_file {
-  -fx-fill: #444444;
-}
-
-.open_corpus_file_dir {
-  -fx-fill: #444444;
-}
-
-.open_corpus_file_error {
-  -fx-fill: #444444;
-}
-
-.open_corpus_file_file_l {
-  -fx-font-size: 1.2em;
-  -fx-text-fill: #00bb00;
-}
-
-.open_corpus_file_dir_l {
-  -fx-font-size: 1.2em;
-  -fx-text-fill: #aaaaff;
-}
-
-.open_corpus_file_error_l {
-  -fx-font-size: 1.2em;
-  -fx-text-fill: #ff0000;
-}
-
-.open_corpus_pwd {
-  -fx-font-size: 2em;
-  -fx-fill: #eeeeee;
-}
-
 .open_corpus_phase_font {
   -fx-font-size: 3em;
   -fx-fill: #eeeeee;

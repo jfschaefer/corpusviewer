@@ -7,6 +7,8 @@ import scalafx.scene.image.Image
 
 import de.jfschaefer.corpusviewer.preview.AbstractPreviewScalingFunction
 
+/** Contains a lot of settings, most of which are defined in the file corpusviewer.properties */
+
 object Configuration {
   var properties = new Properties()
   try {
@@ -20,7 +22,7 @@ object Configuration {
 
   // display settings
   val displayScreen = load("display_screen", _.toInt)
-  val gestureConfigProperties = load[String]("gesture_config_properties", {x: String => x})
+  val gestureConfigProperties = load("gesture_config_properties", identity)
   val fullscreen = load("fullscreen", _.toBoolean)
 
   // layout settings
@@ -56,7 +58,7 @@ object Configuration {
   val graphvisualizationCentralizeEdges = load("graphvisualization_centralize_edges", _.toBoolean)
 
   // style settings
-  val stylesheet = load[String]("stylesheet", {x: String => x})
+  val stylesheet = load[String]("stylesheet", identity)
   val backgroundColor = load("background_color", identity)
   val graphColor = load("graph_color", identity)
   val numberOfIds = load("number_of_ids", _.toInt)
@@ -65,26 +67,28 @@ object Configuration {
 
   // behaviour settings
   val previewIsTrashZone = load("preview_is_trash_zone", _.toBoolean)
-  val previewScaling = Class.forName(load("preview_scaling_function", identity)).newInstance().asInstanceOf[AbstractPreviewScalingFunction]
+  val previewScaling = Class.forName(load("preview_scaling_function", identity))
+                                        .newInstance().asInstanceOf[AbstractPreviewScalingFunction]
 
-  // other settings
-  // val openCorpusWizardDefaultConfigFile = load("open_corpus_wizard_default_config_file", identity)
-
-
+  /** Loads a property from the properties file and converts it
+    *
+    * @param name the name of the property
+    * @param conversion the conversion function
+    * @tparam E the target type
+    * @return the converted property
+    */
   def load[E](name: String, conversion: String => E): E =
      try {
        conversion(properties.getProperty(name))
      } catch {
        case exc: Exception =>
-         System.err.println("de.jfschaefer.corpusviewer.Configuration: Couldn't load property " + name + " in corpusviewer.properties")
+         System.err.println("de.jfschaefer.corpusviewer.Configuration: Couldn't load property " +
+                                                                                   name + " in corpusviewer.properties")
          exc.printStackTrace()
          sys.exit(1)
      }
 
   val visualizationFactory : AbstractVisualizationFactory = new ConcreteVisualizationFactory
-  //val previewScaling: AbstractPreviewScalingFunction =
-  // new de.jfschaefer.corpusviewer.preview.PolynomialScalingFunction
-  //val previewScaling: AbstractPreviewScalingFunction = new de.jfschaefer.corpusviewer.preview.ConstantScalingFunction
 
   val radialMenuButtonImage = new Image("file://" + System.getProperty("user.dir") + "/icons/radialmenu.png")
 }

@@ -1,16 +1,16 @@
 package de.jfschaefer.corpusviewer
 
-import de.jfschaefer.corpusviewer.opendialog._ //OpenCorpusDialog
+import de.jfschaefer.corpusviewer.opendialog._
 
 import de.up.ling.gesture.JavaFxAdapter
 
 import scalafx.application.JFXApp
 import scalafx.scene.Scene
-import scalafx.stage.{StageStyle, Screen}
+import scalafx.stage.{Screen, StageStyle}
 import scalafx.Includes._
 
 
-
+/** The main program */
 
 object Main extends JFXApp {
   val corpusScene = new Scene {
@@ -45,9 +45,14 @@ object Main extends JFXApp {
     fullscreen(0)
   }
 
-  //openCorpusScene.root = new OpenCorpusDialog(openCorpus)
   openCorpusScene.root = new OpenCorpusWizard(openCorpus)
 
+  /** Opens a corpus and displays it
+    *
+    * @param instances the instances of the corpus
+    * @param interpretations a map from the interpretation names to the corresponding algebra classes
+    * @param previewInterpretations a subset of the interpretation names, which will be displayed in the preview
+    */
   def openCorpus(instances: Seq[de.up.ling.irtg.corpus.Instance],
                  interpretations: Map[String, String], previewInterpretations: Set[String]): Unit = {
     corpus = new Corpus(instances, interpretations, previewInterpretations)
@@ -58,6 +63,10 @@ object Main extends JFXApp {
 
   def getCorpus:Corpus = corpus
 
+  /** Put stage into fullscreen
+    *
+    * @param displayId the screen on which it shall be displayed
+    */
   def fullscreen(displayId:Int): Unit = {
     val targetScreen = Screen.screens.get(displayId)
     val bounds = targetScreen.getVisualBounds

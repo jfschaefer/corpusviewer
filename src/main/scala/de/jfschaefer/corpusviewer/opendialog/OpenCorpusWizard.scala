@@ -25,11 +25,20 @@ import scalafx.Includes._
 import scala.collection.mutable
 import scala.collection.JavaConversions._
 
+/** A wizard for opening a corpus
+  *
+  * It should be rewritten in a cleaner way at some point.
+  * There is one method for each step of the wizard.
+  *
+  * @param load the function to be called when done
+  */
 class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, String], Set[String]) => Unit) extends Group {
 
+  // Should put some of these into the configuration file at some point
   val PADDING = 15d
   val MEDIUM_WIDTH = 400
-  val defaultFilterRule = "def filter(instance, interpretations):\n\treturn True\n"
+  //val defaultFilterRule = "def filter(instance, interpretations):\n\treturn True\n"
+  val defaultFilterRule = "# The default filter. It accepts all instances.\n\n# The function filter will be called on all instances.\n# Instances for which it returns False will be discarded.\n\n# There are a few example filter rules in the repository.\n\ndef filter(instance, interpretations):\n\treturn True"
   prepareGroup()
 
   val borderPane : BorderPane = new BorderPane
@@ -366,7 +375,7 @@ class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, 
               for (line <- scala.io.Source.fromFile(file).getLines()) {
                 s.append(line.replaceAll("    ", "\t") + "\n")    //TODO: Find more flexible solution - maybe along with a decent editor
               }
-              textArea.setText(s.toString)
+              textArea.setText(s.toString())
             } catch {
               case e : Exception => OpenCorpusUtil.showError("Couldn't load filter rule", e.toString)
             }

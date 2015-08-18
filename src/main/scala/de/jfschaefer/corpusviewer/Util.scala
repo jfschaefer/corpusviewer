@@ -9,7 +9,13 @@ import scalafx.scene.input.{ZoomEvent, ScrollEvent}
 import java.awt.datatransfer.{StringSelection, Clipboard}
 import java.awt.Toolkit
 
+/** A diverse collection of usefule functions */
 object Util {
+  /** Creates a function that handles zoom events for some node
+    *
+    * @param node the node
+    * @return the function that handles the events
+    */
   def handleZoom(node: Node): ZoomEvent => Unit = {
     ev: ZoomEvent => {
       val bounds = node.boundsInLocal.value
@@ -28,6 +34,12 @@ object Util {
     }
   }
 
+  /** Creates a function that handles zoom events for some node
+    *
+    * @param node the node
+    * @param scale the BooleanProperty to be set instead of the node's scale itself
+    * @return the function that handles the events
+    */
   def handleZoom(node: Node, scale: DoubleProperty): ZoomEvent => Unit = {
     ev: ZoomEvent => {
       val bounds = node.boundsInLocal.value
@@ -46,6 +58,12 @@ object Util {
     }
   }
 
+  /** Creates a function handling ZoomEvents for a Displayable
+   *
+   * @param d the Displayable
+   * @param content the node that shall be scaled (we don't scale the entire Displayable)
+   * @return the function
+   */
   def dispHandleZoom(d : Displayable, content : Node): ZoomEvent => Unit = {
     ev: ZoomEvent => {
       d.toFront()
@@ -79,6 +97,11 @@ object Util {
     }
   }
 
+  /** Returns a function handling the ScrollEvents for a Node by translating it accordingly
+    *
+    * @param node the node
+    * @return the function
+    */
   def handleScroll(node: Node): ScrollEvent => Unit = {
     ev: ScrollEvent => {
       node.translateX = node.translateX.value + ev.deltaX
@@ -87,6 +110,11 @@ object Util {
     }
   }
 
+  /** Updates the style of a Displayable depending on whether or not it is over some trash area
+   *
+   * @param displayable the displayable
+   * @param styleNode the node which gets the style
+   */
   def trashStyleUpdate(displayable: Displayable, styleNode: Node):Unit = {
     if (Main.getCorpus.trash.isOverTrash(displayable)) {
       while (styleNode.styleClass.contains("no_trash_alert")) styleNode.styleClass.remove(styleNode.styleClass.indexOf("no_trash_alert"))
@@ -97,6 +125,10 @@ object Util {
     }
   }
 
+  /** Trashes a Displayable, if it is over the trash area
+    *
+    * @param displayable the displayable
+    */
   def trashIfRequired(displayable: Displayable):Unit = {
     if (Main.getCorpus.trash.isOverTrash(displayable)) {
       // displayable.getIw.releaseId()
@@ -105,6 +137,10 @@ object Util {
     }
   }
 
+  /** Copies a String into the clipboard
+    *
+    * @param string the string
+    */
   def copyIntoClipboard(string : String): Unit = {
     val selection = new StringSelection(string)
     val clipboard : Clipboard = Toolkit.getDefaultToolkit.getSystemClipboard

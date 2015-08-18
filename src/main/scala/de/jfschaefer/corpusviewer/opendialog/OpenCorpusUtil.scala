@@ -5,7 +5,13 @@ import scalafx.scene.control._
 
 import de.up.ling.tclup.perf.alto.{CorpusFromDb, GrammarMetadata}
 
+/** A collection of useful functions for a dialog for opening a corpus */
 object OpenCorpusUtil {
+  /** Get a description for GrammarMetadata
+    *
+    * @param grammarMetadata the meta data
+    * @return the description
+    */
   def stringFromMeta(grammarMetadata: GrammarMetadata): String = {
     val s = new StringBuilder
     s.append("name:\t")
@@ -24,6 +30,11 @@ object OpenCorpusUtil {
     s.toString()
   }
 
+  /** Get a description for corpus metadata
+    *
+    * @param corpusMeta the meta data
+    * @return the description
+    */
   def stringFromMeta(corpusMeta: CorpusFromDb#CorpusMetadata): String = {
     val s = new StringBuilder
     s.append("name:\t")
@@ -43,6 +54,11 @@ object OpenCorpusUtil {
     s.toString()
   }
 
+  /** Displays an error message
+    *
+    * @param head the title
+    * @param body the message
+    */
   def showError(head : String, body : String): Unit = {
     val alert = new Alert(AlertType.Error)
     alert.setHeaderText(head)

@@ -9,9 +9,10 @@ import scalafx.scene.input.{MouseEvent, ScrollEvent}
 import scalafx.scene.shape.Rectangle
 import scalafx.Includes._
 
-/*
-  Displays an interval of the corpus for preview. Sentences can be dragged out for further inspection
- */
+/** Displays an interval of the corpus for preview. Sentences can be dragged out for further inspection
+  *
+  * @param corpus the corpus
+  */
 
 class PreviewGroup(corpus: Corpus) extends Group {
   // Due to the desired generality (arbitrary scaling function, varying heights of previews within one corpus),
@@ -46,6 +47,7 @@ class PreviewGroup(corpus: Corpus) extends Group {
   var c_bottom = 0d
   var c_top = 0d
 
+  /** update variables about the displayed interval (start, end, length, ...) */
   def updateVars():Unit = {
     p_totalHeight = height.value
     c_totalHeight = p_totalHeight / Configuration.previewScale //* f_scaling.reciprocalIntegralFromMinusOne(1)
@@ -85,7 +87,6 @@ class PreviewGroup(corpus: Corpus) extends Group {
         }
       case Some(i) => i_top = i
     }
-    //if (i_top > 0) i_top -= 1
 
     // iterate over all the nodes to be displayed
     var i_it = i_top
@@ -124,6 +125,7 @@ class PreviewGroup(corpus: Corpus) extends Group {
 
   enableInteraction()
 
+  /** Enables the interaction, i.e. scrolling and dragging out */
   def enableInteraction(): Unit = {
     // Using the same notation as in update()
     onScrollStarted = { ev: ScrollEvent =>
@@ -233,13 +235,12 @@ class PreviewGroup(corpus: Corpus) extends Group {
             node.getIw.releaseId()
           }
           Util.trashStyleUpdate(node, node)
-        case None => {
+        case None =>
           updateVars()
           val p_yPos = ev.y
           val s_pos: Double = f_scaling.normalizedIntegralInverse(p_yPos / p_totalHeight)
           val c_newY: Double = (1d + s_pos) * c_totalHeight * 0.5 + c_top
           corpus.offset.set(corpus.offset.value - (c_newY - c_prevDragY)) // minus as direction reversed
-        }
       }
       p_dragLast = (ev.x, ev.y)
       ev.consume()

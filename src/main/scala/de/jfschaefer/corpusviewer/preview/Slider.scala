@@ -9,9 +9,7 @@ import scalafx.scene.input.MouseEvent
 
 import scalafx.Includes._
 
-/*
-  A simple slider. The JavaFX slider is really annoying when it comes to resizing, scaling and absolute placement.
- */
+/**A simple slider. The JavaFX slider is really annoying when it comes to resizing, scaling and absolute placement. */
 
 class Slider extends Pane {
   prefWidth = Configuration.sliderWidth

@@ -7,8 +7,11 @@ import scalafx.scene.Group
 import scala.collection.JavaConversions._
 
 
-/*
-   Both, the Corpus itself, and the GUI component for scrolling through it
+/** Both, the Corpus itself, and the GUI component for scrolling through it
+ *
+ * @param instances the instances of the corpus
+ * @param interpretations a map of interpretation names to String representations of the corresponding algebra classes
+ * @param previewInterpretations set of interpretations that shall be displayed in the preview (if possible)
  */
 
 class Corpus(instances: Seq[de.up.ling.irtg.corpus.Instance], interpretations: Map[String, String],
@@ -32,7 +35,7 @@ class Corpus(instances: Seq[de.up.ling.irtg.corpus.Instance], interpretations: M
       } else {
         iw.corpusOffsetStart = iws (index - 1).corpusOffsetEnd + Configuration.previewMargin
       }
-      iw.corpusOffsetEnd = iw.corpusOffsetStart + iw.preview.getHeight // iw.preview.boundsInLocal.value.getHeight
+      iw.corpusOffsetEnd = iw.corpusOffsetStart + iw.preview.getHeight
       index += 1
     }
     index - 1
@@ -66,10 +69,14 @@ class Corpus(instances: Seq[de.up.ling.irtg.corpus.Instance], interpretations: M
   children.add(trash)
 
 
+  /** Maps a pixel offset to the index corresponding index, or the following index, if it falls into a gap.
+    *
+    * @param pos the pixel offset
+    * @return the index
+    */
   def getNextIndex(pos: Double): Option[Int] = {
-    // some kind of a binary search, returns the index of the instance corresponding to pos, or the first instance
-    // after pos, if it falls into a gap
-    // It's easy to find a more efficient search (as the distribution is very predictable), but that's not urgent
+    // some kind of a binary search.
+    // It's easy to find a more efficient search algorithm (as the distribution is very predictable), but that's not urgent
     var left = 0
     var right = lastIndex
     while (left != right) {
@@ -95,7 +102,11 @@ class Corpus(instances: Seq[de.up.ling.irtg.corpus.Instance], interpretations: M
     }
   }
 
-  //returns the index corresponding to the corpus offset pos
+  /** get the index of an instance corresponding to a pixel offset
+    *
+    * @param pos the pixel offset
+    * @return the index, if there is a corresponding instance.
+    */
   def getIndex(pos: Double): Option[Int] = {
     getNextIndex(pos) match {
       case Some(i) =>

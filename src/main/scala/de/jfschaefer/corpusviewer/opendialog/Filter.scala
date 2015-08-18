@@ -10,7 +10,13 @@ import org.python.util.PythonInterpreter
 import scalafx.scene.control.Alert
 import scalafx.scene.control.Alert.AlertType
 
+/** Provides functions for filtering */
 object Filter {
+  /** Creates a Filter using Jython
+    *
+    * @param s the filter code
+    * @return the filter
+    */
   def createFromJython(s: String): FilterResult = {
     try {
       FilterOk(new FilterTrait {
@@ -25,7 +31,7 @@ object Filter {
             if (isError) {
               val alert = new Alert(AlertType.Error)
               alert.setHeaderText("Error in filter rule")
-              alert.setContentText(str.toString)
+              alert.setContentText(str.toString())
               alert.showAndWait()
             }
             str.clear()
@@ -43,13 +49,12 @@ object Filter {
             result = interpreter.eval("filter(variablenamethatwillnotbeusedinthefilterrules_instance," +
               "variablenamethatwillnotbeusedinthefilterrules_interpretations)").asInstanceOf[PyInteger].asInt() != 0
           } catch {
-            case e : PyException => {
+            case e : PyException =>
               val alert = new Alert(AlertType.Error)
               alert.setHeaderText("PyException")
               alert.setContentText(e.toString)
               alert.showAndWait()
               throw new FilterException
-            }
           }
           err.tryAlert()
           result
@@ -61,15 +66,24 @@ object Filter {
   }
 }
 
+/** An exception in the filter */
 class FilterException extends RuntimeException
 
+/** The result of creating a filter (either success and a filter, or failure and an error message) */
 abstract class FilterResult
 
+/** A filter */
 case class FilterOk(filter: FilterTrait) extends FilterResult
 
+/** An error message */
 case class FilterErr(error: String) extends FilterResult
 
-
+/** A filter */
 trait FilterTrait {
+  /** The only thing a filter has to do: Assess instances
+    *
+    * @param instance the instance to be assessed
+    * @return true, if the instance is accepted, otherwise false
+    */
   def assess(instance: Instance): Boolean
 }

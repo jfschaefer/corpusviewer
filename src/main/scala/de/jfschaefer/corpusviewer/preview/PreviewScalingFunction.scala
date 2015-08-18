@@ -1,35 +1,64 @@
 package de.jfschaefer.corpusviewer.preview
 
-/*
-  This functions are used in the preview group for the scaling of the preview images.
- */
-
+/** A function that can be used in the preview group for the scaling of the preview images */
 abstract class AbstractPreviewScalingFunction {
-  // The actual scaling function (function(x) is the scaling factor for a Displayable at position x)
-  // The range [-1, 1] corresponds to the screen height
-  // Only makes sense if the range is non-negative
-  // Other code probably assumes that the function is symmetric wrt x = 0
-  // The integral over [-1, 1] should be 2, if the margins between the images are supposed to be correct
+  /** The actual scaling function (function(x) is the scaling factor for a Displayable at position x)
+    * The range [-1, 1] corresponds to the screen height
+    * Other code probably assumes that the function is symmetric wrt x = 0
+    * Obviously, the value range has to be non-negative (for x in [-1, 1])
+    * The integral over [-1, 1] should be 2, otherwise the margins between the previews won't be correct
+    *
+    * @param x x
+    * @return f(x)
+    */
   def function(x: Double): Double
 
-  // The integral of the function
+  /** The integral over the function
+    *
+    * @param x x
+    * @return integral from a to x over function(x), where a is some constant
+    */
   def integral(x: Double): Double
 
-  // The normalized integral, i.e. normalizedIntegral(-1) = 0 and normalizedIntegral(1) = 1
+  /** The normalized integral
+    *
+    * transformation of the integral such that normalizedIntegral(-1) = 0 and normalizedIntegral(1) = 1
+    *
+    * @param x x
+    * @return the normalized integral of x
+    */
   def normalizedIntegral(x: Double): Double = {
     val at_x0 = integral(-1d)
     val total = integral(1d) - at_x0
     (integral(x) - at_x0) / total
   }
 
+  /** inverse of the normalizedIntegral
+    *
+    * The inverse exists over [-1, 1], as function(x) is non-negative for all x in [-1, 1]
+    *
+    * @param x x
+    * @return y such that normalizedIntegral(y) - x = 0
+    */
   def normalizedIntegralInverse(x: Double): Double = {
     // result should be in the range [-2, 2] (actually [-1, 1], but let's accept one more iteration to be safe)
-    // idea: Find y such that normalizedIntegral(y) - x = 0
     secantMethod(-2, 2, normalizedIntegral(_) - x, 40)
   }
 
-  println(secantMethod(3.0, 4.0, math.sin, 25))
+  assert(secantMethod(3.0, 4.0, math.sin, 25) <= 3.142)
+  assert(secantMethod(3.0, 4.0, math.sin, 25) >= 3.141)
 
+  /** A simple implementation of the secant method
+    *
+    * Returns a value x, a0 < x < b0, such that approximately f(x) = 0
+    * Preconditions: a0 < b0, f smooth, f(a0) * f(b0) < 0
+    *
+    * @param a0 the interval start
+    * @param b0 the interval end
+    * @param f the function
+    * @param maxIter the maximal number of iterations
+    * @return x
+    */
   def secantMethod(a0: Double, b0: Double, f: Double => Double, maxIter: Int) : Double = {
     val epsilon = 1e-12
     var a = a0
@@ -46,12 +75,14 @@ abstract class AbstractPreviewScalingFunction {
   }
 }
 
+/** Constant scaling */
 class ConstantScalingFunction extends AbstractPreviewScalingFunction {
   override def function(x: Double): Double = 1d
   override def integral(x: Double): Double = x
   //override def reciprocalIntegral(x: Double): Double = x
 }
 
+/** Polynomial scaling */
 class PolynomialScalingFunction extends AbstractPreviewScalingFunction {
   override def function(x: Double): Double = (2/1.3) * (if (x < -1 || x > 1) 0.25 else 1 - (x*x) * (1.5 - 0.75 * x*x))
   override def integral(x: Double): Double = (2/1.3) * (
