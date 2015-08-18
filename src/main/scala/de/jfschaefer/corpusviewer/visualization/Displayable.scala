@@ -44,7 +44,21 @@ trait Displayable extends Node {
   /** Enables interaction with this Displayable, such as zooming and scrolling */
   def enableInteraction(): Unit = {
     //onZoom = {ev : ZoomEvent => Util.handleZoom(this, scale)(ev); toFront()}
-    onScroll = {ev : ScrollEvent => Util.handleScroll(this)(ev); toFront(); Util.trashStyleUpdate(this, this); drawLocationLines() }
+    onScroll = {ev : ScrollEvent =>
+      for (child <- childDisplayables) {
+        Util.handleScroll(child)(ev)
+      }
+      Util.handleScroll(this)(ev)
+      toFront()
+      Util.trashStyleUpdate(this, this)
+      drawLocationLines()
+    }
+
+    onScrollFinished = {ev : ScrollEvent =>
+      Util.trashIfRequired(this)
+      toFront()
+      removeLocationLines()
+    }
 
     if (header != null) {
       header.onMousePressed = { ev: MouseEvent =>
@@ -76,7 +90,6 @@ trait Displayable extends Node {
       }
     }
 
-    onScrollFinished = {ev : ScrollEvent => Util.trashIfRequired(this); toFront(); removeLocationLines() }
   }
 
   var idstyleclass : String = "no_id_assigned"
