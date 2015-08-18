@@ -10,7 +10,7 @@ import scalafx.scene.layout.Pane
 
 import scala.collection.mutable
 import scala.collection.JavaConversions._
-import scalafx.scene.paint.Color
+import javafx.scene.paint.Color
 
 /** A Pane visualizing a [[de.up.ling.tree.Tree[String]] using [[de.jfschaefer.layeredgraphlayout]]
  *
@@ -57,7 +57,7 @@ class TreePane(tree : de.up.ling.tree.Tree[String]) extends Pane {
   }
 
   val nodeFactory = new SimpleGraphFXNodeFactory[Integer](nodeNames, "graph_node", "")
-  val edgeFactory = new SimpleGraphFXEdgeFactory[Integer](layoutconfig, edgeNames, Color.Black)
+  val edgeFactory = new SimpleGraphFXEdgeFactory[Integer](layoutconfig, edgeNames, Color.BLACK)
   val graph = new GraphFX[Integer, Integer](layout, nodeFactory, edgeFactory)
   children.add(graph)
 

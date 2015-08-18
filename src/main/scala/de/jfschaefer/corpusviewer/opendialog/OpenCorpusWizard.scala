@@ -14,8 +14,9 @@ import org.antlr.v4.runtime.ANTLRInputStream
 import scalafx.collections.ObservableBuffer
 import scalafx.event.ActionEvent
 import scalafx.geometry.Pos
-import scalafx.scene.control.Alert.AlertType
+import javafx.scene.control.Alert.AlertType
 import scalafx.scene.control._
+import javafx.scene.control.Alert
 import scalafx.scene.layout.{HBox, VBox, BorderPane}
 import scalafx.scene.{Group, Node, Scene}
 import scalafx.scene.text.Text
@@ -167,7 +168,7 @@ class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, 
             trimmed match {
               case iregex(key, value) => interpretationsTmp.put(key, value)
               case _ =>
-                val alert = new Alert(AlertType.Warning)
+                val alert = new Alert(AlertType.WARNING)
                 alert.setHeaderText("Warning: Couldn't parse line in interpretations file (skipping it)")
                 alert.setContentText(s"Line:\n$line")
                 alert.showAndWait()
