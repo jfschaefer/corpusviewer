@@ -7,8 +7,8 @@ import de.up.ling.irtg.corpus.Instance
 import org.python.core.{PyException, PyInteger}
 import org.python.util.PythonInterpreter
 
-import scalafx.scene.control.Alert
-import scalafx.scene.control.Alert.AlertType
+import javafx.scene.control.Alert
+import javafx.scene.control.Alert.AlertType
 
 /** Provides functions for filtering */
 object Filter {
@@ -29,7 +29,7 @@ object Filter {
           def tryAlert(): Boolean = {
             val isError = str.nonEmpty
             if (isError) {
-              val alert = new Alert(AlertType.Error)
+              val alert = new Alert(AlertType.ERROR)
               alert.setHeaderText("Error in filter rule")
               alert.setContentText(str.toString())
               alert.showAndWait()
@@ -50,7 +50,7 @@ object Filter {
               "variablenamethatwillnotbeusedinthefilterrules_interpretations)").asInstanceOf[PyInteger].asInt() != 0
           } catch {
             case e : PyException =>
-              val alert = new Alert(AlertType.Error)
+              val alert = new Alert(AlertType.ERROR)
               alert.setHeaderText("PyException")
               alert.setContentText(e.toString)
               alert.showAndWait()

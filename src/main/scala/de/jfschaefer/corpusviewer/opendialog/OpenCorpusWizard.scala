@@ -13,7 +13,7 @@ import org.antlr.v4.runtime.ANTLRInputStream
 
 import scalafx.collections.ObservableBuffer
 import scalafx.event.ActionEvent
-import scalafx.geometry.Pos
+import javafx.geometry.Pos
 import javafx.scene.control.Alert.AlertType
 import scalafx.scene.control._
 import javafx.scene.control.Alert
@@ -87,7 +87,7 @@ class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, 
     nextButton.disable = true
 
     val vbox = new VBox {
-      alignment = Pos.Center
+      alignment = Pos.CENTER
       spacing = 15
     }
 
@@ -117,7 +117,7 @@ class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, 
     prevButton.disable = false
     nextButton.disable = corpusFile == null || interpretationsFile == null
     val vbox = new VBox {
-      alignment = Pos.Center
+      alignment = Pos.CENTER
       spacing = 15
     }
 
@@ -208,7 +208,7 @@ class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, 
     prevButton.disable = false
     nextButton.disable = configFile == null
     val vbox = new VBox {
-      alignment = Pos.Center
+      alignment = Pos.CENTER
       spacing = 15
     }
     val textField = new Text("The configuration file:\n"+configFile)
@@ -253,7 +253,7 @@ class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, 
     var componentsSet = 0
 
     val vbox = new VBox {
-      alignment = Pos.Center
+      alignment = Pos.CENTER
       spacing = 15
     }
 
@@ -352,18 +352,19 @@ class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, 
     prevButton.disable = false
 
     val vbox = new VBox {
-      alignment = Pos.Center
+      alignment = Pos.CENTER
       spacing = 15
     }
 
     val label = new Label("Filter rule:") { minWidth <== stage.width - 2 * PADDING }
-    val textArea = new TextArea(filterRule) {
+    val textArea = new TextArea() {
       minWidth <== stage.width - 2 * PADDING
       maxWidth <== stage.width - 2 * PADDING
       wrapText = false  //after all, it's code
       minHeight = 300
       maxHeight = 300
     }
+    textArea.setText(filterRule)
     vbox.children.add(label)
     vbox.children.add(textArea)
     vbox.children.add(Button.sfxButton2jfx(new Button("Load filter rule from file") {
@@ -433,7 +434,7 @@ class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, 
 
     val recWidth = stage.getWidth - 2 * PADDING
     val vbox = new VBox {
-      alignment = Pos.Center
+      alignment = Pos.CENTER
       spacing = 15
     }
 
