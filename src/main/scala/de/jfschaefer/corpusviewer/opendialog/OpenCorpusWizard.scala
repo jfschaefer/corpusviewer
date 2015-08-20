@@ -39,7 +39,7 @@ class OpenCorpusWizard(load: (Seq[de.up.ling.irtg.corpus.Instance], Map[String, 
   val PADDING = 15d
   val MEDIUM_WIDTH = 400
   //val defaultFilterRule = "def filter(instance, interpretations):\n\treturn True\n"
-  val defaultFilterRule = "# The default filter. It accepts all instances.\n\n# The function filter will be called on all instances.\n# Instances for which it returns False will be discarded.\n\n# There are a few example filter rules in the repository.\n\ndef filter(instance, interpretations):\n\treturn True"
+  val defaultFilterRule = "# The default filter. It accepts all instances.\n#\n# The function filter will be called on all instances.\n# Instances for which it returns False will be discarded.\n#\n# There are a few example filter rules in the repository.\n\ndef filter(instance, interpretations):\n\treturn True"
   prepareGroup()
 
   val borderPane : BorderPane = new BorderPane
