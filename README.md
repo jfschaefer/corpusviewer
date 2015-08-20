@@ -1,3 +1,11 @@
+# THIS REPOSITORY HAS BEEN MOVED
+
+You can find it at https://bitbucket.org/tclup/corpusviewer
+
+&nbsp;
+
+&nbsp;
+
 # README
 
 The corpusviewer is a tool to view corpora in the IRTG format (more about IRTGs at http://www.ling.uni-potsdam.de/staff/koller?id=irtg-11).
