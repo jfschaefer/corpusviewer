@@ -42,6 +42,8 @@ class ConcreteVisualizationFactory extends AbstractVisualizationFactory {
       new GraphVisualization(iw, parentDisplayable, key)
     } else if (className == "de.up.ling.irtg.algebra.BinarizingTreeWithAritiesAlgebra") {
       new TreeStringVisualization(iw, parentDisplayable, key)
+    } else if (className == "de.up.ling.irtg.algebra.TreeAlgebra") {
+      new TreeStringVisualization(iw, parentDisplayable, key)
     } else {
       new NoVisualization(iw, parentDisplayable, key, "Sorry, visualizations for objects of " + className + " aren't supported yet")
     }
